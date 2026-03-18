@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voleybol Day Pro | Canlı Veri Portalı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --brand-primary: #6366f1;
+            --brand-secondary: #f43f5e;
+            --brand-dark: #1e1b4b;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #f8fafc; 
+            scroll-behavior: smooth;
+        }
+
+        .match-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 2.5rem; 
+        }
+        
+        .match-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+
+        .sticky-header { 
+            position: sticky; 
+            top: 0; 
+            z-index: 50; 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .status-btn.active {
+            background-color: white;
+            color: var(--brand-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .team-logo-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #f1f5f9;
+            flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            position: relative;
+        }
+
+        .team-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+            z-index: 2;
+            position: relative;
+            background: white;
+        }
+
+        .fallback-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            z-index: 1;
+            background: #f8fafc;
+        }
+
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(15, 23, 42, 0.8); 
+            z-index: 100; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 1.5rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .live-pulse {
+            position: relative;
+        }
+        .live-pulse::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            background: currentColor;
+            opacity: 0.4;
+            animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-900">
+
+<div id="loading-overlay" class="fixed inset-0 bg-slate-50 z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300">
+    <div class="relative w-24 h-24">
+        <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+        <i class="fas fa-volleyball-ball absolute inset-0 flex items-center justify-center text-indigo-600 text-3xl animate-bounce"></i>
+    </div>
+    <div class="text-center">
+        <h2 class="text-2xl font-black text-slate-800 mb-1 tracking-tighter uppercase">Voleybol Day Pro</h2>
+        <p class="text-sm text-slate-500 font-medium" id="loading-text">Veriler Senkronize Ediliyor...</p>
+    </div>
+</div>
+
+<div id="app" class="max-w-[1600px] mx-auto min-h-screen pb-20">
+    <header class="bg-indigo-950 text-white pt-16 pb-28 px-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[700px] h-[700px] bg-indigo-500 rounded-full opacity-10 blur-[130px] -mr-48 -mt-48"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8 container mx-auto">
+            <div class="space-y-4">
+                <h1 class="text-5xl md:text-7xl font-black tracking-tighter">
+                    Voleybol <span class="text-indigo-400">Day</span> Pro
+                </h1>
+                <p class="text-indigo-200/70 font-medium text-lg max-w-lg">Takım odaklı canlı veri ve paylaşım portalı.</p>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="bg-white/5 backdrop-blur-xl p-6 rounded-[2.5rem] border border-white/10 shadow-2xl min-w-[140px] text-center">
+                    <span class="block text-[10px] uppercase font-bold text-indigo-300 tracking-widest mb-1">Maç Sayısı</span>
+                    <span id="match-count-badge" class="text-4xl font-black">0</span>
+                </div>
+                <button onclick="fetchData()" class="bg-white text-indigo-950 p-7 rounded-[2.5rem] hover:bg-indigo-50 transition-all group shadow-xl active:scale-95">
+                    <i class="fas fa-sync-alt text-2xl group-active:rotate-180 transition-transform duration-500"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="-mt-14 px-4 container mx-auto">
+        <div class="sticky-header bg-white/95 shadow-2xl shadow-indigo-900/5 rounded-[3rem] p-5 md:p-10 border border-white flex flex-col gap-8">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div class="flex bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar">
+                    <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap">Hepsi</button>
+                    <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
+                    <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
+                </div>
+
+                <div class="flex-1 w-full max-w-2xl relative group">
+                    <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="team-search" oninput="handleSearch(this.value)" placeholder="Takım veya lig ara..." 
+                           class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-2xl py-4.5 pl-14 pr-6 text-sm font-semibold outline-none transition-all">
+                </div>
+
+                <div class="hidden md:flex items-center gap-4 bg-indigo-50 px-6 py-4 rounded-2xl border border-indigo-100">
+                    <i class="fas fa-calendar-day text-indigo-600"></i>
+                    <span id="current-date-text" class="font-bold text-indigo-950 uppercase tracking-tight">--.--.----</span>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-6">
+                <div id="date-tabs" class="flex gap-3 overflow-x-auto w-full no-scrollbar pb-1"></div>
+            </div>
+            
+            <div id="quick-filters" class="flex flex-wrap gap-2 border-t border-slate-100 pt-6 empty:hidden">
+                <div class="flex flex-wrap gap-2 items-center" id="venue-chips"></div>
+            </div>
+        </div>
+    </div>
+
+    <main id="match-container" class="mt-12 px-4 container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></main>
+    
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-40 text-slate-300">
+        <i class="fas fa-volleyball-ball text-8xl mb-6 opacity-10"></i>
+        <p class="font-bold text-xl tracking-tight">Eşleşen maç bulunamadı.</p>
+    </div>
+</div>
+
+<!-- WhatsApp Not Modalı -->
+<div id="whatsapp-modal" class="modal-overlay">
+    <div class="modal-content shadow-2xl">
+        <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+        <div class="mb-6">
+            <h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter mb-2">WhatsApp'ta Paylaş</h3>
+        </div>
+        <div class="relative">
+            <textarea id="whatsapp-note" rows="4" placeholder="Maç hakkında bir şeyler yazın (isteğe bağlı)..." 
+                      class="w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-100 focus:bg-white rounded-2xl p-4 text-sm font-semibold outline-none transition-all resize-none mb-4"></textarea>
+        </div>
+        <button id="whatsapp-send-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-green-100">
+            <i class="fab fa-whatsapp text-2xl"></i> PAYLAŞ
+        </button>
+    </div>
+</div>
+
+<script>
+    const SHEET_ID = '1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic';
+    const MATCHES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+    const LOGOS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=logolar`;
+
+    const CONSTANT_LOGOS = {
+        "fenerbahçe": "https://upload.wikimedia.org/wikipedia/tr/8/86/Fenerbah%C3%A7e_SK.png",
+        "altınyurt": "https://volleybox.net/media/upload/teams/big_1738135332HXY9f.png",
+        "istanbulgençlik": "https://kaltaltekma.com/fs/file/kalt/sk.kalt/team/7/%C4%B0stanbul-Genclik-Spor.png",
+        "istanbuldinamikyıldız": "https://i.ibb.co/XrnZzHpt/image-5d5159.png",
+        "istanbulvoleybol": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsD8IIcspm7enQ5M0RCafDgCrqtIwELl65rg&s",
+        "istanbulalpspor": "https://volleybox.net/media/upload/teams/big_1739362957CMG3q.png",
+        "güzelyaşam": "https://volleybox.net/media/upload/teams/big_1756371499s9PAo.png",
+        "beylikdüzüvoleybol": "https://volleybox.net/media/upload/teams/1763730802sA6Gu.png",
+        "gökspor": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaX4FBAECEqrOBwGQ0VVskBl6KOiV-x7i-zA&s",
+        "geleceğedönüş": "https://volleybox.net/media/upload/teams/big_1755074095wU74u.png"
+    };
+
+    let state = {
+        allMatches: [],
+        logoMap: {},
+        currentDate: "",
+        selectedStatus: "all",
+        searchQuery: "",
+        selectedVenue: null,
+        loading: true,
+        currentSharingMatch: null
+    };
+
+    // --- Core UI & Logic ---
+
+    function getTurkeyTime() {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        return new Date(utc + (3600000 * 3));
+    }
+
+    function normalize(str) {
+        if (!str) return "";
+        return str.toString().trim().toLocaleLowerCase('tr-TR').replace(/sk$/g, '').replace(/s\.k$/g, '').replace(/kulübü/g, '').replace(/\s+/g, '').replace(/[\.\,\-\(\)]/g, ''); 
+    }
+
+    function wrapProxy(url) {
+        if (!url) return "";
+        const cleanUrl = url.toString().replace(/^"|"$/g, '').trim();
+        if (cleanUrl.startsWith('data:')) return cleanUrl;
+        return `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}&default=${encodeURIComponent(cleanUrl)}`;
+    }
+
+    function fixLogoUrl(url) {
+        if (!url) return "";
+        url = url.toString().replace(/^"|"$/g, '').trim();
+        if (url.includes('drive.google.com')) {
+            const idMatch = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^\&]+)/);
+            if (idMatch && idMatch[1]) return `https://docs.google.com/uc?export=download&id=${idMatch[1]}`;
+        }
+        return url;
+    }
+
+    function parseCSVLine(line) {
+        const parts = []; let curr = ''; let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) { parts.push(curr); curr = ''; }
+            else curr += char;
+        }
+        parts.push(curr);
+        return parts;
+    }
+
+    async function fetchData() {
+        try {
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            const timestamp = Date.now();
+            const [mRes, lRes] = await Promise.all([
+                fetch(`${MATCHES_URL}&cb=${timestamp}`),
+                fetch(`${LOGOS_URL}&cb=${timestamp}`)
+            ]);
+            state.logoMap = parseLogos(await lRes.text());
+            state.allMatches = parseMatches(await mRes.text());
+            if (state.allMatches.length > 0) {
+                const dates = getSortedDates();
+                if (!state.currentDate || !dates.includes(state.currentDate)) state.currentDate = dates[0];
+            }
+            state.loading = false;
+            document.getElementById('loading-overlay').classList.add('hidden');
+            updateUI();
+        } catch (error) { showError("Veri yüklenirken bir hata oluştu."); }
+    }
+
+    function parseLogos(csv) {
+        const lines = csv.split(/\r?\n/);
+        const map = {...CONSTANT_LOGOS}; 
+        lines.forEach(line => {
+            const p = parseCSVLine(line);
+            if (p.length >= 2) {
+                const name = normalize(p[0].replace(/^"|"$/g, ''));
+                const url = fixLogoUrl(p[1]);
+                if (name && url && url.startsWith('http')) map[name] = url;
+            }
+        });
+        return map;
+    }
+
+    function parseMatches(csv) {
+        const lines = csv.split(/\r?\n/);
+        return lines.slice(1).filter(l => l.trim()).map(line => {
+            const p = parseCSVLine(line);
+            return {
+                date: p[0] || "", venue: p[1] || "", time: p[2] || "",
+                t1: p[3] || "", s1: p[4] || "-", s2: p[5] || "-", t2: p[6] || "",
+                sets: p[7] || "Oynanmadı", gender: p[9] || "M", league: p[10] || "LİG"
+            };
+        });
+    }
+
+    function getLogoHtml(teamName, sizeClass = "w-12 h-12") {
+        const normalizedName = normalize(teamName);
+        let rawUrl = null;
+        for (const key in state.logoMap) {
+            if (normalizedName.includes(key) || key.includes(normalizedName)) {
+                rawUrl = state.logoMap[key]; break;
+            }
+        }
+        const url = wrapProxy(rawUrl);
+        const initials = teamName.substring(0, 2).toUpperCase();
+        return `
+            <div class="team-logo-circle ${sizeClass} relative bg-white">
+                <span class="fallback-text">${initials}</span>
+                ${rawUrl ? `<img src="${url}" class="relative z-10" loading="lazy" crossorigin="anonymous" onerror="this.style.opacity='0';">` : ''}
+            </div>`;
+    }
+
+    function formatSets(sets) {
+        if (!sets || sets.toLowerCase().includes("oynanmadı")) return "MAÇ BEKLENİYOR";
+        return sets.replace(/\((\d+)-(\d+)\)/g, (match, s1, s2) => {
+            const win = parseInt(s1) > parseInt(s2) ? 'text-green-500' : 'text-slate-400';
+            const lose = parseInt(s2) > parseInt(s1) ? 'text-green-500' : 'text-slate-400';
+            return `<span class="mx-1 font-mono font-bold">(<span class="${win}">${s1}</span>-<span class="${lose}">${s2}</span>)</span>`;
+        });
+    }
+
+    function checkLiveStatus(m) {
+        const trTime = getTurkeyTime();
+        const todayStr = trTime.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const s1 = parseInt(m.s1); const s2 = parseInt(m.s2);
+        if (!isNaN(s1) && !isNaN(s2) && (s1 >= 3 || s2 >= 3)) return false;
+        if (m.date === todayStr) {
+            const [mH, mM] = m.time.split(':').map(Number);
+            if (m.s1 !== "-" || (trTime.getHours() * 60 + trTime.getMinutes()) >= (mH * 60 + mM)) return true;
+        }
+        return false;
+    }
+
+    function openWhatsappModal(mStr) {
+        const m = JSON.parse(decodeURIComponent(mStr));
+        state.currentSharingMatch = m;
+        document.getElementById('whatsapp-modal').style.display = 'flex';
+        document.getElementById('whatsapp-note').value = '';
+    }
+
+    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
+
+    document.getElementById('whatsapp-send-btn').onclick = function() {
+        if (!state.currentSharingMatch) return;
+        const m = state.currentSharingMatch;
+        const note = document.getElementById('whatsapp-note').value.trim();
+        const isPlayed = m.s1 !== "-" && m.s1 !== "";
+        
+        let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
+        let msg = `*${header}*\n\n`;
+        if (note) msg += `${note}\n\n`;
+        if (isPlayed) {
+            msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
+        } else {
+            msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
+        }
+        msg += `Salon: ${m.venue}\nTarih: ${m.date}`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        closeWhatsappModal();
+    };
+
+    function renderMatches() {
+        const container = document.getElementById('match-container');
+        document.getElementById('current-date-text').innerText = state.currentDate || "--.--.----";
+        
+        let filtered = state.allMatches.filter(m => m.date === state.currentDate);
+        if (state.selectedStatus === 'played') filtered = filtered.filter(m => m.s1 !== '-' && !m.sets.toLowerCase().includes("oynanmadı"));
+        else if (state.selectedStatus === 'pending') filtered = filtered.filter(m => m.s1 === '-' || m.sets.toLowerCase().includes("oynanmadı"));
+        if (state.selectedVenue) filtered = filtered.filter(m => m.venue === state.selectedVenue);
+        if (state.searchQuery) {
+            const q = normalize(state.searchQuery);
+            filtered = filtered.filter(m => normalize(m.t1).includes(q) || normalize(m.t2).includes(q));
+        }
+
+        document.getElementById('match-count-badge').innerText = filtered.length;
+        container.innerHTML = '';
+        if (filtered.length === 0) document.getElementById('empty-state').classList.remove('hidden');
+        else document.getElementById('empty-state').classList.add('hidden');
+
+        filtered.forEach(m => {
+            const isLive = checkLiveStatus(m);
+            const win1 = parseInt(m.s1) > parseInt(m.s2);
+            const win2 = parseInt(m.s2) > parseInt(m.s1);
+            const encodedMatch = encodeURIComponent(JSON.stringify(m));
+
+            const card = `
+                <div class="match-card bg-white p-6 shadow-sm flex flex-col relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border border-indigo-100">
+                            ${m.league} • ${m.gender === 'E' ? 'Erkek' : 'Kadın'}
+                        </span>
+                        <div class="flex items-center gap-2">
+                            ${isLive ? '<span class="flex items-center gap-1.5 text-rose-500 font-black text-[10px] uppercase tracking-widest live-pulse"><span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>CANLI</span>' : ''}
+                            <span class="text-xs font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded-md">${m.time}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mb-8">
+                        <div class="flex justify-between items-center rounded-2xl p-4 border transition-colors ${win1 ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50/50 border-transparent'}">
+                            <div class="flex items-center gap-4 flex-1 overflow-hidden">
+                                ${getLogoHtml(m.t1, "w-11 h-11")}
+                                <span class="text-sm font-black truncate ${win1 ? 'text-indigo-950' : 'text-slate-600'}">${m.t1}</span>
+                            </div>
+                            <span class="text-4xl font-black font-mono tracking-tighter ${win1 ? 'text-indigo-600' : 'text-slate-200'}">${m.s1 === "-" ? "" : m.s1}</span>
+                        </div>
+                        <div class="flex justify-between items-center rounded-2xl p-4 border transition-colors ${win2 ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50/50 border-transparent'}">
+                            <div class="flex items-center gap-4 flex-1 overflow-hidden">
+                                ${getLogoHtml(m.t2, "w-11 h-11")}
+                                <span class="text-sm font-black truncate ${win2 ? 'text-indigo-950' : 'text-slate-600'}">${m.t2}</span>
+                            </div>
+                            <span class="text-4xl font-black font-mono tracking-tighter ${win2 ? 'text-indigo-600' : 'text-slate-200'}">${m.s2 === "-" ? "" : m.s2}</span>
+                        </div>
+                    </div>
+                    <div class="mt-auto pt-6 border-t border-slate-50 flex flex-col gap-4">
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 font-bold mb-3"><i class="fas fa-location-dot"></i> ${m.venue}</p>
+                            <div class="text-[11px] font-medium text-slate-800 bg-slate-50 py-3 rounded-2xl border border-slate-100 mb-4">${formatSets(m.sets)}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openWhatsappModal('${encodedMatch}')" class="w-full bg-green-500 hover:bg-green-600 text-white py-3.5 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-green-50"><i class="fab fa-whatsapp text-lg"></i> PAYLAŞ</button>
+                        </div>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', card);
+        });
+    }
+
+    function updateUI() { renderDateTabs(); renderVenueChips(); renderMatches(); }
+    
+    function renderDateTabs() {
+        const container = document.getElementById('date-tabs');
+        const dates = getSortedDates();
+        container.innerHTML = '';
+        dates.forEach(date => {
+            const isActive = date === state.currentDate;
+            const btn = document.createElement('button');
+            btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`;
+            btn.innerText = date;
+            btn.onclick = () => { state.currentDate = date; state.selectedVenue = null; updateUI(); };
+            container.appendChild(btn);
+        });
+    }
+    
+    function renderVenueChips() {
+        const container = document.getElementById('venue-chips');
+        const venues = [...new Set(state.allMatches.filter(m => m.date === state.currentDate).map(m => m.venue))].sort();
+        if (venues.length === 0) { container.innerHTML = ''; return; }
+        container.innerHTML = `<span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">Salonlar:</span>`;
+        venues.forEach(v => {
+            const isActive = state.selectedVenue === v;
+            const chip = document.createElement('button');
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`;
+            chip.innerText = v;
+            chip.onclick = () => { state.selectedVenue = isActive ? null : v; renderMatches(); };
+            container.appendChild(chip);
+        });
+    }
+    
+    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); renderMatches(); }
+    
+    function handleSearch(v) { state.searchQuery = v; renderMatches(); }
+    
+    function showError(m) { 
+        const t = document.createElement('div'); 
+        t.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-sm animate-bounce"; 
+        t.innerText = m; 
+        document.body.appendChild(t); 
+        setTimeout(() => t.remove(), 3000); 
+    }
+    
+    function getSortedDates() {
+        return [...new Set(state.allMatches.map(m => m.date))].sort((a,b) => {
+            const pA = a.split('.').map(Number); const pB = b.split('.').map(Number);
+            return new Date(pA[2], pA[1]-1, pA[0]) - new Date(pB[2], pB[1]-1, pB[0]);
+        });
+    }
+
+    window.onload = fetchData;
+    setInterval(updateUI, 60000); // UI verilerini her dakika yeniler (canlı takip)
+</script>
+</body>
+</html>
