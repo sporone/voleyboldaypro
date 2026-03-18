@@ -195,8 +195,10 @@
                 <div id="date-tabs" class="flex gap-3 overflow-x-auto w-full no-scrollbar pb-1"></div>
             </div>
             
-            <div id="quick-filters" class="flex flex-wrap gap-2 border-t border-slate-100 pt-6 empty:hidden">
-                <div class="flex flex-wrap gap-2 items-center" id="venue-chips"></div>
+            <div id="quick-filters" class="flex flex-col gap-3 border-t border-slate-100 pt-6 empty:hidden">
+                <div class="flex flex-wrap gap-2 items-center empty:hidden" id="league-chips"></div>
+                <div class="flex flex-wrap gap-2 items-center empty:hidden" id="gender-chips"></div>
+                <div class="flex flex-wrap gap-2 items-center empty:hidden" id="venue-chips"></div>
             </div>
         </div>
     </div>
@@ -253,6 +255,8 @@
         selectedStatus: "all",
         searchQuery: "",
         selectedVenue: null,
+        selectedLeague: null,
+        selectedGender: null,
         loading: true,
         currentSharingMatch: null
     };
@@ -392,21 +396,27 @@
 
     function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
 
+    // Whatsapp buton işlevi güncellendi: Kategori bilgisi eklendi
     document.getElementById('whatsapp-send-btn').onclick = function() {
         if (!state.currentSharingMatch) return;
         const m = state.currentSharingMatch;
         const note = document.getElementById('whatsapp-note').value.trim();
         const isPlayed = m.s1 !== "-" && m.s1 !== "";
+        const category = `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
         
         let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
-        let msg = `*${header}*\n\n`;
+        let msg = `*${header}*\n`;
+        msg += `Kategori: ${category}\n\n`; // Kategori eklendi
+        
         if (note) msg += `${note}\n\n`;
+        
         if (isPlayed) {
             msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
         } else {
             msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
         }
         msg += `Salon: ${m.venue}\nTarih: ${m.date}`;
+        
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
         closeWhatsappModal();
     };
@@ -418,7 +428,11 @@
         let filtered = state.allMatches.filter(m => m.date === state.currentDate);
         if (state.selectedStatus === 'played') filtered = filtered.filter(m => m.s1 !== '-' && !m.sets.toLowerCase().includes("oynanmadı"));
         else if (state.selectedStatus === 'pending') filtered = filtered.filter(m => m.s1 === '-' || m.sets.toLowerCase().includes("oynanmadı"));
+        
         if (state.selectedVenue) filtered = filtered.filter(m => m.venue === state.selectedVenue);
+        if (state.selectedLeague) filtered = filtered.filter(m => m.league === state.selectedLeague);
+        if (state.selectedGender) filtered = filtered.filter(m => m.gender === state.selectedGender);
+        
         if (state.searchQuery) {
             const q = normalize(state.searchQuery);
             filtered = filtered.filter(m => normalize(m.t1).includes(q) || normalize(m.t2).includes(q));
@@ -476,7 +490,13 @@
         });
     }
 
-    function updateUI() { renderDateTabs(); renderVenueChips(); renderMatches(); }
+    function updateUI() { 
+        renderDateTabs(); 
+        renderLeagueChips();
+        renderGenderChips();
+        renderVenueChips(); 
+        renderMatches(); 
+    }
     
     function renderDateTabs() {
         const container = document.getElementById('date-tabs');
@@ -487,8 +507,45 @@
             const btn = document.createElement('button');
             btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`;
             btn.innerText = date;
-            btn.onclick = () => { state.currentDate = date; state.selectedVenue = null; updateUI(); };
+            btn.onclick = () => { 
+                state.currentDate = date; 
+                state.selectedVenue = null; 
+                state.selectedLeague = null;
+                state.selectedGender = null;
+                updateUI(); 
+            };
             container.appendChild(btn);
+        });
+    }
+
+    function renderLeagueChips() {
+        const container = document.getElementById('league-chips');
+        const leagues = [...new Set(state.allMatches.filter(m => m.date === state.currentDate).map(m => m.league))].filter(Boolean).sort();
+        if (leagues.length === 0) { container.innerHTML = ''; return; }
+        container.innerHTML = `<span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2"><i class="fas fa-trophy mr-1"></i> Lig:</span>`;
+        leagues.forEach(l => {
+            const isActive = state.selectedLeague === l;
+            const chip = document.createElement('button');
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
+            chip.innerText = l;
+            chip.onclick = () => { state.selectedLeague = isActive ? null : l; updateUI(); };
+            container.appendChild(chip);
+        });
+    }
+
+    function renderGenderChips() {
+        const container = document.getElementById('gender-chips');
+        const genders = [...new Set(state.allMatches.filter(m => m.date === state.currentDate).map(m => m.gender))].filter(Boolean).sort();
+        if (genders.length === 0) { container.innerHTML = ''; return; }
+        container.innerHTML = `<span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2"><i class="fas fa-venus-mars mr-1"></i> Kategori:</span>`;
+        genders.forEach(g => {
+            const isActive = state.selectedGender === g;
+            const label = g === 'E' ? 'Erkek' : (g === 'K' ? 'Kadın' : g);
+            const chip = document.createElement('button');
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
+            chip.innerText = label;
+            chip.onclick = () => { state.selectedGender = isActive ? null : g; updateUI(); };
+            container.appendChild(chip);
         });
     }
     
@@ -496,20 +553,20 @@
         const container = document.getElementById('venue-chips');
         const venues = [...new Set(state.allMatches.filter(m => m.date === state.currentDate).map(m => m.venue))].sort();
         if (venues.length === 0) { container.innerHTML = ''; return; }
-        container.innerHTML = `<span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">Salonlar:</span>`;
+        container.innerHTML = `<span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2"><i class="fas fa-location-dot mr-1"></i> Salon:</span>`;
         venues.forEach(v => {
             const isActive = state.selectedVenue === v;
             const chip = document.createElement('button');
-            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`;
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
             chip.innerText = v;
-            chip.onclick = () => { state.selectedVenue = isActive ? null : v; renderMatches(); };
+            chip.onclick = () => { state.selectedVenue = isActive ? null : v; updateUI(); };
             container.appendChild(chip);
         });
     }
     
-    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); renderMatches(); }
+    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); updateUI(); }
     
-    function handleSearch(v) { state.searchQuery = v; renderMatches(); }
+    function handleSearch(v) { state.searchQuery = v; updateUI(); }
     
     function showError(m) { 
         const t = document.createElement('div'); 
