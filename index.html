@@ -44,6 +44,10 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* Kaydırma alanları için imleç stilleri */
+        .drag-scroll { cursor: grab; }
+        .drag-scroll:active { cursor: grabbing; }
+
         .status-btn.active {
             background-color: white;
             color: var(--brand-primary);
@@ -173,7 +177,7 @@
     <div class="-mt-14 px-4 container mx-auto">
         <div class="sticky-header bg-white/95 shadow-2xl shadow-indigo-900/5 rounded-[3rem] p-5 md:p-10 border border-white flex flex-col gap-8">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div class="flex bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar">
+                <div id="status-tabs" class="drag-scroll flex bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar select-none">
                     <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap">Hepsi</button>
                     <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
                     <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
@@ -192,7 +196,8 @@
             </div>
 
             <div class="border-t border-slate-100 pt-6">
-                <div id="date-tabs" class="flex gap-3 overflow-x-auto w-full no-scrollbar pb-1"></div>
+                <!-- drag-scroll ve select-none sınıfları ile yatay kaydırma iyileştirildi -->
+                <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto w-full no-scrollbar pb-1 select-none"></div>
             </div>
             
             <div id="quick-filters" class="flex flex-col gap-3 border-t border-slate-100 pt-6 empty:hidden">
@@ -260,6 +265,35 @@
         loading: true,
         currentSharingMatch: null
     };
+
+    // --- Sürüklenebilir Kaydırma (Drag-to-Scroll) Mantığı ---
+    function makeScrollable(elementId) {
+        const slider = document.getElementById(elementId);
+        if (!slider) return;
+
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // Kaydırma hızı çarpanı
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    }
 
     // --- Core UI & Logic ---
 
@@ -396,7 +430,6 @@
 
     function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
 
-    // Whatsapp buton işlevi güncellendi: Kategori bilgisi eklendi
     document.getElementById('whatsapp-send-btn').onclick = function() {
         if (!state.currentSharingMatch) return;
         const m = state.currentSharingMatch;
@@ -406,7 +439,7 @@
         
         let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
         let msg = `*${header}*\n`;
-        msg += `Kategori: ${category}\n\n`; // Kategori eklendi
+        msg += `Kategori: ${category}\n\n`; 
         
         if (note) msg += `${note}\n\n`;
         
@@ -505,7 +538,7 @@
         dates.forEach(date => {
             const isActive = date === state.currentDate;
             const btn = document.createElement('button');
-            btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`;
+            btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border select-none ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`;
             btn.innerText = date;
             btn.onclick = () => { 
                 state.currentDate = date; 
@@ -526,7 +559,7 @@
         leagues.forEach(l => {
             const isActive = state.selectedLeague === l;
             const chip = document.createElement('button');
-            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all select-none ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
             chip.innerText = l;
             chip.onclick = () => { state.selectedLeague = isActive ? null : l; updateUI(); };
             container.appendChild(chip);
@@ -542,7 +575,7 @@
             const isActive = state.selectedGender === g;
             const label = g === 'E' ? 'Erkek' : (g === 'K' ? 'Kadın' : g);
             const chip = document.createElement('button');
-            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all select-none ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
             chip.innerText = label;
             chip.onclick = () => { state.selectedGender = isActive ? null : g; updateUI(); };
             container.appendChild(chip);
@@ -557,7 +590,7 @@
         venues.forEach(v => {
             const isActive = state.selectedVenue === v;
             const chip = document.createElement('button');
-            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
+            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all select-none ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
             chip.innerText = v;
             chip.onclick = () => { state.selectedVenue = isActive ? null : v; updateUI(); };
             container.appendChild(chip);
@@ -583,7 +616,13 @@
         });
     }
 
-    window.onload = fetchData;
+    window.onload = () => {
+        fetchData();
+        // Yatay kaydırma fonksiyonunu başlat (Status filter ve date tabs için)
+        makeScrollable('status-tabs');
+        makeScrollable('date-tabs');
+    };
+    
     setInterval(updateUI, 60000); // UI verilerini her dakika yeniler (canlı takip)
 </script>
 </body>
