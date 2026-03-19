@@ -48,6 +48,12 @@
         .drag-scroll { cursor: grab; }
         .drag-scroll:active { cursor: grabbing; }
 
+        /* Tüm takımlar alanı için özel dikey scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
         .status-btn.active {
             background-color: white;
             color: var(--brand-primary);
@@ -196,15 +202,20 @@
             </div>
 
             <div class="border-t border-slate-100 pt-6">
-                <!-- drag-scroll ve select-none sınıfları ile yatay kaydırma iyileştirildi -->
                 <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto w-full no-scrollbar pb-1 select-none"></div>
             </div>
             
             <div id="quick-filters" class="flex flex-col gap-3 border-t border-slate-100 pt-6 empty:hidden">
                 <div class="flex flex-wrap gap-2 items-center empty:hidden" id="league-chips"></div>
                 <div class="flex flex-wrap gap-2 items-center empty:hidden" id="gender-chips"></div>
-                <div class="flex flex-wrap gap-2 items-center empty:hidden" id="venue-chips"></div>
             </div>
+
+            <!-- Yenilenen Bölüm: Tüm Takımlar -->
+            <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 mt-2 hidden">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3"><i class="fas fa-users mr-1"></i> Maçı Olan Takımlar</h3>
+                <div id="playing-teams" class="flex flex-wrap gap-2.5 w-full max-h-[180px] overflow-y-auto custom-scrollbar pb-2 pr-2 select-none"></div>
+            </div>
+
         </div>
     </div>
 
@@ -259,7 +270,6 @@
         currentDate: "",
         selectedStatus: "all",
         searchQuery: "",
-        selectedVenue: null,
         selectedLeague: null,
         selectedGender: null,
         loading: true,
@@ -290,7 +300,7 @@
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - slider.offsetLeft;
-            const walk = (x - startX) * 2; // Kaydırma hızı çarpanı
+            const walk = (x - startX) * 2; // Kaydırma hızı
             slider.scrollLeft = scrollLeft - walk;
         });
     }
@@ -413,10 +423,17 @@
         const trTime = getTurkeyTime();
         const todayStr = trTime.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const s1 = parseInt(m.s1); const s2 = parseInt(m.s2);
+        
+        // Skorlardan biri 3'e ulaştıysa maç kesinlikle bitmiştir.
         if (!isNaN(s1) && !isNaN(s2) && (s1 >= 3 || s2 >= 3)) return false;
+        
         if (m.date === todayStr) {
             const [mH, mM] = m.time.split(':').map(Number);
-            if (m.s1 !== "-" || (trTime.getHours() * 60 + trTime.getMinutes()) >= (mH * 60 + mM)) return true;
+            const matchMins = mH * 60 + (mM || 0);
+            const currentMins = trTime.getHours() * 60 + trTime.getMinutes();
+            
+            // Eğer maçın saati gelmişse VEYA skoru girilmişse ve yukarıdaki şarta göre bitmemişse CANLI sayılır.
+            if (m.s1 !== "-" || currentMins >= matchMins) return true;
         }
         return false;
     }
@@ -462,7 +479,6 @@
         if (state.selectedStatus === 'played') filtered = filtered.filter(m => m.s1 !== '-' && !m.sets.toLowerCase().includes("oynanmadı"));
         else if (state.selectedStatus === 'pending') filtered = filtered.filter(m => m.s1 === '-' || m.sets.toLowerCase().includes("oynanmadı"));
         
-        if (state.selectedVenue) filtered = filtered.filter(m => m.venue === state.selectedVenue);
         if (state.selectedLeague) filtered = filtered.filter(m => m.league === state.selectedLeague);
         if (state.selectedGender) filtered = filtered.filter(m => m.gender === state.selectedGender);
         
@@ -470,6 +486,38 @@
             const q = normalize(state.searchQuery);
             filtered = filtered.filter(m => normalize(m.t1).includes(q) || normalize(m.t2).includes(q));
         }
+
+        // --- AKILLI SIRALAMA (SMART SORTING) ---
+        const timeToMins = (t) => {
+            if (!t) return 0;
+            const parts = t.split(':');
+            return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
+        };
+
+        filtered.sort((a, b) => {
+            const aLive = checkLiveStatus(a);
+            const bLive = checkLiveStatus(b);
+            
+            const aFinished = !aLive && a.s1 !== '-' && !a.sets.toLowerCase().includes("oynanmadı");
+            const bFinished = !bLive && b.s1 !== '-' && !b.sets.toLowerCase().includes("oynanmadı");
+            
+            // Kategoriler: 0 = Canlı, 1 = Biten, 2 = Gelecek (Başlamamış)
+            const aCat = aLive ? 0 : (aFinished ? 1 : 2);
+            const bCat = bLive ? 0 : (bFinished ? 1 : 2);
+            
+            if (aCat !== bCat) return aCat - bCat;
+            
+            const aMins = timeToMins(a.time);
+            const bMins = timeToMins(b.time);
+            
+            if (aCat === 1) {
+                // Kategori 1 (Bitenler): Saati en geç olan (en son biten) en üstte
+                return bMins - aMins;
+            } else {
+                // Kategori 0 & 2 (Canlılar ve Gelecek): Saati en erken olan en üstte
+                return aMins - bMins;
+            }
+        });
 
         document.getElementById('match-count-badge').innerText = filtered.length;
         container.innerHTML = '';
@@ -527,7 +575,7 @@
         renderDateTabs(); 
         renderLeagueChips();
         renderGenderChips();
-        renderVenueChips(); 
+        renderPlayingTeams();
         renderMatches(); 
     }
     
@@ -542,7 +590,6 @@
             btn.innerText = date;
             btn.onclick = () => { 
                 state.currentDate = date; 
-                state.selectedVenue = null; 
                 state.selectedLeague = null;
                 state.selectedGender = null;
                 updateUI(); 
@@ -581,18 +628,61 @@
             container.appendChild(chip);
         });
     }
-    
-    function renderVenueChips() {
-        const container = document.getElementById('venue-chips');
-        const venues = [...new Set(state.allMatches.filter(m => m.date === state.currentDate).map(m => m.venue))].sort();
-        if (venues.length === 0) { container.innerHTML = ''; return; }
-        container.innerHTML = `<span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2"><i class="fas fa-location-dot mr-1"></i> Salon:</span>`;
-        venues.forEach(v => {
-            const isActive = state.selectedVenue === v;
-            const chip = document.createElement('button');
-            chip.className = `px-4 py-1.5 rounded-full text-[10px] font-bold border transition-all select-none ${isActive ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'}`;
-            chip.innerText = v;
-            chip.onclick = () => { state.selectedVenue = isActive ? null : v; updateUI(); };
+
+    // --- YENİ: Maçı Olan Takımlar Bölümü (Tüm Takımlar) ---
+    function renderPlayingTeams() {
+        const container = document.getElementById('playing-teams');
+        const wrapper = document.getElementById('playing-teams-wrapper');
+        
+        // Benzersiz tüm takımları topla (Sadece güncel tarih değil, tüm veri setindeki takımlar)
+        const teamsSet = new Set();
+        state.allMatches.forEach(m => {
+            if (m.t1 && m.t1 !== "-") teamsSet.add(m.t1);
+            if (m.t2 && m.t2 !== "-") teamsSet.add(m.t2);
+        });
+        
+        // Türkçe karakterlere duyarlı harf sırasına göre diz
+        const teams = Array.from(teamsSet).sort((a, b) => a.localeCompare(b, 'tr'));
+        
+        if (teams.length === 0) { 
+            wrapper.classList.add('hidden');
+            return; 
+        } else {
+            wrapper.classList.remove('hidden');
+        }
+
+        container.innerHTML = '';
+        teams.forEach(team => {
+            const isActive = state.searchQuery === team;
+            const chip = document.createElement('div');
+            
+            // Flex wrap için kutu stilleri
+            chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border transition-all cursor-pointer select-none shrink-0 ${isActive ? 'bg-indigo-600 border-indigo-600 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+            
+            chip.onclick = () => {
+                if (isActive) {
+                    document.getElementById('team-search').value = '';
+                    handleSearch('');
+                } else {
+                    document.getElementById('team-search').value = team;
+                    
+                    // Akıllı Sekme Değişimi: Eğer takım bu tarihte oynamıyorsa, oynadığı ilk tarihe otomatik git
+                    const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (m.t1 === team || m.t2 === team));
+                    if (!teamPlaysToday) {
+                        const nextMatch = state.allMatches.find(m => m.t1 === team || m.t2 === team);
+                        if (nextMatch) state.currentDate = nextMatch.date;
+                    }
+                    
+                    handleSearch(team);
+                }
+            };
+            
+            const textColor = isActive ? 'text-white' : 'text-slate-700';
+            
+            chip.innerHTML = `
+                ${getLogoHtml(team, "w-7 h-7 border-none shadow-none bg-transparent")}
+                <span class="text-[11px] font-bold ${textColor}">${team}</span>
+            `;
             container.appendChild(chip);
         });
     }
@@ -618,7 +708,7 @@
 
     window.onload = () => {
         fetchData();
-        // Yatay kaydırma fonksiyonunu başlat (Status filter ve date tabs için)
+        // Yatay kaydırma fonksiyonunu başlat
         makeScrollable('status-tabs');
         makeScrollable('date-tabs');
     };
