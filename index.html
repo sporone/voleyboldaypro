@@ -204,7 +204,7 @@
 
             <div class="sticky-header bg-white/95 shadow-2xl shadow-indigo-900/5 rounded-[3rem] p-5 md:p-10 border border-white flex flex-col gap-6 relative z-50">
                 
-                <!-- YENİ EKLENEN: Sadece Logoların Olduğu Üst Bar -->
+                <!-- Sadece Logoların Olduğu Üst Bar -->
                 <div id="top-logos-wrapper" class="w-full transition-all duration-300">
                     <div id="top-logos-container" class="drag-scroll flex gap-2.5 sm:gap-3 overflow-x-auto w-full no-scrollbar pb-2 select-none items-center">
                         <!-- Logolar JavaScript ile buraya eklenecek -->
@@ -262,6 +262,17 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="team-filter-selects">
                     </div>
                 </div>
+
+                <!-- GERİ EKLENEN: A-Z Takım Filtreleme -->
+                <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 mt-2 hidden transition-all duration-300">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fas fa-users mr-1"></i> Sistemdeki Takımlar</h3>
+                        <span class="text-[9px] font-bold text-slate-300 uppercase">A-Z Filtresi</span>
+                    </div>
+                    <div id="alphabet-index" class="drag-scroll flex gap-1.5 overflow-x-auto w-full no-scrollbar pb-3 mb-3 select-none border-b border-slate-50"></div>
+                    <div id="playing-teams" class="flex flex-wrap gap-2.5 w-full max-h-[180px] overflow-y-auto custom-scrollbar pb-2 pr-2 select-none"></div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -804,6 +815,7 @@
         const dailyQuoteContainer = document.getElementById('daily-quote-container');
         const dateTabsWrapper = document.getElementById('date-tabs-wrapper');
         const regionTabsWrapper = document.getElementById('region-tabs-wrapper');
+        const playingTeamsWrapper = document.getElementById('playing-teams-wrapper');
         
         const selectedTeamDisplay = document.getElementById('selected-team-display');
         const selectedTeamLogo = document.getElementById('selected-team-logo');
@@ -813,6 +825,7 @@
             dailyQuoteContainer.classList.add('opacity-30', 'pointer-events-none');
             dateTabsWrapper.classList.add('hidden');
             regionTabsWrapper.classList.add('hidden');
+            playingTeamsWrapper.classList.add('hidden');
             
             selectedTeamDisplay.classList.remove('hidden');
             selectedTeamDisplay.classList.add('flex');
@@ -822,13 +835,15 @@
             dailyQuoteContainer.classList.remove('opacity-30', 'pointer-events-none');
             dateTabsWrapper.classList.remove('hidden');
             regionTabsWrapper.classList.remove('hidden');
+            playingTeamsWrapper.classList.remove('hidden');
             
             selectedTeamDisplay.classList.add('hidden');
             selectedTeamDisplay.classList.remove('flex');
         }
 
         renderDateTabs(); 
-        renderPlayingTeams();
+        renderTopLogos();
+        renderAlphabetTeams();
         renderTeamSpecificFilters(); 
         renderMatches(); 
     }
@@ -850,13 +865,12 @@
         });
     }
 
-    function renderPlayingTeams() {
+    function renderTopLogos() {
         const container = document.getElementById('top-logos-container');
         const wrapper = document.getElementById('top-logos-wrapper');
         
         const teamsSet = new Set();
 
-        // 1. Önce seçili tarihteki takımları bul
         if (state.currentDate) {
             const matchesOnDate = state.allMatches.filter(m => m.date === state.currentDate);
             matchesOnDate.forEach(m => {
@@ -865,14 +879,12 @@
             });
         }
 
-        // 2. Eğer o tarihte hiç maç/takım yoksa (veya ilk yüklemede), sistemdeki ilk 50 takımı al
         if (teamsSet.size === 0) {
             const allTeams = new Set();
             state.allMatches.forEach(m => {
                 if (m.t1 && m.t1 !== "-") allTeams.add(getBaseTeamName(m.t1));
                 if (m.t2 && m.t2 !== "-") allTeams.add(getBaseTeamName(m.t2));
             });
-            // Alfabetik sırala ve ilk 50'yi seç
             const allTeamsArray = Array.from(allTeams).sort((a, b) => a.localeCompare(b, 'tr')).slice(0, 50);
             allTeamsArray.forEach(t => teamsSet.add(t));
         }
@@ -892,9 +904,8 @@
             const isActive = state.selectedTeam === team;
             const chip = document.createElement('div');
             
-            // Yuvarlak şık logo kapsayıcısı
             chip.className = `flex items-center justify-center p-0.5 rounded-full border-2 transition-all cursor-pointer select-none shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300 hover:scale-105 shadow-sm'}`;
-            chip.title = team; // Üzerine gelince takım adını gösterir
+            chip.title = team; 
             
             chip.onclick = () => {
                 if (isActive) { 
@@ -914,8 +925,109 @@
                 }
             };
             
-            // Logoyu kutunun içine ekle
             chip.innerHTML = getLogoHtml(team, "w-10 h-10 sm:w-12 sm:h-12");
+            container.appendChild(chip);
+        });
+    }
+
+    // GERİ EKLENEN: A-Z Filtreleme Mantığı
+    function renderAlphabetTeams() {
+        const container = document.getElementById('playing-teams');
+        const wrapper = document.getElementById('playing-teams-wrapper');
+        const alphabetContainer = document.getElementById('alphabet-index');
+        
+        const teamsSet = new Set();
+        state.allMatches.forEach(m => {
+            if (m.t1 && m.t1 !== "-") teamsSet.add(getBaseTeamName(m.t1));
+            if (m.t2 && m.t2 !== "-") teamsSet.add(getBaseTeamName(m.t2));
+        });
+        const teams = Array.from(teamsSet).sort((a, b) => a.localeCompare(b, 'tr'));
+        
+        if (teams.length === 0) { 
+            wrapper.classList.add('hidden'); 
+            return; 
+        } else { 
+            wrapper.classList.remove('hidden'); 
+        }
+
+        const alphabet = ['Hepsi', '0-9', 'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'İ', 'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'Q', 'R', 'S', 'Ş', 'T', 'U', 'Ü', 'V', 'W', 'X', 'Y', 'Z'];
+
+        const teamsByLetter = {};
+        alphabet.forEach(l => teamsByLetter[l] = []);
+        
+        teams.forEach(team => {
+            const firstChar = team.charAt(0).toLocaleUpperCase('tr-TR');
+            if (/[0-9]/.test(firstChar)) {
+                teamsByLetter['0-9'].push(team);
+            } else {
+                if (teamsByLetter[firstChar]) {
+                    teamsByLetter[firstChar].push(team);
+                } else {
+                    const fallbackChar = team.charAt(0).toUpperCase();
+                    if (teamsByLetter[fallbackChar]) {
+                        teamsByLetter[fallbackChar].push(team);
+                    }
+                }
+            }
+            teamsByLetter['Hepsi'].push(team);
+        });
+
+        alphabetContainer.innerHTML = '';
+        alphabet.forEach(letter => {
+            const hasTeams = teamsByLetter[letter] && teamsByLetter[letter].length > 0;
+            const isActive = state.selectedAlphabet === letter;
+            
+            const btn = document.createElement('button');
+            if (hasTeams || letter === 'Hepsi') {
+                btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'} ${letter === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`;
+                btn.innerText = letter;
+                btn.onclick = () => {
+                    state.selectedAlphabet = isActive ? null : letter;
+                    updateUI(); 
+                };
+            } else {
+                btn.className = `w-8 h-8 shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black text-slate-300 bg-slate-50/50 cursor-not-allowed border border-slate-100/50`;
+                btn.innerText = letter;
+            }
+            alphabetContainer.appendChild(btn);
+        });
+
+        container.innerHTML = '';
+
+        if (!state.selectedAlphabet) {
+            container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-3 px-2 flex items-center gap-2"><i class="fas fa-hand-pointer text-indigo-400"></i> Takımları görmek için yukarıdan bir harf veya "Hepsi" seçeneğine tıklayın.</span>';
+            return;
+        }
+        
+        const teamsToShow = teamsByLetter[state.selectedAlphabet] || [];
+        
+        if (teamsToShow.length === 0) {
+            container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-2 px-1">Bu harfle başlayan takım bulunmamaktadır.</span>';
+        }
+
+        teamsToShow.forEach(team => {
+            const isActive = state.selectedTeam === team;
+            const chip = document.createElement('div');
+            chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border transition-all cursor-pointer select-none shrink-0 ${isActive ? 'bg-indigo-600 border-indigo-600 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+            chip.onclick = () => {
+                if (isActive) { 
+                    clearSelectedTeam();
+                } else {
+                    clearTeamSpecificFilters(); 
+                    state.selectedTeam = team;
+                    document.getElementById('team-search').value = team;
+                    
+                    const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (getBaseTeamName(m.t1) === team || getBaseTeamName(m.t2) === team));
+                    if (!teamPlaysToday) {
+                        const nextMatch = state.allMatches.find(m => getBaseTeamName(m.t1) === team || getBaseTeamName(m.t2) === team);
+                        if (nextMatch) state.currentDate = nextMatch.date;
+                    }
+                    
+                    handleSearch(team);
+                }
+            };
+            const textColor = isActive ? 'text-white' : 'text-slate-700';
+            chip.innerHTML = `${getLogoHtml(team, "w-7 h-7 border-none shadow-none bg-transparent")} <span class="text-[11px] font-bold ${textColor}">${team}</span>`;
             container.appendChild(chip);
         });
     }
@@ -947,8 +1059,9 @@
         fetchData(); 
         makeScrollable('status-tabs'); 
         makeScrollable('date-tabs'); 
-        makeScrollable('top-logos-container'); // Yenilenen id
+        makeScrollable('top-logos-container');
         makeScrollable('region-tabs');
+        makeScrollable('alphabet-index'); 
     };
     setInterval(updateUI, 60000);
 </script>
