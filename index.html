@@ -61,28 +61,26 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
         }
 
+        /* YENİDEN DÜZENLENDİ: Logo kesilmelerini ve ezilmelerini engelleyen yapı */
         .team-logo-circle {
-            width: 52px;
-            height: 52px;
             border-radius: 50%;
-            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #f1f5f9;
-            flex-shrink: 0;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
+            flex-shrink: 0; /* Flexbox içinde boyutunun küçülmesini engeller */
         }
 
         .team-logo-circle img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            padding: 4px;
+            object-position: center;
+            padding: 3px; /* Logoların sınırda kesilmesini önleyen standart iç koruma boşluğu */
             z-index: 2;
             position: relative;
-            background: white;
+            background: transparent;
         }
 
         .fallback-text {
@@ -92,11 +90,12 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 10px;
+            font-size: 11px;
             color: #94a3b8;
             text-transform: uppercase;
             z-index: 1;
             background: #f8fafc;
+            border-radius: 50%;
         }
 
         .modal-overlay { 
@@ -204,7 +203,6 @@
 
             <div class="sticky-header bg-white/95 shadow-2xl shadow-indigo-900/5 rounded-[3rem] p-5 md:p-10 border border-white flex flex-col gap-6 relative z-50">
                 
-                <!-- Sadece Logoların Olduğu Üst Bar -->
                 <div id="top-logos-wrapper" class="w-full transition-all duration-300">
                     <div id="top-logos-container" class="drag-scroll flex gap-2.5 sm:gap-3 overflow-x-auto w-full no-scrollbar pb-2 select-none items-center">
                         <!-- Logolar JavaScript ile buraya eklenecek -->
@@ -263,7 +261,6 @@
                     </div>
                 </div>
 
-                <!-- GERİ EKLENEN: A-Z Takım Filtreleme -->
                 <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 mt-2 hidden transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fas fa-users mr-1"></i> Sistemdeki Takımlar</h3>
@@ -290,12 +287,18 @@
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
             <i class="fas fa-times text-xl"></i>
         </button>
-        <div class="mb-6">
-            <h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter mb-2">WhatsApp'ta Paylaş</h3>
+        <div class="mb-4 text-center border-b border-slate-100 pb-4">
+            <h3 class="text-lg font-black text-indigo-950 uppercase tracking-tighter">WhatsApp'ta Paylaş</h3>
+            <p class="text-[10px] text-slate-400 font-bold mt-1">Maç Bilgilerini Gönder</p>
         </div>
+        
+        <div id="whatsapp-modal-match-info" class="flex items-center justify-between gap-2 mb-6 p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
+            <!-- Dinamik olarak JS ile doldurulacak -->
+        </div>
+
         <div class="relative">
-            <textarea id="whatsapp-note" rows="4" placeholder="Maç hakkında bir şeyler yazın (isteğe bağlı)..." 
-                      class="w-full bg-slate-50 border-2 border-slate-100 focus:border-indigo-100 focus:bg-white rounded-2xl p-4 text-sm font-semibold outline-none transition-all resize-none mb-4"></textarea>
+            <textarea id="whatsapp-note" rows="3" placeholder="Maç hakkında bir şeyler yazın (isteğe bağlı)..." 
+                      class="w-full bg-white border-2 border-slate-100 focus:border-indigo-100 rounded-2xl p-4 text-sm font-semibold outline-none transition-all resize-none mb-4"></textarea>
         </div>
         <button id="whatsapp-send-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-green-100">
             <i class="fab fa-whatsapp text-2xl"></i> PAYLAŞ
@@ -318,7 +321,20 @@
         "güzelyaşam": "https://volleybox.net/media/upload/teams/big_1756371499s9PAo.png",
         "beylikdüzüvoleybol": "https://volleybox.net/media/upload/teams/1763730802sA6Gu.png",
         "gökspor": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaX4FBAECEqrOBwGQ0VVskBl6KOiV-x7i-zA&s",
-        "geleceğedönüş": "https://volleybox.net/media/upload/teams/big_1755074095wU74u.png"
+        "geleceğedönüş": "https://volleybox.net/media/upload/teams/big_1755074095wU74u.png",
+        "atakent34": "https://tbf.org.tr/res/e5efb8db-3372-4ff9-9c42-451bb5430a02_atakent34sk.png",
+        "devadım": "https://tbf.org.tr/res/62895059-feb6-4b02-bb2d-0bf0d5410fef_dev%20adim%20sk.png",
+        "beyok": "https://volleybox.net/media/upload/teams/big_1768827099jB6Oh.png",
+        "devataşehir": "https://www.devatasehir.com/wp-content/uploads/2025/01/devatasehir-voleybol.png",
+        "anadolumarmara": "https://anadolumarmara.org/wp-content/uploads/2025/09/cropped-logo_anadolu.png",
+        "odak": "https://volleybox.net/media/upload/teams/big_1770298333IOR0d.png",
+        "haliçakademi": "https://volleybox.net/media/upload/teams/big_1739358643jczR9.png",
+        "açı": "https://www.gelisimligi.com/upload/2_4.jpg",
+        "uno": "https://volleybox.net/media/upload/teams/big_1770285119ez5h6.png",
+        "tuzlanew": "https://volleybox.net/media/upload/teams/big_17405585056qKWD.png",
+        "timeatletik": "https://i.hizliresim.com/apd9lrn.png",
+        "adayıldızları": "https://www.adayildizlari.com/wp-content/uploads/2017/06/adayildizlari-logo.png",
+        "alfa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-8SYpB9-Wpt3J0lB2UKEsGVVroXjh2zPM9A&s"
     };
 
     const MOTIVATION_QUOTES = [
@@ -408,19 +424,27 @@
 
     function getBaseTeamName(str) {
         if (!str) return "";
-        return cleanTeamName(str).trim().replace(/\s+[a-zA-Z0-9]$/i, '').trim();
+        let s = cleanTeamName(str).trim();
+        s = s.replace(/[\s\-]+[a-zA-Z0-9]$/i, ''); 
+        s = s.replace(/([0-9]+)[a-zA-Z]$/i, '$1'); 
+        return s.trim();
     }
 
     function normalize(str) {
         if (!str) return "";
-        return cleanTeamName(str).toLocaleLowerCase('tr-TR').replace(/sk$/g, '').replace(/s\.k$/g, '').replace(/kulübü/g, '').replace(/\s+/g, '').replace(/[\.\,\-\(\)]/g, ''); 
+        let s = cleanTeamName(str).toLocaleLowerCase('tr-TR');
+        s = s.replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)$/gi, '');
+        s = s.replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)\s+/gi, ' ');
+        s = s.replace(/sk$/g, '').replace(/s\.k$/g, '').replace(/spor/g, '').replace(/kulübü/g, '');
+        s = s.replace(/\s+/g, '').replace(/[\.\,\-\(\)]/g, ''); 
+        return s;
     }
 
     function wrapProxy(url) {
         if (!url) return "";
         const cleanUrl = url.toString().replace(/^"|"$/g, '').trim();
-        if (cleanUrl.startsWith('data:')) return cleanUrl;
-        return `https://images.weserv.nl/?url=${encodeURIComponent(cleanUrl)}&default=${encodeURIComponent(cleanUrl)}`;
+        if (cleanUrl.startsWith('data:') || cleanUrl.includes('tbf.org.tr') || cleanUrl.includes('wikipedia')) return cleanUrl;
+        return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}`;
     }
 
     function fixLogoUrl(url) {
@@ -473,7 +497,8 @@
 
     function parseLogos(csv) {
         const lines = csv.split(/\r?\n/);
-        const map = {...CONSTANT_LOGOS}; 
+        const map = {}; 
+        
         lines.forEach(line => {
             const p = parseCSVLine(line);
             if (p.length >= 2) {
@@ -482,6 +507,11 @@
                 if (name && url && url.startsWith('http')) map[name] = url;
             }
         });
+
+        for (const key in CONSTANT_LOGOS) {
+            map[normalize(key)] = CONSTANT_LOGOS[key];
+        }
+        
         return map;
     }
 
@@ -505,20 +535,34 @@
         });
     }
 
-    function getLogoHtml(teamName, sizeClass = "w-12 h-12") {
+    function getLogoHtml(teamName, extraClasses = "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0") {
         const normalizedName = normalize(teamName);
+        const baseName = normalize(getBaseTeamName(teamName)); 
         let rawUrl = null;
-        for (const key in state.logoMap) {
-            if (normalizedName.includes(key) || key.includes(normalizedName)) {
-                rawUrl = state.logoMap[key]; break;
+        
+        if (state.logoMap[normalizedName]) {
+            rawUrl = state.logoMap[normalizedName];
+        } else if (state.logoMap[baseName]) {
+            rawUrl = state.logoMap[baseName];
+        } else {
+            let bestMatch = "";
+            for (const key in state.logoMap) {
+                if (key.length > 2 && (normalizedName.includes(key) || baseName.includes(key) || key.includes(normalizedName) || key.includes(baseName))) {
+                    if (key.length > bestMatch.length) {
+                        bestMatch = key;
+                        rawUrl = state.logoMap[key]; 
+                    }
+                }
             }
         }
+        
         const url = wrapProxy(rawUrl);
-        const initials = teamName.substring(0, 2).toUpperCase();
+        const initials = getBaseTeamName(teamName).substring(0, 2).toUpperCase() || "VO";
+        
         return `
-            <div class="team-logo-circle ${sizeClass} relative bg-transparent !border-none !shadow-none">
-                <span class="fallback-text !bg-transparent">${initials}</span>
-                ${rawUrl ? `<img src="${url}" class="relative z-10" loading="lazy" crossorigin="anonymous" onerror="this.style.opacity='0';">` : ''}
+            <div class="team-logo-circle ${extraClasses}">
+                <span class="fallback-text">${initials}</span>
+                ${rawUrl ? `<img src="${url}" loading="lazy" onerror="this.style.display='none';">` : ''}
             </div>`;
     }
 
@@ -570,6 +614,7 @@
         return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
     };
 
+    // YENİDEN TASARLANDI: Sütunların yükseklikleri (height) senkronize edildi. Ezilme önlendi.
     function createMatchCard(m) {
         const isLive = checkLiveStatus(m);
         const encodedMatch = encodeURIComponent(JSON.stringify(m));
@@ -597,26 +642,29 @@
                 </div>
 
                 <div class="flex-1 flex flex-row items-center justify-between w-full overflow-hidden border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
-                    <div class="flex flex-col justify-between h-[68px] flex-1 pr-2 md:pr-4 min-w-0">
-                        <div class="flex items-center gap-3 flex-1 min-w-0">
-                            ${getLogoHtml(m.t1, "w-7 h-7 md:w-8 md:h-8")}
+                    
+                    <div class="flex flex-col gap-2 md:gap-3 flex-1 pr-2 md:pr-4 min-w-0 py-1">
+                        <div class="flex items-center gap-3 w-full h-8 md:h-10">
+                            ${getLogoHtml(m.t1, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
                             <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t1}</span>
                         </div>
-                        <div class="flex items-center gap-3 flex-1 min-w-0">
-                            ${getLogoHtml(m.t2, "w-7 h-7 md:w-8 md:h-8")}
+                        <div class="flex items-center gap-3 w-full h-8 md:h-10">
+                            ${getLogoHtml(m.t2, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
                             <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t2}</span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 md:gap-5 shrink-0">
-                        <div class="bg-[#1a1a1a] rounded-md flex flex-col w-7 md:w-8 h-[64px] text-white font-bold text-[13px] md:text-sm">
-                            <div class="flex-1 flex items-center justify-center border-b border-gray-700">${m.s1 === '-' ? '' : m.s1}</div>
-                            <div class="flex-1 flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
+
+                    <div class="flex items-stretch gap-3 md:gap-5 shrink-0 py-1">
+                        <div class="bg-[#1a1a1a] rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] md:text-sm">
+                            <div class="h-8 md:h-10 flex items-center justify-center border-b border-gray-700">${m.s1 === '-' ? '' : m.s1}</div>
+                            <div class="h-8 md:h-10 flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
                         </div>
-                        <div class="flex flex-col justify-between h-[64px] font-bold text-[13px] md:text-sm">
-                            <div class="flex-1 flex items-center gap-1 md:gap-2">${setScores.row1}</div>
-                            <div class="flex-1 flex items-center gap-1 md:gap-2">${setScores.row2}</div>
+                        <div class="flex flex-col gap-2 md:gap-3 font-bold text-[13px] md:text-sm">
+                            <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row1}</div>
+                            <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row2}</div>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="w-full lg:w-[130px] shrink-0 flex justify-end lg:justify-center items-center lg:border-l border-slate-100 lg:pl-4 mt-2 lg:mt-0 pt-3 lg:pt-0">
@@ -632,6 +680,24 @@
         state.currentSharingMatch = m;
         document.getElementById('whatsapp-modal').style.display = 'flex';
         document.getElementById('whatsapp-note').value = '';
+
+        const modalInfo = document.getElementById('whatsapp-modal-match-info');
+        if (modalInfo) {
+            modalInfo.innerHTML = `
+                <div class="flex flex-col items-center gap-2 w-[40%]">
+                    ${getLogoHtml(m.t1, "w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 shadow-sm shrink-0")}
+                    <span class="text-[10px] md:text-xs font-bold text-slate-800 text-center leading-tight">${m.t1}</span>
+                </div>
+                <div class="flex flex-col items-center justify-center w-[20%]">
+                    <span class="text-sm md:text-lg font-black text-indigo-900 whitespace-nowrap">${m.s1 !== "-" ? m.s1 + " - " + m.s2 : "VS"}</span>
+                    <span class="text-[9px] font-bold text-slate-400 mt-1">${m.time}</span>
+                </div>
+                <div class="flex flex-col items-center gap-2 w-[40%]">
+                    ${getLogoHtml(m.t2, "w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 shadow-sm shrink-0")}
+                    <span class="text-[10px] md:text-xs font-bold text-slate-800 text-center leading-tight">${m.t2}</span>
+                </div>
+            `;
+        }
     }
 
     function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
@@ -829,7 +895,7 @@
             
             selectedTeamDisplay.classList.remove('hidden');
             selectedTeamDisplay.classList.add('flex');
-            selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-14 h-14"); 
+            selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0"); 
         } else {
             statusTabs.classList.remove('opacity-30', 'pointer-events-none');
             dailyQuoteContainer.classList.remove('opacity-30', 'pointer-events-none');
@@ -904,7 +970,7 @@
             const isActive = state.selectedTeam === team;
             const chip = document.createElement('div');
             
-            chip.className = `flex items-center justify-center p-0.5 rounded-full border-2 transition-all cursor-pointer select-none shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300 hover:scale-105 shadow-sm'}`;
+            chip.className = `flex items-center justify-center p-1 rounded-full border-2 transition-all cursor-pointer select-none shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300 hover:scale-105 shadow-sm'}`;
             chip.title = team; 
             
             chip.onclick = () => {
@@ -925,12 +991,11 @@
                 }
             };
             
-            chip.innerHTML = getLogoHtml(team, "w-10 h-10 sm:w-12 sm:h-12");
+            chip.innerHTML = getLogoHtml(team, "w-10 h-10 sm:w-12 sm:h-12 bg-transparent shrink-0");
             container.appendChild(chip);
         });
     }
 
-    // GERİ EKLENEN: A-Z Filtreleme Mantığı
     function renderAlphabetTeams() {
         const container = document.getElementById('playing-teams');
         const wrapper = document.getElementById('playing-teams-wrapper');
@@ -1027,7 +1092,7 @@
                 }
             };
             const textColor = isActive ? 'text-white' : 'text-slate-700';
-            chip.innerHTML = `${getLogoHtml(team, "w-7 h-7 border-none shadow-none bg-transparent")} <span class="text-[11px] font-bold ${textColor}">${team}</span>`;
+            chip.innerHTML = `${getLogoHtml(team, "w-7 h-7 bg-transparent shrink-0")} <span class="text-[11px] font-bold ${textColor}">${team}</span>`;
             container.appendChild(chip);
         });
     }
