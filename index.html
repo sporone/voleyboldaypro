@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Voleybol Day">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1004/1004554.png">
-    
     <!-- DİNAMİK MANİFEST DOSYASI (TEK DOSYADA PWA İÇİN) -->
     <link rel="manifest" href='data:application/manifest+json,{"name":"Voleybol Day Pro","short_name":"VoleybolDay","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#1e1b4b","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/1004/1004554.png","sizes":"512x512","type":"image/png"}]}'>
 
@@ -297,7 +296,7 @@
         <p id="empty-state-text" class="font-bold text-xl tracking-tight text-center px-4">Eşleşen maç bulunamadı.</p>
     </div>
 
-    <!-- Footer Alanı (İndirme Butonu Eklendi) -->
+    <!-- Footer Alanı -->
     <footer class="mt-12 pb-12 pt-12 border-t border-slate-200/60 bg-transparent w-full">
         <div class="flex flex-col items-center justify-center gap-6 text-center px-4 max-w-6xl mx-auto">
             <div class="flex items-center gap-2 opacity-50">
@@ -364,9 +363,9 @@
     </div>
 </div>
 
-<!-- WhatsApp Not Modalı -->
+<!-- WhatsApp Not Modalı GÜNCELLENDİ (Kadro Alanı Eklendi) -->
 <div id="whatsapp-modal" class="modal-overlay">
-    <div class="modal-content shadow-2xl">
+    <div class="modal-content shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
             <i class="fas fa-times text-xl"></i>
         </button>
@@ -380,10 +379,23 @@
         </div>
 
         <div class="relative">
-            <textarea id="whatsapp-note" rows="3" placeholder="Maç hakkında bir şeyler yazın (isteğe bağlı)..." 
+            <textarea id="whatsapp-note" rows="2" placeholder="Maç hakkında bir şeyler yazın (isteğe bağlı)..." 
                       class="w-full bg-white border-2 border-slate-100 focus:border-indigo-100 rounded-2xl p-4 text-sm font-semibold outline-none transition-all resize-none mb-4"></textarea>
         </div>
-        <button id="whatsapp-send-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-green-100">
+
+        <!-- YENİ EKLENEN: OYNANMAMIŞ MAÇLAR İÇİN KADRO BİLGİSİ -->
+        <div id="whatsapp-roster-section" class="hidden flex-col gap-3 mb-4 border-t border-slate-100 pt-4">
+            <h4 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1.5">
+                <i class="fas fa-clipboard-list"></i> Maç Kadrosu (İsteğe Bağlı)
+            </h4>
+            <input type="text" id="coach-name" placeholder="Antrenör Adı" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold outline-none transition-all">
+            
+            <div class="flex flex-col gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-1" id="players-list">
+                <!-- JS ile 18 Satır Doldurulacak -->
+            </div>
+        </div>
+
+        <button id="whatsapp-send-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-green-100 mt-2">
             <i class="fab fa-whatsapp text-2xl"></i> PAYLAŞ
         </button>
     </div>
@@ -512,6 +524,26 @@
                 console.log('PWA SW: Add a blank sw.js file to your server root to complete offline caching.');
             });
         });
+    }
+
+    // --- YENİ EKLENEN: 18 Kişilik Kadro Formunu Başlatma ---
+    function initRosterForm() {
+        const playersList = document.getElementById('players-list');
+        if (!playersList) return;
+        let html = '';
+        for (let i = 1; i <= 18; i++) {
+            html += `
+            <div class="flex items-center gap-2">
+                <span class="text-[11px] font-black text-slate-300 w-5 text-right">${i}.</span>
+                <input type="text" id="player-name-${i}" placeholder="Sporcu Adı" class="flex-1 bg-white border border-slate-200 focus:border-indigo-400 rounded-lg p-2.5 text-[11px] font-bold outline-none transition-all">
+                <select id="player-serve-${i}" class="bg-white border border-slate-200 focus:border-indigo-400 rounded-lg p-2 text-[11px] font-bold outline-none text-slate-600 shrink-0 cursor-pointer">
+                    <option value="Servis: Var">Servis ✅</option>
+                    <option value="Servis: Yok">Servis ❌</option>
+                </select>
+            </div>
+            `;
+        }
+        playersList.innerHTML = html;
     }
 
     function showInstallGuide() { 
@@ -891,6 +923,19 @@
                 </div>
             `;
         }
+
+        // GÜNCELLEME: Kadro Formunun Görünürlüğünü Ayarla (Sadece Oynanmamışsa Çıkar)
+        const isPlayed = m.s1 !== "-" && m.s1 !== "";
+        const rosterSection = document.getElementById('whatsapp-roster-section');
+        if (rosterSection) {
+            if (!isPlayed) {
+                rosterSection.classList.remove('hidden');
+                rosterSection.classList.add('flex');
+            } else {
+                rosterSection.classList.add('hidden');
+                rosterSection.classList.remove('flex');
+            }
+        }
     }
 
     function closeWhatsappModal() { 
@@ -909,10 +954,39 @@
             const category = `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
             let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
             let msg = `*${header}*\nKategori: ${category}\n\n`; 
-            if (note) msg += `${note}\n\n`;
-            if (isPlayed) msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
-            else msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
-            msg += `Salon: ${m.venue}\nTarih: ${m.date}`;
+            
+            if (isPlayed) {
+                msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
+            } else {
+                msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
+            }
+            msg += `Salon: ${m.venue}\nTarih: ${m.date}\n\n`;
+
+            if (note) msg += `Not: ${note}\n\n`;
+
+            // GÜNCELLEME: Oynanmamış maçsa Antrenör ve Kadro bilgilerini mesajın sonuna ekler
+            if (!isPlayed) {
+                const coachInput = document.getElementById('coach-name');
+                const coachName = coachInput ? coachInput.value.trim() : '';
+                if (coachName) msg += `*Antrenör:* ${coachName}\n`;
+                
+                let playersMsg = '';
+                for(let i=1; i<=18; i++) {
+                    const pInput = document.getElementById(`player-name-${i}`);
+                    const pServe = document.getElementById(`player-serve-${i}`);
+                    if (pInput && pServe) {
+                        const pName = pInput.value.trim();
+                        const serveText = pServe.value; // Örn: "Servis: Var"
+                        if (pName) {
+                            playersMsg += `${i}. ${pName} (${serveText})\n`;
+                        }
+                    }
+                }
+                if (playersMsg) {
+                    msg += `\n*Maç Kadrosu:*\n${playersMsg}\n`;
+                }
+            }
+
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
             closeWhatsappModal();
         };
@@ -1302,6 +1376,7 @@
     }
 
     window.onload = () => { 
+        initRosterForm(); // Kadro formunu yüklemede başlat
         setDailyQuote();
         startLiveClock(); 
         fetchData(); 
