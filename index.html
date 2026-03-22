@@ -61,7 +61,6 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
         }
 
-        /* YENİDEN DÜZENLENDİ: Logo kesilmelerini ve ezilmelerini engelleyen yapı */
         .team-logo-circle {
             border-radius: 50%;
             display: flex;
@@ -69,7 +68,7 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
-            flex-shrink: 0; /* Flexbox içinde boyutunun küçülmesini engeller */
+            flex-shrink: 0;
         }
 
         .team-logo-circle img {
@@ -77,7 +76,7 @@
             height: 100%;
             object-fit: contain;
             object-position: center;
-            padding: 3px; /* Logoların sınırda kesilmesini önleyen standart iç koruma boşluğu */
+            padding: 3px;
             z-index: 2;
             position: relative;
             background: transparent;
@@ -205,15 +204,15 @@
                 
                 <div id="top-logos-wrapper" class="w-full transition-all duration-300">
                     <div id="top-logos-container" class="drag-scroll flex gap-2.5 sm:gap-3 overflow-x-auto w-full no-scrollbar pb-2 select-none items-center">
-                        <!-- Logolar JavaScript ile buraya eklenecek -->
+                        <!-- Logolar JavaScript ile eklenecek -->
                     </div>
                 </div>
 
                 <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
-                    <div id="status-tabs" class="drag-scroll flex bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar select-none transition-opacity duration-300">
-                        <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap">Hepsi</button>
-                        <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
-                        <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-8 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
+                    <div id="status-tabs" class="drag-scroll flex items-center bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar select-none transition-opacity duration-300">
+                        <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap text-indigo-600">Hepsi</button>
+                        <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
+                        <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
                     </div>
 
                     <div id="daily-quote-container" class="flex-1 w-full flex items-center justify-center bg-indigo-50/50 border border-indigo-100 rounded-2xl py-3.5 px-6 transition-opacity duration-300">
@@ -227,7 +226,7 @@
 
                 <div class="w-full relative group">
                     <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="team-search" oninput="handleSearch(this.value)" placeholder="Takım veya lig ara..." 
+                    <input type="text" id="team-search" oninput="handleSearch(this.value)" placeholder="Sistemdeki takımları veya ligi ara..." 
                            class="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-2xl py-4.5 pl-14 pr-6 text-sm font-semibold outline-none transition-all">
                 </div>
 
@@ -242,25 +241,15 @@
                         <button class="px-5 py-3 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed opacity-80">
                             TVF İzmir <span class="normal-case font-medium text-[9px] ml-1 opacity-70">(Yakında)</span>
                         </button>
-                        <button class="px-5 py-3 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed opacity-80">
-                            TVF Kocaeli <span class="normal-case font-medium text-[9px] ml-1 opacity-70">(Yakında)</span>
-                        </button>
                     </div>
                 </div>
 
+                <!-- MAÇLAR EKRANINDA GÖRÜNECEK ALANLAR -->
                 <div id="date-tabs-wrapper" class="border-t border-slate-100 pt-6 transition-all duration-300">
                     <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto w-full no-scrollbar pb-1 select-none"></div>
                 </div>
 
-                <div id="team-specific-filters" class="hidden flex-col gap-3 border-t border-slate-100 pt-5 mt-2 transition-all duration-300">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest"><i class="fas fa-filter mr-1"></i> Takım Filtreleri</h3>
-                        <button onclick="clearTeamSpecificFilters()" class="text-[9px] font-bold text-slate-400 hover:text-rose-500 uppercase transition-colors"><i class="fas fa-undo mr-1"></i>Temizle</button>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="team-filter-selects">
-                    </div>
-                </div>
-
+                <!-- SİSTEMDEKİ TAKIMLAR ALANI (A-Z) -->
                 <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 mt-2 hidden transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fas fa-users mr-1"></i> Sistemdeki Takımlar</h3>
@@ -270,18 +259,58 @@
                     <div id="playing-teams" class="flex flex-wrap gap-2.5 w-full max-h-[180px] overflow-y-auto custom-scrollbar pb-2 pr-2 select-none"></div>
                 </div>
 
+                <div id="team-groups-wrapper" class="hidden flex-col gap-3 border-t border-slate-100 pt-5 mt-2 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest"><i class="fas fa-sitemap mr-1"></i> TAKIMIN LİGLERİ VE GRUPLARI</h3>
+                    </div>
+                    <div id="team-groups-buttons" class="flex flex-wrap gap-2"></div>
+                    
+                    <div id="team-group-list-container" class="hidden mt-1 p-4 bg-indigo-50/50 border border-indigo-100/50 rounded-2xl shadow-inner transition-all duration-300">
+                        <h4 id="team-group-list-title" class="text-[10px] font-black text-indigo-900 uppercase tracking-tight mb-3 flex items-center gap-1.5"></h4>
+                        <div id="team-group-list-teams" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- GRUPLAR EKRANINDA GÖRÜNECEK ALAN (YENİ) -->
+                <div id="global-groups-wrapper" class="hidden flex-col gap-4 border-t border-slate-100 pt-6 mt-2 transition-all duration-300">
+                    <h3 id="global-groups-main-title" class="text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-1 flex items-center"></h3>
+                    <div id="global-groups-list" class="flex flex-col gap-5 w-full pb-4 select-none"></div>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <!-- MAÇLAR KART ALANI -->
     <main id="match-container" class="mt-12 px-4 container mx-auto flex flex-col gap-6 max-w-6xl mx-auto"></main>
     
     <div id="empty-state" class="hidden flex-col items-center justify-center py-40 text-slate-300">
         <i class="fas fa-volleyball-ball text-8xl mb-6 opacity-10"></i>
-        <p class="font-bold text-xl tracking-tight">Eşleşen maç bulunamadı.</p>
+        <p id="empty-state-text" class="font-bold text-xl tracking-tight text-center px-4">Eşleşen maç bulunamadı.</p>
     </div>
+
+    <!-- Footer Alanı -->
+    <footer class="mt-12 pb-8 pt-12 border-t border-slate-200/60 bg-transparent w-full">
+        <div class="flex flex-col items-center justify-center gap-5 text-center px-4 max-w-6xl mx-auto">
+            <div class="flex items-center gap-2 opacity-50">
+                <i class="fas fa-volleyball-ball text-indigo-900"></i>
+                <h3 class="font-black text-indigo-950 tracking-tight text-sm uppercase">Voleybol Day Pro</h3>
+            </div>
+            
+            <div class="flex flex-col items-center gap-3">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">İletişim & Destek</span>
+                <a href="https://wa.me/90535724758?text=Merhaba%20Voleybol%20Day%20Pro,%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" 
+                   class="flex items-center gap-2.5 px-6 py-3 bg-white border border-slate-200 hover:border-[#25D366] hover:bg-[#25D366]/5 text-slate-700 hover:text-[#25D366] rounded-2xl font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-95 group">
+                    <i class="fab fa-whatsapp text-xl text-[#25D366] group-hover:scale-110 transition-transform"></i> 
+                    Voleybol Day Pro - Nasıl yardımcı olabilirim?
+                </a>
+            </div>
+        </div>
+    </footer>
+
 </div>
 
+<!-- WhatsApp Not Modalı -->
 <div id="whatsapp-modal" class="modal-overlay">
     <div class="modal-content shadow-2xl">
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
@@ -293,7 +322,7 @@
         </div>
         
         <div id="whatsapp-modal-match-info" class="flex items-center justify-between gap-2 mb-6 p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
-            <!-- Dinamik olarak JS ile doldurulacak -->
+            <!-- Dinamik doldurulacak -->
         </div>
 
         <div class="relative">
@@ -307,7 +336,8 @@
 </div>
 
 <script>
-    const SHEET_ID = '1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic';
+    // --- TEMEL BAĞLANTILAR VE AYARLAR ---
+    const SHEET_ID = '1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic'; // Maçlar
     const MATCHES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
     const LOGOS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=logolar`;
 
@@ -334,25 +364,25 @@
         "tuzlanew": "https://volleybox.net/media/upload/teams/big_17405585056qKWD.png",
         "timeatletik": "https://i.hizliresim.com/apd9lrn.png",
         "adayıldızları": "https://www.adayildizlari.com/wp-content/uploads/2017/06/adayildizlari-logo.png",
-        "alfa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-8SYpB9-Wpt3J0lB2UKEsGVVroXjh2zPM9A&s"
+        "alfa": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-8SYpB9-Wpt3J0lB2UKEsGVVroXjh2zPM9A&s",
+        "anadolusmaç": "https://r.resimlink.com/5MqIQVKh9D.png",
+        "anka": "https://r.resimlink.com/Ns8JL.png",
+        "atakentatletik": "https://r.resimlink.com/_Ic27SRh0Je4.png",
+        "atakentelit": "https://r.resimlink.com/_6nyse7W.png",
+        "anadoluolimpik": "https://r.resimlink.com/srj_2fzdV.png",
+        "atayıldız": "https://r.resimlink.com/5R7M_ogbF.png",
+        "atlasolimpik": "https://r.resimlink.com/C8zNJjyer.png",
+        "ava": "https://r.resimlink.com/gdTpqOo19.png",
+        "avcılardemirordu": "https://r.resimlink.com/1uSvAayc.png"
     };
 
     const MOTIVATION_QUOTES = [
         "Başarı, hazırlık ve fırsatın buluştuğu yerdir.",
-        "Düşmek önemli değil, düştüğün yerden daha güçlü kalkmak önemlidir.",
         "Sahadaki en büyük yetenek, asla pes etmeme yeteneğidir.",
         "Ter dökmeden dökülen gözyaşı, zafer getirmez.",
-        "Zorluklar, sıradan insanları sıra dışı başarılara hazırlar.",
         "Şampiyonlar salonlarda yapılmaz. Şampiyonlar içlerindeki tutkuyla oluşur.",
         "Bir takımın gücü, her bir üyesidir. Her bir üyenin gücü ise takımdır.",
-        "Sınırlarını zorla, çünkü mucizeler sınırların bittiği yerde başlar.",
-        "Maç sahada kazanılmadan önce zihinde kazanılır.",
-        "Yetenek maçı kazandırır, ancak zeka ve takım oyunu şampiyonluğu.",
-        "Her antrenman, zafere atılan bir adımdır.",
-        "İnanç, görünmeyene inanmaktır. Ödülü ise inandığını görmektir.",
-        "Mazeretler, sadece başarısızlıkların süslü kılıflarıdır.",
-        "Geri adım atmak sadece daha uzağa sıçramak içindir.",
-        "Asla pes etme! Çünkü tam vazgeçtiğin an, mucizenin gerçekleşeceği andır."
+        "Maç sahada kazanılmadan önce zihinde kazanılır."
     ];
 
     let state = {
@@ -364,10 +394,7 @@
         selectedAlphabet: null,
         selectedTeam: null,
         loading: true,
-        currentSharingMatch: null,
-        teamFilters: {
-            dk: "", c: "", kume: "", ktg: "", tur: "", gr: ""
-        }
+        currentSharingMatch: null
     };
 
     function setDailyQuote() {
@@ -424,20 +451,71 @@
 
     function getBaseTeamName(str) {
         if (!str) return "";
-        let s = cleanTeamName(str).trim();
-        s = s.replace(/[\s\-]+[a-zA-Z0-9]$/i, ''); 
-        s = s.replace(/([0-9]+)[a-zA-Z]$/i, '$1'); 
-        return s.trim();
+        return cleanTeamName(str).trim();
     }
 
     function normalize(str) {
         if (!str) return "";
-        let s = cleanTeamName(str).toLocaleLowerCase('tr-TR');
-        s = s.replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)$/gi, '');
-        s = s.replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)\s+/gi, ' ');
-        s = s.replace(/sk$/g, '').replace(/s\.k$/g, '').replace(/spor/g, '').replace(/kulübü/g, '');
-        s = s.replace(/\s+/g, '').replace(/[\.\,\-\(\)]/g, ''); 
-        return s;
+        return str.toString().trim().toLocaleLowerCase('tr-TR')
+            .replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)$/gi, '')
+            .replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)\s+/gi, ' ')
+            .replace(/sk$/g, '').replace(/s\.k$/g, '')
+            .replace(/spor/g, '').replace(/kulübü/g, '')
+            .replace(/\s+/g, '').replace(/[\.\,\-\(\)]/g, ''); 
+    }
+
+    function isPlaceholderTeam(str) {
+        if (!str) return true;
+        const s = str.toLowerCase();
+        return s.includes(".si") || s.includes(".sü") || s.includes(".cü") || 
+               s.includes(".cı") || s.includes(".sı") || s.includes("galibi") || 
+               s.includes("mağlubu") || s.includes("yükselen") || s.includes("düşen");
+    }
+
+    function buildGroupName(kume, c, ktg, tur, gr) {
+        const parts = [];
+        const cleanPart = (str) => {
+            if (!str || str === "-") return '';
+            return str.trim().replace(/^[\.\-\_]+|[\.\-\_]+$/g, '').trim();
+        };
+
+        const pKume = cleanPart(kume);
+        const pC = cleanPart(c);
+        const pKtg = cleanPart(ktg);
+        const pTur = cleanPart(tur);
+        
+        if (pKume) parts.push(pKume);
+        if (pC) parts.push(pC);
+        if (pKtg) parts.push(pKtg);
+        if (pTur) parts.push(pTur);
+        
+        let pGr = cleanPart(gr);
+        if (pGr) {
+            pGr = pGr.replace(/grubu/i, '').replace(/grup/i, '').replace(/gr\./i, '').replace(/gr/i, '').trim();
+            pGr = cleanPart(pGr); 
+            
+            if (pGr) {
+                if (/^\d+$/.test(pGr)) {
+                    parts.push(pGr + ". Grup");
+                } else {
+                    parts.push(pGr + " Grubu");
+                }
+            }
+        }
+        
+        return parts.length > 0 ? parts.join(' ').replace(/\s+/g, ' ') : '';
+    }
+
+    function formatExtractedGroupName(name) {
+        let g = name.trim();
+        g = g.replace(/-\.\s*Grubu/gi, ''); 
+        g = g.replace(/-\s*Grubu/gi, ''); 
+        g = g.replace(/\.\s*Grubu/gi, ' Grubu');
+        g = g.replace(/([A-Za-z])\.\s*Grubu/gi, '$1 Grubu');
+        g = g.replace(/GRUBU/g, 'Grubu'); 
+        g = g.replace(/\s+/g, ' ');
+        g = g.replace(/[\-\.]+$/g, '').trim();
+        return g;
     }
 
     function wrapProxy(url) {
@@ -473,12 +551,15 @@
         try {
             document.getElementById('loading-overlay').classList.remove('hidden');
             const timestamp = Date.now();
-            const [mRes, lRes] = await Promise.all([
-                fetch(`${MATCHES_URL}&cb=${timestamp}`),
-                fetch(`${LOGOS_URL}&cb=${timestamp}`)
-            ]);
-            state.logoMap = parseLogos(await lRes.text());
-            state.allMatches = parseMatches(await mRes.text());
+            
+            const mPromise = fetch(`${MATCHES_URL}&cb=${timestamp}`).then(r => r.text());
+            const lPromise = fetch(`${LOGOS_URL}&cb=${timestamp}`).then(r => r.text());
+
+            const results = await Promise.all([mPromise, lPromise]);
+            
+            state.logoMap = parseLogos(results[1]);
+            state.allMatches = parseMatches(results[0]);
+
             if (state.allMatches.length > 0) {
                 const dates = getSortedDates();
                 const todayStr = getTodayString();
@@ -492,13 +573,15 @@
             state.loading = false;
             document.getElementById('loading-overlay').classList.add('hidden');
             updateUI();
-        } catch (error) { showError("Veri yüklenirken bir hata oluştu."); }
+        } catch (error) { 
+            console.error(error);
+            showError("Veri yüklenirken bir hata oluştu."); 
+        }
     }
 
     function parseLogos(csv) {
         const lines = csv.split(/\r?\n/);
         const map = {}; 
-        
         lines.forEach(line => {
             const p = parseCSVLine(line);
             if (p.length >= 2) {
@@ -511,7 +594,7 @@
         for (const key in CONSTANT_LOGOS) {
             map[normalize(key)] = CONSTANT_LOGOS[key];
         }
-        
+
         return map;
     }
 
@@ -523,41 +606,25 @@
                 date: p[0] || "", venue: p[1] || "", time: p[2] || "",
                 t1: cleanTeamName(p[3]), s1: p[4] || "-", s2: p[5] || "-", t2: cleanTeamName(p[6]),
                 sets: p[7] || "Oynanmadı", 
-                dk: p[8] || "",
-                c: p[9] || "",
-                kume: p[10] || "",
-                ktg: p[11] || "",
-                tur: p[12] || "",
-                gr: p[13] || "",
-                gender: p[9] || "M", 
-                league: p[10] || "LİG" 
+                dk: p[8] || "", c: p[9] || "", kume: p[10] || "", ktg: p[11] || "", tur: p[12] || "", gr: p[13] || "",
+                gender: p[9] || "M", league: p[10] || "LİG" 
             };
         });
     }
 
     function getLogoHtml(teamName, extraClasses = "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0") {
         const normalizedName = normalize(teamName);
-        const baseName = normalize(getBaseTeamName(teamName)); 
         let rawUrl = null;
         
-        if (state.logoMap[normalizedName]) {
-            rawUrl = state.logoMap[normalizedName];
-        } else if (state.logoMap[baseName]) {
-            rawUrl = state.logoMap[baseName];
-        } else {
-            let bestMatch = "";
-            for (const key in state.logoMap) {
-                if (key.length > 2 && (normalizedName.includes(key) || baseName.includes(key) || key.includes(normalizedName) || key.includes(baseName))) {
-                    if (key.length > bestMatch.length) {
-                        bestMatch = key;
-                        rawUrl = state.logoMap[key]; 
-                    }
-                }
+        for (const key in state.logoMap) {
+            if (key.length > 2 && (normalizedName.includes(key) || key.includes(normalizedName))) {
+                rawUrl = state.logoMap[key]; 
+                break;
             }
         }
         
         const url = wrapProxy(rawUrl);
-        const initials = getBaseTeamName(teamName).substring(0, 2).toUpperCase() || "VO";
+        const initials = teamName.substring(0, 2).toUpperCase() || "VO";
         
         return `
             <div class="team-logo-circle ${extraClasses}">
@@ -614,31 +681,31 @@
         return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
     };
 
-    // YENİDEN TASARLANDI: Sütunların yükseklikleri (height) senkronize edildi. Ezilme önlendi.
     function createMatchCard(m) {
         const isLive = checkLiveStatus(m);
         const encodedMatch = encodeURIComponent(JSON.stringify(m));
         const setScores = parseSetScoresHtml(m.sets);
 
-        const infoTags = [];
-        if(m.league && m.league !== "LİG") infoTags.push(m.league);
-        if(m.gender) infoTags.push(m.gender === 'E' ? 'Erkek' : (m.gender === 'K' ? 'Kadın' : m.gender));
-        if(m.ktg) infoTags.push(m.ktg);
-        if(m.tur) infoTags.push(m.tur);
-        if(m.gr) infoTags.push(m.gr + '. Gr');
+        const leagueGroupText = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
 
         return `
             <div class="match-card bg-white p-4 lg:p-5 shadow-sm flex flex-col lg:flex-row items-center gap-4 lg:gap-6 relative overflow-hidden group/card w-full border border-slate-200 rounded-[1.25rem]">
-                <div class="w-full lg:w-[170px] shrink-0 flex flex-col gap-3">
-                    <div class="bg-slate-100/80 rounded-xl p-3 text-[11px] text-slate-500 font-medium leading-relaxed relative">
-                        <span class="text-indigo-600 font-bold block mb-1">${infoTags.join(' • ')}</span>
-                        ${m.date} - ${m.time}
+                <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2">
+                    
+                    <div class="bg-indigo-50 rounded-xl py-2 px-3 text-[10.5px] text-indigo-700 font-bold leading-relaxed border border-indigo-100/50 shadow-sm flex items-center gap-1.5 uppercase tracking-tight">
+                        <i class="fas fa-trophy text-amber-500 text-xs"></i> ${leagueGroupText}
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-2.5 text-[11px] text-slate-500 font-semibold leading-relaxed relative border border-slate-100 flex flex-col gap-1.5">
+                        <div class="flex items-center gap-2">
+                            <i class="far fa-calendar-alt text-slate-400"></i> ${m.date} - ${m.time}
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-map-marker-alt mt-0.5 text-slate-400"></i> <span class="leading-tight">${m.venue}</span>
+                        </div>
                         ${isLive ? '<div class="absolute top-2 right-2 flex items-center gap-1 text-rose-500 font-black text-[9px] uppercase animate-pulse"><span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>CANLI</div>' : ''}
                     </div>
-                    <div class="flex items-start gap-2 text-xs text-slate-500 font-medium px-1">
-                        <i class="fas fa-map-marker-alt mt-0.5 text-slate-400"></i>
-                        <span class="leading-tight">${m.venue}</span>
-                    </div>
+
                 </div>
 
                 <div class="flex-1 flex flex-row items-center justify-between w-full overflow-hidden border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
@@ -757,85 +824,31 @@
         }
     }
 
-    function clearSelectedTeam() {
-        state.selectedTeam = null;
-        clearTeamSpecificFilters();
-        document.getElementById('team-search').value = '';
-        handleSearch('');
-    }
-
-    function handleTeamFilterChange(key, value) {
-        state.teamFilters[key] = value;
-        renderMatches(); 
-    }
-
-    function clearTeamSpecificFilters() {
-        state.teamFilters = { dk: "", c: "", kume: "", ktg: "", tur: "", gr: "" };
+    function selectTeam(team) {
+        state.selectedTeam = team;
+        document.getElementById('team-search').value = team;
+        state.searchQuery = team;
+        
+        document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active', 'text-indigo-600'));
+        const allFilterBtn = document.getElementById('filter-all');
+        if (allFilterBtn) {
+            allFilterBtn.classList.add('active', 'text-indigo-600');
+            state.selectedStatus = 'all';
+        }
+        
+        const teamNorm = normalize(team);
+        const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (normalize(m.t1) === teamNorm || normalize(m.t2) === teamNorm));
+        if (!teamPlaysToday) {
+            const nextMatch = state.allMatches.find(m => normalize(m.t1) === teamNorm || normalize(m.t2) === teamNorm);
+            if (nextMatch) state.currentDate = nextMatch.date;
+        }
         updateUI();
     }
 
-    function renderTeamSpecificFilters() {
-        const container = document.getElementById('team-specific-filters');
-        const selectsContainer = document.getElementById('team-filter-selects');
-        
-        if (!state.selectedTeam) {
-            container.classList.add('hidden');
-            container.classList.remove('flex');
-            return;
-        }
-
-        const teamMatches = state.allMatches.filter(m => getBaseTeamName(m.t1) === state.selectedTeam || getBaseTeamName(m.t2) === state.selectedTeam);
-
-        const filterKeys = [
-            { id: 'dk', label: 'Dk.' },
-            { id: 'c', label: 'C' },
-            { id: 'kume', label: 'Küme' },
-            { id: 'ktg', label: 'Ktg' },
-            { id: 'tur', label: 'Tür' },
-            { id: 'gr', label: 'Gr' }
-        ];
-
-        selectsContainer.innerHTML = '';
-        let hasAnyFilter = false;
-
-        filterKeys.forEach(fk => {
-            const uniqueValues = [...new Set(teamMatches.map(m => m[fk.id]).filter(v => v && v.trim() !== ""))].sort();
-            
-            if (uniqueValues.length === 0) return;
-            
-            hasAnyFilter = true;
-
-            const selectWrapper = document.createElement('div');
-            selectWrapper.className = 'relative w-full';
-            
-            const select = document.createElement('select');
-            select.className = 'w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 appearance-none cursor-pointer pr-8';
-            
-            select.innerHTML = `<option value="">${fk.label} (Tümü)</option>`;
-            
-            uniqueValues.forEach(val => {
-                const isSelected = state.teamFilters[fk.id] === val;
-                select.innerHTML += `<option value="${val}" ${isSelected ? 'selected' : ''}>${val}</option>`;
-            });
-
-            select.onchange = (e) => handleTeamFilterChange(fk.id, e.target.value);
-            
-            const arrow = document.createElement('div');
-            arrow.className = 'absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-[10px]';
-            arrow.innerHTML = '<i class="fas fa-chevron-down"></i>';
-
-            selectWrapper.appendChild(select);
-            selectWrapper.appendChild(arrow);
-            selectsContainer.appendChild(selectWrapper);
-        });
-
-        if (hasAnyFilter) {
-            container.classList.remove('hidden');
-            container.classList.add('flex');
-        } else {
-            container.classList.add('hidden');
-            container.classList.remove('flex');
-        }
+    function clearSelectedTeam() {
+        state.selectedTeam = null;
+        document.getElementById('team-search').value = '';
+        handleSearch('');
     }
 
     function renderMatches() {
@@ -845,15 +858,10 @@
         let matchesToRender = [];
 
         if (state.selectedTeam) {
-            matchesToRender = state.allMatches.filter(m => getBaseTeamName(m.t1) === state.selectedTeam || getBaseTeamName(m.t2) === state.selectedTeam);
-
-            if (state.teamFilters.dk) matchesToRender = matchesToRender.filter(m => m.dk === state.teamFilters.dk);
-            if (state.teamFilters.c) matchesToRender = matchesToRender.filter(m => m.c === state.teamFilters.c);
-            if (state.teamFilters.kume) matchesToRender = matchesToRender.filter(m => m.kume === state.teamFilters.kume);
-            if (state.teamFilters.ktg) matchesToRender = matchesToRender.filter(m => m.ktg === state.teamFilters.ktg);
-            if (state.teamFilters.tur) matchesToRender = matchesToRender.filter(m => m.tur === state.teamFilters.tur);
-            if (state.teamFilters.gr) matchesToRender = matchesToRender.filter(m => m.gr === state.teamFilters.gr);
-
+            matchesToRender = state.allMatches.filter(m => 
+                normalize(m.t1) === normalize(state.selectedTeam) || 
+                normalize(m.t2) === normalize(state.selectedTeam)
+            );
         } else {
             matchesToRender = state.allMatches.filter(m => m.date === state.currentDate);
 
@@ -870,6 +878,11 @@
 
         if (matchesToRender.length === 0) {
             document.getElementById('empty-state').classList.remove('hidden');
+            if(state.selectedTeam) {
+                document.getElementById('empty-state-text').innerText = "Bu takımın henüz planlanmış maçı bulunmamaktadır.";
+            } else {
+                document.getElementById('empty-state-text').innerText = "Eşleşen maç bulunamadı.";
+            }
         } else {
             document.getElementById('empty-state').classList.add('hidden');
             renderMatchGroups(matchesToRender, container);
@@ -895,7 +908,7 @@
             
             selectedTeamDisplay.classList.remove('hidden');
             selectedTeamDisplay.classList.add('flex');
-            selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0"); 
+            selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0 border-none shadow-none"); 
         } else {
             statusTabs.classList.remove('opacity-30', 'pointer-events-none');
             dailyQuoteContainer.classList.remove('opacity-30', 'pointer-events-none');
@@ -910,7 +923,6 @@
         renderDateTabs(); 
         renderTopLogos();
         renderAlphabetTeams();
-        renderTeamSpecificFilters(); 
         renderMatches(); 
     }
     
@@ -935,27 +947,24 @@
         const container = document.getElementById('top-logos-container');
         const wrapper = document.getElementById('top-logos-wrapper');
         
-        const teamsSet = new Set();
+        const teamsMap = new Map();
 
         if (state.currentDate) {
             const matchesOnDate = state.allMatches.filter(m => m.date === state.currentDate);
             matchesOnDate.forEach(m => {
-                if (m.t1 && m.t1 !== "-") teamsSet.add(getBaseTeamName(m.t1));
-                if (m.t2 && m.t2 !== "-") teamsSet.add(getBaseTeamName(m.t2));
+                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) teamsMap.set(normalize(m.t1), m.t1);
+                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) teamsMap.set(normalize(m.t2), m.t2);
             });
         }
 
-        if (teamsSet.size === 0) {
-            const allTeams = new Set();
+        if (teamsMap.size === 0) {
             state.allMatches.forEach(m => {
-                if (m.t1 && m.t1 !== "-") allTeams.add(getBaseTeamName(m.t1));
-                if (m.t2 && m.t2 !== "-") allTeams.add(getBaseTeamName(m.t2));
+                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) teamsMap.set(normalize(m.t1), m.t1);
+                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) teamsMap.set(normalize(m.t2), m.t2);
             });
-            const allTeamsArray = Array.from(allTeams).sort((a, b) => a.localeCompare(b, 'tr')).slice(0, 50);
-            allTeamsArray.forEach(t => teamsSet.add(t));
         }
 
-        const teams = Array.from(teamsSet).sort((a, b) => a.localeCompare(b, 'tr'));
+        const teams = Array.from(teamsMap.values()).sort((a, b) => a.localeCompare(b, 'tr')).slice(0, 50);
         
         if (teams.length === 0) { 
             wrapper.classList.add('hidden'); 
@@ -967,7 +976,7 @@
         container.innerHTML = '';
 
         teams.forEach(team => {
-            const isActive = state.selectedTeam === team;
+            const isActive = normalize(state.selectedTeam) === normalize(team);
             const chip = document.createElement('div');
             
             chip.className = `flex items-center justify-center p-1 rounded-full border-2 transition-all cursor-pointer select-none shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300 hover:scale-105 shadow-sm'}`;
@@ -977,17 +986,7 @@
                 if (isActive) { 
                     clearSelectedTeam();
                 } else {
-                    clearTeamSpecificFilters(); 
-                    state.selectedTeam = team;
-                    document.getElementById('team-search').value = team;
-                    
-                    const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (getBaseTeamName(m.t1) === team || getBaseTeamName(m.t2) === team));
-                    if (!teamPlaysToday) {
-                        const nextMatch = state.allMatches.find(m => getBaseTeamName(m.t1) === team || getBaseTeamName(m.t2) === team);
-                        if (nextMatch) state.currentDate = nextMatch.date;
-                    }
-                    
-                    handleSearch(team);
+                    selectTeam(team);
                 }
             };
             
@@ -1001,12 +1000,14 @@
         const wrapper = document.getElementById('playing-teams-wrapper');
         const alphabetContainer = document.getElementById('alphabet-index');
         
-        const teamsSet = new Set();
+        const teamsMap = new Map();
+        
         state.allMatches.forEach(m => {
-            if (m.t1 && m.t1 !== "-") teamsSet.add(getBaseTeamName(m.t1));
-            if (m.t2 && m.t2 !== "-") teamsSet.add(getBaseTeamName(m.t2));
+            if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) teamsMap.set(normalize(m.t1), m.t1);
+            if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) teamsMap.set(normalize(m.t2), m.t2);
         });
-        const teams = Array.from(teamsSet).sort((a, b) => a.localeCompare(b, 'tr'));
+
+        const teams = Array.from(teamsMap.values()).sort((a, b) => a.localeCompare(b, 'tr'));
         
         if (teams.length === 0) { 
             wrapper.classList.add('hidden'); 
@@ -1016,7 +1017,6 @@
         }
 
         const alphabet = ['Hepsi', '0-9', 'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'İ', 'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'Q', 'R', 'S', 'Ş', 'T', 'U', 'Ü', 'V', 'W', 'X', 'Y', 'Z'];
-
         const teamsByLetter = {};
         alphabet.forEach(l => teamsByLetter[l] = []);
         
@@ -1029,33 +1029,33 @@
                     teamsByLetter[firstChar].push(team);
                 } else {
                     const fallbackChar = team.charAt(0).toUpperCase();
-                    if (teamsByLetter[fallbackChar]) {
-                        teamsByLetter[fallbackChar].push(team);
-                    }
+                    if (teamsByLetter[fallbackChar]) teamsByLetter[fallbackChar].push(team);
                 }
             }
             teamsByLetter['Hepsi'].push(team);
         });
 
-        alphabetContainer.innerHTML = '';
-        alphabet.forEach(letter => {
-            const hasTeams = teamsByLetter[letter] && teamsByLetter[letter].length > 0;
-            const isActive = state.selectedAlphabet === letter;
-            
-            const btn = document.createElement('button');
-            if (hasTeams || letter === 'Hepsi') {
-                btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'} ${letter === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`;
-                btn.innerText = letter;
-                btn.onclick = () => {
-                    state.selectedAlphabet = isActive ? null : letter;
-                    updateUI(); 
-                };
-            } else {
-                btn.className = `w-8 h-8 shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black text-slate-300 bg-slate-50/50 cursor-not-allowed border border-slate-100/50`;
-                btn.innerText = letter;
-            }
-            alphabetContainer.appendChild(btn);
-        });
+        if (alphabetContainer) {
+            alphabetContainer.innerHTML = '';
+            alphabet.forEach(letter => {
+                const hasTeams = teamsByLetter[letter] && teamsByLetter[letter].length > 0;
+                const isActive = state.selectedAlphabet === letter;
+                
+                const btn = document.createElement('button');
+                if (hasTeams || letter === 'Hepsi') {
+                    btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'} ${letter === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`;
+                    btn.innerText = letter;
+                    btn.onclick = () => {
+                        state.selectedAlphabet = isActive ? null : letter;
+                        updateUI(); 
+                    };
+                } else {
+                    btn.className = `w-8 h-8 shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black text-slate-300 bg-slate-50/50 cursor-not-allowed border border-slate-100/50`;
+                    btn.innerText = letter;
+                }
+                alphabetContainer.appendChild(btn);
+            });
+        }
 
         container.innerHTML = '';
 
@@ -1064,47 +1064,55 @@
             return;
         }
         
-        const teamsToShow = teamsByLetter[state.selectedAlphabet] || [];
+        let teamsToShow = teamsByLetter[state.selectedAlphabet] || [];
         
+        if (state.searchQuery && !state.selectedTeam) {
+            const q = normalize(state.searchQuery);
+            teamsToShow = teamsToShow.filter(t => normalize(t).includes(q));
+        }
+
         if (teamsToShow.length === 0) {
-            container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-2 px-1">Bu harfle başlayan takım bulunmamaktadır.</span>';
+            container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-2 px-1">Eşleşen takım bulunamadı.</span>';
         }
 
         teamsToShow.forEach(team => {
-            const isActive = state.selectedTeam === team;
+            const isActive = normalize(state.selectedTeam) === normalize(team);
             const chip = document.createElement('div');
             chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border transition-all cursor-pointer select-none shrink-0 ${isActive ? 'bg-indigo-600 border-indigo-600 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
+            chip.innerHTML = `${getLogoHtml(team, "w-6 h-6 bg-transparent shrink-0")} <span class="text-[11px] font-bold ${isActive ? 'text-white' : 'text-slate-700'}">${team}</span>`;
+            
             chip.onclick = () => {
                 if (isActive) { 
                     clearSelectedTeam();
                 } else {
-                    clearTeamSpecificFilters(); 
-                    state.selectedTeam = team;
-                    document.getElementById('team-search').value = team;
-                    
-                    const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (getBaseTeamName(m.t1) === team || getBaseTeamName(m.t2) === team));
-                    if (!teamPlaysToday) {
-                        const nextMatch = state.allMatches.find(m => getBaseTeamName(m.t1) === team || getBaseTeamName(m.t2) === team);
-                        if (nextMatch) state.currentDate = nextMatch.date;
-                    }
-                    
-                    handleSearch(team);
+                    selectTeam(team);
                 }
             };
-            const textColor = isActive ? 'text-white' : 'text-slate-700';
-            chip.innerHTML = `${getLogoHtml(team, "w-7 h-7 bg-transparent shrink-0")} <span class="text-[11px] font-bold ${textColor}">${team}</span>`;
             container.appendChild(chip);
         });
     }
-    
-    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); updateUI(); }
-    
-    function handleSearch(v) { 
-        state.searchQuery = v; 
-        if (state.selectedTeam && v !== state.selectedTeam) {
-            clearSelectedTeam();
+
+    function handleSearch(val) {
+        state.searchQuery = val;
+        
+        if (val && state.selectedTeam && normalize(val) !== normalize(state.selectedTeam)) {
+            state.selectedTeam = null;
         }
-        updateUI(); 
+        updateUI();
+    }
+
+    function setStatusFilter(status) {
+        state.selectedStatus = status;
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.classList.remove('active', 'text-indigo-600');
+            btn.classList.add('text-slate-500');
+        });
+        const activeBtn = document.getElementById(`filter-${status}`);
+        if (activeBtn) {
+            activeBtn.classList.add('active', 'text-indigo-600');
+            activeBtn.classList.remove('text-slate-500');
+        }
+        updateUI();
     }
     
     function showError(m) { 
