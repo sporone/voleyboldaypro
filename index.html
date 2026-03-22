@@ -259,24 +259,6 @@
                     <div id="playing-teams" class="flex flex-wrap gap-2.5 w-full max-h-[180px] overflow-y-auto custom-scrollbar pb-2 pr-2 select-none"></div>
                 </div>
 
-                <div id="team-groups-wrapper" class="hidden flex-col gap-3 border-t border-slate-100 pt-5 mt-2 transition-all duration-300">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest"><i class="fas fa-sitemap mr-1"></i> TAKIMIN LİGLERİ VE GRUPLARI</h3>
-                    </div>
-                    <div id="team-groups-buttons" class="flex flex-wrap gap-2"></div>
-                    
-                    <div id="team-group-list-container" class="hidden mt-1 p-4 bg-indigo-50/50 border border-indigo-100/50 rounded-2xl shadow-inner transition-all duration-300">
-                        <h4 id="team-group-list-title" class="text-[10px] font-black text-indigo-900 uppercase tracking-tight mb-3 flex items-center gap-1.5"></h4>
-                        <div id="team-group-list-teams" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
-
-                <!-- GRUPLAR EKRANINDA GÖRÜNECEK ALAN (YENİ) -->
-                <div id="global-groups-wrapper" class="hidden flex-col gap-4 border-t border-slate-100 pt-6 mt-2 transition-all duration-300">
-                    <h3 id="global-groups-main-title" class="text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-1 flex items-center"></h3>
-                    <div id="global-groups-list" class="flex flex-col gap-5 w-full pb-4 select-none"></div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -449,6 +431,15 @@
         return str.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').trim();
     }
 
+    // YENİ EK: Takımın ismindeki sondaki A, B, C gibi ekleri silen çekirdek isim fonksiyonu (Filtreler için)
+    function getCoreName(str) {
+        if (!str) return "";
+        let s = cleanTeamName(str);
+        // Sadece tekil harf olan takım şubesi uzantılarını ( A, B, C, D, E ) sondan kaldır
+        s = s.replace(/\s+[A-E]$/i, '');
+        return s.trim();
+    }
+
     function getBaseTeamName(str) {
         if (!str) return "";
         return cleanTeamName(str).trim();
@@ -504,18 +495,6 @@
         }
         
         return parts.length > 0 ? parts.join(' ').replace(/\s+/g, ' ') : '';
-    }
-
-    function formatExtractedGroupName(name) {
-        let g = name.trim();
-        g = g.replace(/-\.\s*Grubu/gi, ''); 
-        g = g.replace(/-\s*Grubu/gi, ''); 
-        g = g.replace(/\.\s*Grubu/gi, ' Grubu');
-        g = g.replace(/([A-Za-z])\.\s*Grubu/gi, '$1 Grubu');
-        g = g.replace(/GRUBU/g, 'Grubu'); 
-        g = g.replace(/\s+/g, ' ');
-        g = g.replace(/[\-\.]+$/g, '').trim();
-        return g;
     }
 
     function wrapProxy(url) {
@@ -824,10 +803,11 @@
         }
     }
 
-    function selectTeam(team) {
-        state.selectedTeam = team;
-        document.getElementById('team-search').value = team;
-        state.searchQuery = team;
+    // TAKIM SEÇİM ORTAK FONKSİYONU - Arama kutusuna Core (Kök) adını yerleştirir
+    function selectTeam(teamCoreName) {
+        state.selectedTeam = teamCoreName;
+        document.getElementById('team-search').value = teamCoreName;
+        state.searchQuery = teamCoreName;
         
         document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active', 'text-indigo-600'));
         const allFilterBtn = document.getElementById('filter-all');
@@ -836,10 +816,10 @@
             state.selectedStatus = 'all';
         }
         
-        const teamNorm = normalize(team);
-        const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (normalize(m.t1) === teamNorm || normalize(m.t2) === teamNorm));
+        const teamNorm = normalize(teamCoreName);
+        const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm));
         if (!teamPlaysToday) {
-            const nextMatch = state.allMatches.find(m => normalize(m.t1) === teamNorm || normalize(m.t2) === teamNorm);
+            const nextMatch = state.allMatches.find(m => normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm);
             if (nextMatch) state.currentDate = nextMatch.date;
         }
         updateUI();
@@ -858,9 +838,11 @@
         let matchesToRender = [];
 
         if (state.selectedTeam) {
+            const selectedNorm = normalize(state.selectedTeam);
+            // GÜNCELLEME: Takımın çekirdek adıyla filtreler. Böylece "SAYDAM" arandığında "SAYDAM A" da gelir.
             matchesToRender = state.allMatches.filter(m => 
-                normalize(m.t1) === normalize(state.selectedTeam) || 
-                normalize(m.t2) === normalize(state.selectedTeam)
+                normalize(getCoreName(m.t1)) === selectedNorm || 
+                normalize(getCoreName(m.t2)) === selectedNorm
             );
         } else {
             matchesToRender = state.allMatches.filter(m => m.date === state.currentDate);
@@ -908,6 +890,7 @@
             
             selectedTeamDisplay.classList.remove('hidden');
             selectedTeamDisplay.classList.add('flex');
+            // Takımın logosunu gösterirken asıl adıyla al
             selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0 border-none shadow-none"); 
         } else {
             statusTabs.classList.remove('opacity-30', 'pointer-events-none');
@@ -952,15 +935,27 @@
         if (state.currentDate) {
             const matchesOnDate = state.allMatches.filter(m => m.date === state.currentDate);
             matchesOnDate.forEach(m => {
-                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) teamsMap.set(normalize(m.t1), m.t1);
-                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) teamsMap.set(normalize(m.t2), m.t2);
+                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
+                    const core = getCoreName(m.t1);
+                    teamsMap.set(normalize(core), core);
+                }
+                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) {
+                    const core = getCoreName(m.t2);
+                    teamsMap.set(normalize(core), core);
+                }
             });
         }
 
         if (teamsMap.size === 0) {
             state.allMatches.forEach(m => {
-                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) teamsMap.set(normalize(m.t1), m.t1);
-                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) teamsMap.set(normalize(m.t2), m.t2);
+                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
+                    const core = getCoreName(m.t1);
+                    teamsMap.set(normalize(core), core);
+                }
+                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) {
+                    const core = getCoreName(m.t2);
+                    teamsMap.set(normalize(core), core);
+                }
             });
         }
 
@@ -975,22 +970,22 @@
 
         container.innerHTML = '';
 
-        teams.forEach(team => {
-            const isActive = normalize(state.selectedTeam) === normalize(team);
+        teams.forEach(teamCore => {
+            const isActive = normalize(state.selectedTeam) === normalize(teamCore);
             const chip = document.createElement('div');
             
             chip.className = `flex items-center justify-center p-1 rounded-full border-2 transition-all cursor-pointer select-none shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300 hover:scale-105 shadow-sm'}`;
-            chip.title = team; 
+            chip.title = teamCore; 
             
             chip.onclick = () => {
                 if (isActive) { 
                     clearSelectedTeam();
                 } else {
-                    selectTeam(team);
+                    selectTeam(teamCore);
                 }
             };
             
-            chip.innerHTML = getLogoHtml(team, "w-10 h-10 sm:w-12 sm:h-12 bg-transparent shrink-0");
+            chip.innerHTML = getLogoHtml(teamCore, "w-10 h-10 sm:w-12 sm:h-12 bg-transparent shrink-0");
             container.appendChild(chip);
         });
     }
@@ -1002,9 +997,16 @@
         
         const teamsMap = new Map();
         
+        // GÜNCELLEME: Takımları filtrelerken (A-Z ve Top Logolar) Core (Çekirdek) adı baz alınır
         state.allMatches.forEach(m => {
-            if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) teamsMap.set(normalize(m.t1), m.t1);
-            if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) teamsMap.set(normalize(m.t2), m.t2);
+            if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
+                const core = getCoreName(m.t1);
+                teamsMap.set(normalize(core), core);
+            }
+            if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) {
+                const core = getCoreName(m.t2);
+                teamsMap.set(normalize(core), core);
+            }
         });
 
         const teams = Array.from(teamsMap.values()).sort((a, b) => a.localeCompare(b, 'tr'));
@@ -1020,19 +1022,19 @@
         const teamsByLetter = {};
         alphabet.forEach(l => teamsByLetter[l] = []);
         
-        teams.forEach(team => {
-            const firstChar = team.charAt(0).toLocaleUpperCase('tr-TR');
+        teams.forEach(teamCore => {
+            const firstChar = teamCore.charAt(0).toLocaleUpperCase('tr-TR');
             if (/[0-9]/.test(firstChar)) {
-                teamsByLetter['0-9'].push(team);
+                teamsByLetter['0-9'].push(teamCore);
             } else {
                 if (teamsByLetter[firstChar]) {
-                    teamsByLetter[firstChar].push(team);
+                    teamsByLetter[firstChar].push(teamCore);
                 } else {
-                    const fallbackChar = team.charAt(0).toUpperCase();
-                    if (teamsByLetter[fallbackChar]) teamsByLetter[fallbackChar].push(team);
+                    const fallbackChar = teamCore.charAt(0).toUpperCase();
+                    if (teamsByLetter[fallbackChar]) teamsByLetter[fallbackChar].push(teamCore);
                 }
             }
-            teamsByLetter['Hepsi'].push(team);
+            teamsByLetter['Hepsi'].push(teamCore);
         });
 
         if (alphabetContainer) {
@@ -1075,17 +1077,17 @@
             container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-2 px-1">Eşleşen takım bulunamadı.</span>';
         }
 
-        teamsToShow.forEach(team => {
-            const isActive = normalize(state.selectedTeam) === normalize(team);
+        teamsToShow.forEach(teamCore => {
+            const isActive = normalize(state.selectedTeam) === normalize(teamCore);
             const chip = document.createElement('div');
             chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border transition-all cursor-pointer select-none shrink-0 ${isActive ? 'bg-indigo-600 border-indigo-600 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
-            chip.innerHTML = `${getLogoHtml(team, "w-6 h-6 bg-transparent shrink-0")} <span class="text-[11px] font-bold ${isActive ? 'text-white' : 'text-slate-700'}">${team}</span>`;
+            chip.innerHTML = `${getLogoHtml(teamCore, "w-6 h-6 bg-transparent shrink-0")} <span class="text-[11px] font-bold ${isActive ? 'text-white' : 'text-slate-700'}">${teamCore}</span>`;
             
             chip.onclick = () => {
                 if (isActive) { 
                     clearSelectedTeam();
                 } else {
-                    selectTeam(team);
+                    selectTeam(teamCore);
                 }
             };
             container.appendChild(chip);
