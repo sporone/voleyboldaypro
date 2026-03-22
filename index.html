@@ -31,7 +31,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: #f8fafc; 
             scroll-behavior: smooth;
-            -webkit-tap-highlight-color: transparent; /* Mobil uygulama hissiyatı için */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .match-card { 
@@ -169,6 +169,7 @@
     <button onclick="document.getElementById('install-banner').classList.add('hidden'); document.getElementById('install-banner').classList.remove('flex');" class="absolute -top-2 -right-2 bg-indigo-950 text-slate-300 hover:text-white rounded-full w-6 h-6 flex items-center justify-center border border-indigo-700"><i class="fas fa-times text-[10px]"></i></button>
 </div>
 
+<!-- YÜKLENİYOR EKRANI -->
 <div id="loading-overlay" class="fixed inset-0 bg-slate-50 z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300">
     <div class="relative w-24 h-24">
         <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
@@ -182,6 +183,7 @@
 </div>
 
 <div id="app" class="max-w-[1600px] mx-auto min-h-screen pb-20">
+    <!-- HEADER -->
     <header class="bg-indigo-950 text-white pt-12 pb-36 md:pt-16 md:pb-32 px-4 md:px-6 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-[700px] h-[700px] bg-indigo-500 rounded-full opacity-10 blur-[130px] -mr-48 -mt-48 pointer-events-none"></div>
         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8 container mx-auto">
@@ -220,25 +222,25 @@
     <div class="-mt-16 px-4 container mx-auto">
         <div class="relative max-w-6xl mx-auto">
             
+            <!-- SEÇİLİ TAKIM GÖSTERGESİ -->
             <div id="selected-team-display" class="hidden absolute left-1/2 -translate-x-1/2 -top-[3.5rem] z-[60] flex-col items-center">
                 <div onclick="clearSelectedTeam()" title="Seçimi kaldırmak için tıklayın" class="bg-indigo-900/90 backdrop-blur-xl border border-indigo-400/30 p-2 rounded-full shadow-[0_15px_40px_-10px_rgba(99,102,241,0.5)] flex items-center justify-center cursor-pointer hover:scale-105 transition-all animate-[modalPop_0.3s_ease-out]">
                     <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-full"></div>
                 </div>
             </div>
 
+            <!-- ANA KONTROL PANELİ -->
             <div class="sticky-header bg-white/95 shadow-2xl shadow-indigo-900/5 rounded-[3rem] p-5 md:p-10 border border-white flex flex-col gap-6 relative z-50">
                 
                 <div id="top-logos-wrapper" class="w-full transition-all duration-300">
-                    <div id="top-logos-container" class="drag-scroll flex gap-2.5 sm:gap-3 overflow-x-auto w-full no-scrollbar pb-2 select-none items-center">
-                        <!-- Logolar JavaScript ile eklenecek -->
-                    </div>
+                    <div id="top-logos-container" class="drag-scroll flex gap-2.5 sm:gap-3 overflow-x-auto w-full no-scrollbar pb-2 select-none items-center"></div>
                 </div>
 
                 <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
                     <div id="status-tabs" class="drag-scroll flex items-center bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar select-none transition-opacity duration-300">
-                        <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap text-indigo-600">Hepsi</button>
-                        <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
-                        <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
+                        <button onclick="setView('matches', 'all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap text-indigo-600">Hepsi</button>
+                        <button onclick="setView('matches', 'played')" id="filter-played" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
+                        <button onclick="setView('matches', 'pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
                     </div>
 
                     <div id="daily-quote-container" class="flex-1 w-full flex items-center justify-center bg-indigo-50/50 border border-indigo-100 rounded-2xl py-3.5 px-6 transition-opacity duration-300">
@@ -274,7 +276,6 @@
                     <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto w-full no-scrollbar pb-1 select-none"></div>
                 </div>
 
-                <!-- SİSTEMDEKİ TAKIMLAR ALANI (A-Z) -->
                 <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 mt-2 hidden transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fas fa-users mr-1"></i> Sistemdeki Takımlar</h3>
@@ -283,12 +284,11 @@
                     <div id="alphabet-index" class="drag-scroll flex gap-1.5 overflow-x-auto w-full no-scrollbar pb-3 mb-3 select-none border-b border-slate-50"></div>
                     <div id="playing-teams" class="flex flex-wrap gap-2.5 w-full max-h-[180px] overflow-y-auto custom-scrollbar pb-2 pr-2 select-none"></div>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- MAÇLAR KART ALANI -->
+    <!-- MAÇLAR -->
     <main id="match-container" class="mt-12 px-4 container mx-auto flex flex-col gap-6 max-w-6xl mx-auto"></main>
     
     <div id="empty-state" class="hidden flex-col items-center justify-center py-40 text-slate-300">
@@ -296,7 +296,7 @@
         <p id="empty-state-text" class="font-bold text-xl tracking-tight text-center px-4">Eşleşen maç bulunamadı.</p>
     </div>
 
-    <!-- Footer Alanı -->
+    <!-- FOOTER -->
     <footer class="mt-12 pb-12 pt-12 border-t border-slate-200/60 bg-transparent w-full">
         <div class="flex flex-col items-center justify-center gap-6 text-center px-4 max-w-6xl mx-auto">
             <div class="flex items-center gap-2 opacity-50">
@@ -312,19 +312,15 @@
                         <i class="fab fa-whatsapp text-xl text-[#25D366] group-hover:scale-110 transition-transform"></i> 
                         Destek Hattı
                     </a>
-                    
-                    <!-- MANUEL İNDİRME REHBERİ BUTONU -->
                     <button onclick="showInstallGuide()" class="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-95 group">
                         <i class="fas fa-download text-lg group-hover:-translate-y-1 transition-transform"></i> 
                         Uygulamayı İndir
                     </button>
                 </div>
             </div>
-            
             <p class="text-[10px] text-slate-400 font-medium mt-2">Bu platform üzerinden güncel voleybol maçlarını takip edebilir, ana ekrana ekleyerek uygulama gibi kullanabilirsiniz.</p>
         </div>
     </footer>
-
 </div>
 
 <!-- PWA: YÜKLEME REHBERİ MODALI -->
@@ -356,14 +352,13 @@
                 </div>
             </div>
         </div>
-        
         <button id="pwa-install-btn" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-indigo-200 mt-6">
             <i class="fas fa-download text-lg"></i> OTOMATİK YÜKLE
         </button>
     </div>
 </div>
 
-<!-- WhatsApp Not Modalı GÜNCELLENDİ (Kadro Alanı Eklendi) -->
+<!-- TEK VE TEMİZ WHATSAPP MODALI -->
 <div id="whatsapp-modal" class="modal-overlay">
     <div class="modal-content shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
@@ -383,16 +378,27 @@
                       class="w-full bg-white border-2 border-slate-100 focus:border-indigo-100 rounded-2xl p-4 text-sm font-semibold outline-none transition-all resize-none mb-4"></textarea>
         </div>
 
-        <!-- YENİ EKLENEN: OYNANMAMIŞ MAÇLAR İÇİN KADRO BİLGİSİ -->
+        <!-- OYNANMAMIŞ MAÇLAR İÇİN KADRO BİLGİSİ -->
         <div id="whatsapp-roster-section" class="hidden flex-col gap-3 mb-4 border-t border-slate-100 pt-4">
             <h4 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1.5">
                 <i class="fas fa-clipboard-list"></i> Maç Kadrosu (İsteğe Bağlı)
             </h4>
+            
             <input type="text" id="coach-name" placeholder="Antrenör Adı" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold outline-none transition-all">
             
-            <div class="flex flex-col gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-1" id="players-list">
-                <!-- JS ile 18 Satır Doldurulacak -->
+            <div class="flex gap-2">
+                <input type="time" id="meeting-time" class="w-1/3 bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold outline-none transition-all text-slate-600" title="Toplanma Saati">
+                <input type="text" id="meeting-location" placeholder="Toplanma Yeri / Adresi" class="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold outline-none transition-all">
             </div>
+
+            <select id="team-serve-status" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold outline-none transition-all text-slate-600 cursor-pointer">
+                <option value="">Servis Durumu (İsteğe Bağlı)</option>
+                <option value="Var ✅">Servis: Var ✅</option>
+                <option value="Yok ❌">Servis: Yok ❌</option>
+            </select>
+            
+            <!-- 18 KİŞİLİK OYUNCU LİSTESİ BURAYA YÜKLENECEK -->
+            <div class="flex flex-col gap-2 max-h-[250px] overflow-y-auto custom-scrollbar pr-1 mt-2" id="players-list"></div>
         </div>
 
         <button id="whatsapp-send-btn" class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-green-100 mt-2">
@@ -401,6 +407,7 @@
     </div>
 </div>
 
+<!-- TEK SCRİPT DOSYASI -->
 <script>
     const SHEET_ID = '1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic'; 
     const MATCHES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
@@ -521,24 +528,41 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log('PWA SW: Add a blank sw.js file to your server root to complete offline caching.');
+                console.log('PWA SW: Web sunucunuza sw.js eklendiğinde indirme tamamen aktif olur.');
             });
         });
     }
 
-    // --- YENİ EKLENEN: 18 Kişilik Kadro Formunu Başlatma ---
+    // OYUNCU LİSTESİ FORMU (Numara + İsim + Mevki)
     function initRosterForm() {
         const playersList = document.getElementById('players-list');
         if (!playersList) return;
+
+        // Form daha önce oluşturulduysa (içinde eleman varsa) üzerine yazmayı durdur, yazılanlar silinmesin.
+        if (playersList.children.length > 0) return;
+
+        let numberOptions = '<option value="">No</option>';
+        for(let n = 1; n <= 99; n++) {
+            let numStr = n < 10 ? '0' + n : n.toString();
+            numberOptions += `<option value="${numStr}">${numStr}</option>`;
+        }
+
         let html = '';
         for (let i = 1; i <= 18; i++) {
             html += `
-            <div class="flex items-center gap-2">
-                <span class="text-[11px] font-black text-slate-300 w-5 text-right">${i}.</span>
-                <input type="text" id="player-name-${i}" placeholder="Sporcu Adı" class="flex-1 bg-white border border-slate-200 focus:border-indigo-400 rounded-lg p-2.5 text-[11px] font-bold outline-none transition-all">
-                <select id="player-serve-${i}" class="bg-white border border-slate-200 focus:border-indigo-400 rounded-lg p-2 text-[11px] font-bold outline-none text-slate-600 shrink-0 cursor-pointer">
-                    <option value="Servis: Var">Servis ✅</option>
-                    <option value="Servis: Yok">Servis ❌</option>
+            <div class="flex flex-row items-center gap-1.5 w-full mb-1.5">
+                <span class="text-[11px] font-black text-slate-400 w-4 text-right shrink-0">${i}.</span>
+                <select id="player-number-${i}" class="bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-700 outline-none w-[55px] shrink-0">
+                    ${numberOptions}
+                </select>
+                <input type="text" id="player-name-${i}" placeholder="Sporcu Adı" class="flex-1 min-w-0 bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-800 outline-none">
+                <select id="player-position-${i}" class="bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-700 outline-none w-[80px] sm:w-[95px] shrink-0">
+                    <option value="">Mevki</option>
+                    <option value="Pasör">Pasör</option>
+                    <option value="Orta">Orta</option>
+                    <option value="Smaçör">Smaçör</option>
+                    <option value="Pasör Çaprazı">P. Çaprazı</option>
+                    <option value="Libero">Libero</option>
                 </select>
             </div>
             `;
@@ -924,13 +948,14 @@
             `;
         }
 
-        // GÜNCELLEME: Kadro Formunun Görünürlüğünü Ayarla (Sadece Oynanmamışsa Çıkar)
         const isPlayed = m.s1 !== "-" && m.s1 !== "";
         const rosterSection = document.getElementById('whatsapp-roster-section');
         if (rosterSection) {
             if (!isPlayed) {
                 rosterSection.classList.remove('hidden');
                 rosterSection.classList.add('flex');
+                // Formun ekrana basılmasını (görünür olmasını) tam burada garantiliyoruz
+                initRosterForm();
             } else {
                 rosterSection.classList.add('hidden');
                 rosterSection.classList.remove('flex');
@@ -955,31 +980,46 @@
             let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
             let msg = `*${header}*\nKategori: ${category}\n\n`; 
             
-            if (isPlayed) {
-                msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
-            } else {
-                msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
-            }
+            if (note) msg += `${note}\n\n`;
+            if (isPlayed) msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
+            else msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
             msg += `Salon: ${m.venue}\nTarih: ${m.date}\n\n`;
 
-            if (note) msg += `Not: ${note}\n\n`;
-
-            // GÜNCELLEME: Oynanmamış maçsa Antrenör ve Kadro bilgilerini mesajın sonuna ekler
             if (!isPlayed) {
                 const coachInput = document.getElementById('coach-name');
                 const coachName = coachInput ? coachInput.value.trim() : '';
                 if (coachName) msg += `*Antrenör:* ${coachName}\n`;
                 
+                const serveInput = document.getElementById('team-serve-status');
+                const serveStatus = serveInput ? serveInput.value : '';
+                if (serveStatus) msg += `*Servis Durumu:* ${serveStatus}\n`;
+
+                const meetingTime = document.getElementById('meeting-time') ? document.getElementById('meeting-time').value : '';
+                const meetingLoc = document.getElementById('meeting-location') ? document.getElementById('meeting-location').value.trim() : '';
+                
+                if (meetingTime || meetingLoc) {
+                    msg += `\n*Toplanma Bilgileri:*\n`;
+                    if (meetingTime) msg += `⏰ Saat: ${meetingTime}\n`;
+                    if (meetingLoc) msg += `📍 Yer: ${meetingLoc}\n`;
+                }
+                
                 let playersMsg = '';
                 for(let i=1; i<=18; i++) {
                     const pInput = document.getElementById(`player-name-${i}`);
-                    const pServe = document.getElementById(`player-serve-${i}`);
-                    if (pInput && pServe) {
-                        const pName = pInput.value.trim();
-                        const serveText = pServe.value; // Örn: "Servis: Var"
-                        if (pName) {
-                            playersMsg += `${i}. ${pName} (${serveText})\n`;
-                        }
+                    const pPos = document.getElementById(`player-position-${i}`);
+                    const pNum = document.getElementById(`player-number-${i}`);
+                    
+                    const pName = pInput && pInput.value ? pInput.value.trim() : '';
+                    const posText = pPos && pPos.value ? pPos.value : ''; 
+                    const numText = pNum && pNum.value ? `#${pNum.value}` : '';
+                    
+                    if (pName || posText || numText) {
+                        let lineText = `${i}.`;
+                        if (numText) lineText += ` ${numText}`;
+                        if (pName) lineText += ` ${pName}`;
+                        if (posText) lineText += ` - ${posText}`;
+                        
+                        playersMsg += lineText + '\n';
                     }
                 }
                 if (playersMsg) {
@@ -1376,7 +1416,7 @@
     }
 
     window.onload = () => { 
-        initRosterForm(); // Kadro formunu yüklemede başlat
+        initRosterForm(); 
         setDailyQuote();
         startLiveClock(); 
         fetchData(); 
