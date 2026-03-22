@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
+    
+    <!-- PWA (UYGULAMA) META ETİKETLERİ -->
+    <meta name="theme-color" content="#1e1b4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Voleybol Day">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1004/1004554.png">
+    
+    <!-- DİNAMİK MANİFEST DOSYASI (TEK DOSYADA PWA İÇİN) -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Voleybol Day Pro","short_name":"VoleybolDay","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#1e1b4b","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/1004/1004554.png","sizes":"512x512","type":"image/png"}]}'>
+
     <title>Voleybol Day Pro | Canlı Veri Portalı</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
@@ -22,6 +32,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: #f8fafc; 
             scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent; /* Mobil uygulama hissiyatı için */
         }
 
         .match-card { 
@@ -106,6 +117,7 @@
             align-items: center; 
             justify-content: center; 
             padding: 1.5rem;
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
@@ -142,6 +154,21 @@
     </style>
 </head>
 <body class="antialiased text-slate-900">
+
+<!-- PWA OTOMATİK İNDİRME BİLDİRİMİ -->
+<div id="install-banner" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-[350px] bg-indigo-900 text-white p-4 rounded-2xl shadow-2xl z-[100] items-center justify-between border border-indigo-700 animate-bounce">
+    <div class="flex items-center gap-3">
+        <div class="bg-white/20 p-2 rounded-xl text-indigo-100 flex items-center justify-center shrink-0">
+            <i class="fas fa-mobile-screen-button text-xl"></i>
+        </div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300">Uygulamayı İndir</span>
+            <span class="text-xs font-bold leading-tight">Ana Ekrana Ekle</span>
+        </div>
+    </div>
+    <button id="banner-install-btn" class="bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-xl text-[11px] font-black uppercase transition-colors shadow-md">Yükle</button>
+    <button onclick="document.getElementById('install-banner').classList.add('hidden'); document.getElementById('install-banner').classList.remove('flex');" class="absolute -top-2 -right-2 bg-indigo-950 text-slate-300 hover:text-white rounded-full w-6 h-6 flex items-center justify-center border border-indigo-700"><i class="fas fa-times text-[10px]"></i></button>
+</div>
 
 <div id="loading-overlay" class="fixed inset-0 bg-slate-50 z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300">
     <div class="relative w-24 h-24">
@@ -244,7 +271,6 @@
                     </div>
                 </div>
 
-                <!-- MAÇLAR EKRANINDA GÖRÜNECEK ALANLAR -->
                 <div id="date-tabs-wrapper" class="border-t border-slate-100 pt-6 transition-all duration-300">
                     <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto w-full no-scrollbar pb-1 select-none"></div>
                 </div>
@@ -271,25 +297,71 @@
         <p id="empty-state-text" class="font-bold text-xl tracking-tight text-center px-4">Eşleşen maç bulunamadı.</p>
     </div>
 
-    <!-- Footer Alanı -->
-    <footer class="mt-12 pb-8 pt-12 border-t border-slate-200/60 bg-transparent w-full">
-        <div class="flex flex-col items-center justify-center gap-5 text-center px-4 max-w-6xl mx-auto">
+    <!-- Footer Alanı (İndirme Butonu Eklendi) -->
+    <footer class="mt-12 pb-12 pt-12 border-t border-slate-200/60 bg-transparent w-full">
+        <div class="flex flex-col items-center justify-center gap-6 text-center px-4 max-w-6xl mx-auto">
             <div class="flex items-center gap-2 opacity-50">
                 <i class="fas fa-volleyball-ball text-indigo-900"></i>
                 <h3 class="font-black text-indigo-950 tracking-tight text-sm uppercase">Voleybol Day Pro</h3>
             </div>
             
-            <div class="flex flex-col items-center gap-3">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">İletişim & Destek</span>
-                <a href="https://wa.me/90535724758?text=Merhaba%20Voleybol%20Day%20Pro,%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" 
-                   class="flex items-center gap-2.5 px-6 py-3 bg-white border border-slate-200 hover:border-[#25D366] hover:bg-[#25D366]/5 text-slate-700 hover:text-[#25D366] rounded-2xl font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-95 group">
-                    <i class="fab fa-whatsapp text-xl text-[#25D366] group-hover:scale-110 transition-transform"></i> 
-                    Voleybol Day Pro - Nasıl yardımcı olabilirim?
-                </a>
+            <div class="flex flex-col items-center gap-4 w-full md:w-auto">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">İletişim & Uygulama</span>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+                    <a href="https://wa.me/90535724758?text=Merhaba%20Voleybol%20Day%20Pro,%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" 
+                       class="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3.5 bg-white border border-slate-200 hover:border-[#25D366] hover:bg-[#25D366]/5 text-slate-700 hover:text-[#25D366] rounded-2xl font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-95 group">
+                        <i class="fab fa-whatsapp text-xl text-[#25D366] group-hover:scale-110 transition-transform"></i> 
+                        Destek Hattı
+                    </a>
+                    
+                    <!-- MANUEL İNDİRME REHBERİ BUTONU -->
+                    <button onclick="showInstallGuide()" class="w-full sm:w-auto flex items-center justify-center gap-2.5 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-95 group">
+                        <i class="fas fa-download text-lg group-hover:-translate-y-1 transition-transform"></i> 
+                        Uygulamayı İndir
+                    </button>
+                </div>
             </div>
+            
+            <p class="text-[10px] text-slate-400 font-medium mt-2">Bu platform üzerinden güncel voleybol maçlarını takip edebilir, ana ekrana ekleyerek uygulama gibi kullanabilirsiniz.</p>
         </div>
     </footer>
 
+</div>
+
+<!-- PWA: YÜKLEME REHBERİ MODALI -->
+<div id="install-guide-modal" class="modal-overlay">
+    <div class="modal-content shadow-2xl text-center">
+        <button onclick="closeInstallGuide()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+        <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+            <i class="fas fa-mobile-screen"></i>
+        </div>
+        <h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter mb-2">Ana Ekrana Ekle</h3>
+        <p class="text-sm text-slate-500 font-medium mb-6">Voleybol Day Pro'yu bir mobil uygulama gibi kullanmak için cihazınıza yükleyebilirsiniz.</p>
+        
+        <div class="bg-slate-50 rounded-2xl p-5 text-left space-y-5 border border-slate-100">
+            <div class="flex items-start gap-3">
+                <i class="fab fa-apple text-2xl text-slate-800 mt-0.5 w-6 text-center"></i>
+                <div>
+                    <span class="block font-black text-sm text-slate-800 mb-1">iOS (iPhone/iPad) İçin</span>
+                    <span class="text-xs text-slate-500 leading-relaxed block">Safari'de alt menüden <b>Paylaş</b> <i class="fas fa-share-square mx-1"></i> ikonuna dokunun ve <b>Ana Ekrana Ekle</b>'yi seçin.</span>
+                </div>
+            </div>
+            <div class="h-px w-full bg-slate-200"></div>
+            <div class="flex items-start gap-3">
+                <i class="fab fa-android text-2xl text-green-500 mt-0.5 w-6 text-center"></i>
+                <div>
+                    <span class="block font-black text-sm text-slate-800 mb-1">Android İçin</span>
+                    <span class="text-xs text-slate-500 leading-relaxed block">Chrome'da sağ üst köşedeki <b>Üç Nokta</b> <i class="fas fa-ellipsis-v mx-1"></i> menüsüne dokunun ve <b>Ana Ekrana Ekle</b>'yi veya <b>Uygulamayı Yükle</b>'yi seçin.</span>
+                </div>
+            </div>
+        </div>
+        
+        <button id="pwa-install-btn" class="hidden w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-indigo-200 mt-6">
+            <i class="fas fa-download text-lg"></i> OTOMATİK YÜKLE
+        </button>
+    </div>
 </div>
 
 <!-- WhatsApp Not Modalı -->
@@ -318,8 +390,7 @@
 </div>
 
 <script>
-    // --- TEMEL BAĞLANTILAR VE AYARLAR ---
-    const SHEET_ID = '1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic'; // Maçlar
+    const SHEET_ID = '1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic'; 
     const MATCHES_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
     const LOGOS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=logolar`;
 
@@ -379,11 +450,86 @@
         currentSharingMatch: null
     };
 
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        const modalInstallBtn = document.getElementById('pwa-install-btn');
+        if (modalInstallBtn) {
+            modalInstallBtn.classList.remove('hidden');
+            modalInstallBtn.classList.add('flex');
+        }
+
+        const banner = document.getElementById('install-banner');
+        if(banner) {
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+        }
+    });
+
+    const pwaBtn = document.getElementById('pwa-install-btn');
+    if (pwaBtn) {
+        pwaBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                closeInstallGuide();
+            }
+        });
+    }
+
+    const bannerInstallBtn = document.getElementById('banner-install-btn');
+    if (bannerInstallBtn) {
+        bannerInstallBtn.addEventListener('click', async () => {
+            const banner = document.getElementById('install-banner');
+            if(banner) {
+                banner.classList.remove('flex');
+                banner.classList.add('hidden');
+            }
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            }
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        const banner = document.getElementById('install-banner');
+        if(banner) {
+            banner.classList.remove('flex');
+            banner.classList.add('hidden');
+        }
+        deferredPrompt = null;
+    });
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('PWA SW: Add a blank sw.js file to your server root to complete offline caching.');
+            });
+        });
+    }
+
+    function showInstallGuide() { 
+        const modal = document.getElementById('install-guide-modal');
+        if (modal) modal.style.display = 'flex'; 
+    }
+    
+    function closeInstallGuide() { 
+        const modal = document.getElementById('install-guide-modal');
+        if (modal) modal.style.display = 'none'; 
+    }
+
     function setDailyQuote() {
         const today = new Date();
         const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
         const quoteIndex = dayOfYear % MOTIVATION_QUOTES.length;
-        document.getElementById('daily-quote-text').innerText = MOTIVATION_QUOTES[quoteIndex];
+        const qt = document.getElementById('daily-quote-text');
+        if (qt) qt.innerText = MOTIVATION_QUOTES[quoteIndex];
     }
 
     function makeScrollable(elementId) {
@@ -431,11 +577,9 @@
         return str.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').trim();
     }
 
-    // YENİ EK: Takımın ismindeki sondaki A, B, C gibi ekleri silen çekirdek isim fonksiyonu (Filtreler için)
     function getCoreName(str) {
         if (!str) return "";
         let s = cleanTeamName(str);
-        // Sadece tekil harf olan takım şubesi uzantılarını ( A, B, C, D, E ) sondan kaldır
         s = s.replace(/\s+[A-E]$/i, '');
         return s.trim();
     }
@@ -528,7 +672,8 @@
 
     async function fetchData() {
         try {
-            document.getElementById('loading-overlay').classList.remove('hidden');
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.classList.remove('hidden');
             const timestamp = Date.now();
             
             const mPromise = fetch(`${MATCHES_URL}&cb=${timestamp}`).then(r => r.text());
@@ -550,7 +695,7 @@
                 }
             }
             state.loading = false;
-            document.getElementById('loading-overlay').classList.add('hidden');
+            if (overlay) overlay.classList.add('hidden');
             updateUI();
         } catch (error) { 
             console.error(error);
@@ -724,8 +869,10 @@
     function openWhatsappModal(mStr) {
         const m = JSON.parse(decodeURIComponent(mStr));
         state.currentSharingMatch = m;
-        document.getElementById('whatsapp-modal').style.display = 'flex';
-        document.getElementById('whatsapp-note').value = '';
+        const modal = document.getElementById('whatsapp-modal');
+        if (modal) modal.style.display = 'flex';
+        const noteInput = document.getElementById('whatsapp-note');
+        if (noteInput) noteInput.value = '';
 
         const modalInfo = document.getElementById('whatsapp-modal-match-info');
         if (modalInfo) {
@@ -746,23 +893,30 @@
         }
     }
 
-    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
+    function closeWhatsappModal() { 
+        const modal = document.getElementById('whatsapp-modal');
+        if (modal) modal.style.display = 'none'; 
+    }
 
-    document.getElementById('whatsapp-send-btn').onclick = function() {
-        if (!state.currentSharingMatch) return;
-        const m = state.currentSharingMatch;
-        const note = document.getElementById('whatsapp-note').value.trim();
-        const isPlayed = m.s1 !== "-" && m.s1 !== "";
-        const category = `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
-        let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
-        let msg = `*${header}*\nKategori: ${category}\n\n`; 
-        if (note) msg += `${note}\n\n`;
-        if (isPlayed) msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
-        else msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
-        msg += `Salon: ${m.venue}\nTarih: ${m.date}`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-        closeWhatsappModal();
-    };
+    const whatsappBtn = document.getElementById('whatsapp-send-btn');
+    if (whatsappBtn) {
+        whatsappBtn.onclick = function() {
+            if (!state.currentSharingMatch) return;
+            const m = state.currentSharingMatch;
+            const noteInput = document.getElementById('whatsapp-note');
+            const note = noteInput ? noteInput.value.trim() : '';
+            const isPlayed = m.s1 !== "-" && m.s1 !== "";
+            const category = `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
+            let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
+            let msg = `*${header}*\nKategori: ${category}\n\n`; 
+            if (note) msg += `${note}\n\n`;
+            if (isPlayed) msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
+            else msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
+            msg += `Salon: ${m.venue}\nTarih: ${m.date}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+            closeWhatsappModal();
+        };
+    }
 
     function renderMatchGroups(matchArray, container) {
         let played = matchArray.filter(m => m.s1 !== '-' && !m.sets.toLowerCase().includes("oynanmadı") && !checkLiveStatus(m));
@@ -803,13 +957,16 @@
         }
     }
 
-    // TAKIM SEÇİM ORTAK FONKSİYONU - Arama kutusuna Core (Kök) adını yerleştirir
     function selectTeam(teamCoreName) {
         state.selectedTeam = teamCoreName;
-        document.getElementById('team-search').value = teamCoreName;
+        const searchInput = document.getElementById('team-search');
+        if (searchInput) searchInput.value = teamCoreName;
         state.searchQuery = teamCoreName;
         
-        document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active', 'text-indigo-600'));
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            if (btn && btn.classList) btn.classList.remove('active', 'text-indigo-600')
+        });
+        
         const allFilterBtn = document.getElementById('filter-all');
         if (allFilterBtn) {
             allFilterBtn.classList.add('active', 'text-indigo-600');
@@ -827,19 +984,21 @@
 
     function clearSelectedTeam() {
         state.selectedTeam = null;
-        document.getElementById('team-search').value = '';
+        const searchInput = document.getElementById('team-search');
+        if (searchInput) searchInput.value = '';
         handleSearch('');
     }
 
     function renderMatches() {
         const container = document.getElementById('match-container');
+        if (!container) return;
+        
         container.innerHTML = '';
         
         let matchesToRender = [];
 
         if (state.selectedTeam) {
             const selectedNorm = normalize(state.selectedTeam);
-            // GÜNCELLEME: Takımın çekirdek adıyla filtreler. Böylece "SAYDAM" arandığında "SAYDAM A" da gelir.
             matchesToRender = state.allMatches.filter(m => 
                 normalize(getCoreName(m.t1)) === selectedNorm || 
                 normalize(getCoreName(m.t2)) === selectedNorm
@@ -856,17 +1015,21 @@
             }
         }
 
-        document.getElementById('match-count-badge').innerText = matchesToRender.length;
+        const badge = document.getElementById('match-count-badge');
+        if (badge) badge.innerText = matchesToRender.length;
+
+        const emptyState = document.getElementById('empty-state');
+        const emptyStateText = document.getElementById('empty-state-text');
 
         if (matchesToRender.length === 0) {
-            document.getElementById('empty-state').classList.remove('hidden');
+            if (emptyState) emptyState.classList.remove('hidden');
             if(state.selectedTeam) {
-                document.getElementById('empty-state-text').innerText = "Bu takımın henüz planlanmış maçı bulunmamaktadır.";
+                if (emptyStateText) emptyStateText.innerText = "Bu takımın henüz planlanmış maçı bulunmamaktadır.";
             } else {
-                document.getElementById('empty-state-text').innerText = "Eşleşen maç bulunamadı.";
+                if (emptyStateText) emptyStateText.innerText = "Eşleşen maç bulunamadı.";
             }
         } else {
-            document.getElementById('empty-state').classList.add('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
             renderMatchGroups(matchesToRender, container);
         }
     }
@@ -882,25 +1045,30 @@
         const selectedTeamLogo = document.getElementById('selected-team-logo');
         
         if (state.selectedTeam) {
-            statusTabs.classList.add('opacity-30', 'pointer-events-none');
-            dailyQuoteContainer.classList.add('opacity-30', 'pointer-events-none');
-            dateTabsWrapper.classList.add('hidden');
-            regionTabsWrapper.classList.add('hidden');
-            playingTeamsWrapper.classList.add('hidden');
+            if (statusTabs) statusTabs.classList.add('opacity-30', 'pointer-events-none');
+            if (dailyQuoteContainer) dailyQuoteContainer.classList.add('opacity-30', 'pointer-events-none');
+            if (dateTabsWrapper) dateTabsWrapper.classList.add('hidden');
+            if (regionTabsWrapper) regionTabsWrapper.classList.add('hidden');
+            if (playingTeamsWrapper) playingTeamsWrapper.classList.add('hidden');
             
-            selectedTeamDisplay.classList.remove('hidden');
-            selectedTeamDisplay.classList.add('flex');
-            // Takımın logosunu gösterirken asıl adıyla al
-            selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0 border-none shadow-none"); 
+            if (selectedTeamDisplay) {
+                selectedTeamDisplay.classList.remove('hidden');
+                selectedTeamDisplay.classList.add('flex');
+            }
+            if (selectedTeamLogo) {
+                selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0 border-none shadow-none");
+            }
         } else {
-            statusTabs.classList.remove('opacity-30', 'pointer-events-none');
-            dailyQuoteContainer.classList.remove('opacity-30', 'pointer-events-none');
-            dateTabsWrapper.classList.remove('hidden');
-            regionTabsWrapper.classList.remove('hidden');
-            playingTeamsWrapper.classList.remove('hidden');
+            if (statusTabs) statusTabs.classList.remove('opacity-30', 'pointer-events-none');
+            if (dailyQuoteContainer) dailyQuoteContainer.classList.remove('opacity-30', 'pointer-events-none');
+            if (dateTabsWrapper) dateTabsWrapper.classList.remove('hidden');
+            if (regionTabsWrapper) regionTabsWrapper.classList.remove('hidden');
+            if (playingTeamsWrapper) playingTeamsWrapper.classList.remove('hidden');
             
-            selectedTeamDisplay.classList.add('hidden');
-            selectedTeamDisplay.classList.remove('flex');
+            if (selectedTeamDisplay) {
+                selectedTeamDisplay.classList.add('hidden');
+                selectedTeamDisplay.classList.remove('flex');
+            }
         }
 
         renderDateTabs(); 
@@ -911,6 +1079,8 @@
     
     function renderDateTabs() {
         const container = document.getElementById('date-tabs');
+        if (!container) return;
+        
         const dates = getSortedDates();
         container.innerHTML = '';
         dates.forEach(date => {
@@ -929,6 +1099,7 @@
     function renderTopLogos() {
         const container = document.getElementById('top-logos-container');
         const wrapper = document.getElementById('top-logos-wrapper');
+        if (!container || !wrapper) return;
         
         const teamsMap = new Map();
 
@@ -994,10 +1165,10 @@
         const container = document.getElementById('playing-teams');
         const wrapper = document.getElementById('playing-teams-wrapper');
         const alphabetContainer = document.getElementById('alphabet-index');
+        if (!container || !wrapper) return;
         
         const teamsMap = new Map();
         
-        // GÜNCELLEME: Takımları filtrelerken (A-Z ve Top Logolar) Core (Çekirdek) adı baz alınır
         state.allMatches.forEach(m => {
             if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
                 const core = getCoreName(m.t1);
@@ -1106,8 +1277,10 @@
     function setStatusFilter(status) {
         state.selectedStatus = status;
         document.querySelectorAll('.status-btn').forEach(btn => {
-            btn.classList.remove('active', 'text-indigo-600');
-            btn.classList.add('text-slate-500');
+            if(btn && btn.classList) {
+                btn.classList.remove('active', 'text-indigo-600');
+                btn.classList.add('text-slate-500');
+            }
         });
         const activeBtn = document.getElementById(`filter-${status}`);
         if (activeBtn) {
