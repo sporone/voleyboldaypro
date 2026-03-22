@@ -223,9 +223,17 @@
         <div class="relative max-w-6xl mx-auto">
             
             <!-- SEÇİLİ TAKIM GÖSTERGESİ -->
-            <div id="selected-team-display" class="hidden absolute left-1/2 -translate-x-1/2 -top-[3.5rem] z-[60] flex-col items-center">
-                <div onclick="clearSelectedTeam()" title="Seçimi kaldırmak için tıklayın" class="bg-indigo-900/90 backdrop-blur-xl border border-indigo-400/30 p-2 rounded-full shadow-[0_15px_40px_-10px_rgba(99,102,241,0.5)] flex items-center justify-center cursor-pointer hover:scale-105 transition-all animate-[modalPop_0.3s_ease-out]">
-                    <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-full"></div>
+            <div id="selected-team-display" class="hidden absolute left-1/2 -translate-x-1/2 -top-[3.5rem] z-[60] flex-col items-center w-max max-w-[95%]">
+                <div onclick="clearSelectedTeam()" title="Seçimi kaldırmak için tıklayın" class="bg-indigo-900/90 backdrop-blur-xl border border-indigo-400/30 p-2 pr-6 sm:pr-8 rounded-full shadow-[0_15px_40px_-10px_rgba(99,102,241,0.5)] flex items-center gap-4 sm:gap-6 cursor-pointer hover:scale-105 transition-all animate-[modalPop_0.3s_ease-out]">
+                    
+                    <!-- Logo solda -->
+                    <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-full shrink-0 shadow-inner ml-1"></div>
+
+                    <!-- İstatistikler sağda -->
+                    <div id="selected-team-stats" class="flex items-center justify-start text-white">
+                        <!-- JS ile doldurulacak -->
+                    </div>
+                    
                 </div>
             </div>
 
@@ -276,14 +284,16 @@
                     <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto w-full no-scrollbar pb-1 select-none"></div>
                 </div>
 
+                <!-- SİSTEMDEKİ TAKIMLAR ALANI (A-Z) -->
                 <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 mt-2 hidden transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest"><i class="fas fa-users mr-1"></i> Sistemdeki Takımlar</h3>
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center"><i class="fas fa-users mr-1"></i> Sistemdeki Takımlar <span id="total-team-count" class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md ml-1.5 text-[9px] empty:hidden"></span></h3>
                         <span class="text-[9px] font-bold text-slate-300 uppercase">A-Z Filtresi</span>
                     </div>
                     <div id="alphabet-index" class="drag-scroll flex gap-1.5 overflow-x-auto w-full no-scrollbar pb-3 mb-3 select-none border-b border-slate-50"></div>
                     <div id="playing-teams" class="flex flex-wrap gap-2.5 w-full max-h-[180px] overflow-y-auto custom-scrollbar pb-2 pr-2 select-none"></div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -1148,6 +1158,44 @@
         }
     }
 
+    // YENİ EKLENEN: Takım İstatistiklerini Hesaplama (Oynanan, Galibiyet, Mağlubiyet, Oynanacak)
+    function calculateTeamStats(teamCoreName) {
+        const teamNorm = normalize(teamCoreName);
+        let played = 0;
+        let wins = 0;
+        let losses = 0;
+        let pending = 0;
+
+        state.allMatches.forEach(m => {
+            const t1Norm = normalize(getCoreName(m.t1));
+            const t2Norm = normalize(getCoreName(m.t2));
+            
+            if (t1Norm === teamNorm || t2Norm === teamNorm) {
+                // Maç oynandı mı ve skor girilmiş mi kontrolü
+                if (m.s1 !== '-' && m.s1 !== '' && !m.sets.toLowerCase().includes('oynanmadı')) {
+                    const s1 = parseInt(m.s1);
+                    const s2 = parseInt(m.s2);
+                    
+                    if (!isNaN(s1) && !isNaN(s2)) {
+                        played++;
+                        if (t1Norm === teamNorm) {
+                            if (s1 > s2) wins++;
+                            else if (s1 < s2) losses++;
+                        } else {
+                            if (s2 > s1) wins++;
+                            else if (s2 < s1) losses++;
+                        }
+                    }
+                } else {
+                    // Oynanmamış (gelecek) maçlar
+                    pending++;
+                }
+            }
+        });
+
+        return { played, wins, losses, pending };
+    }
+
     function updateUI() { 
         const statusTabs = document.getElementById('status-tabs');
         const dailyQuoteContainer = document.getElementById('daily-quote-container');
@@ -1157,6 +1205,7 @@
         
         const selectedTeamDisplay = document.getElementById('selected-team-display');
         const selectedTeamLogo = document.getElementById('selected-team-logo');
+        const selectedTeamStats = document.getElementById('selected-team-stats');
         
         if (state.selectedTeam) {
             if (statusTabs) statusTabs.classList.add('opacity-30', 'pointer-events-none');
@@ -1171,6 +1220,30 @@
             }
             if (selectedTeamLogo) {
                 selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0 border-none shadow-none");
+            }
+            if (selectedTeamStats) {
+                const stats = calculateTeamStats(state.selectedTeam);
+                selectedTeamStats.innerHTML = `
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-[8px] sm:text-[9px] text-indigo-300 font-bold uppercase tracking-widest">Oynanan</span>
+                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.played}</span>
+                    </div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-3 sm:mx-4"></div>
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-[8px] sm:text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Galibiyet</span>
+                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.wins}</span>
+                    </div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-3 sm:mx-4"></div>
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-[8px] sm:text-[9px] text-rose-400 font-bold uppercase tracking-widest">Mağlubiyet</span>
+                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.losses}</span>
+                    </div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-3 sm:mx-4"></div>
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-[8px] sm:text-[9px] text-amber-400 font-bold uppercase tracking-widest">Oynanacak</span>
+                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.pending}</span>
+                    </div>
+                `;
             }
         } else {
             if (statusTabs) statusTabs.classList.remove('opacity-30', 'pointer-events-none');
@@ -1295,6 +1368,9 @@
         });
 
         const teams = Array.from(teamsMap.values()).sort((a, b) => a.localeCompare(b, 'tr'));
+        
+        const countBadge = document.getElementById('total-team-count');
+        if (countBadge) countBadge.innerText = teams.length;
         
         if (teams.length === 0) { 
             wrapper.classList.add('hidden'); 
