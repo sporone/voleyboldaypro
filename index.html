@@ -883,14 +883,14 @@
         if (showAd) {
             adHtml = `
                 <!-- REKLAM 1 ALANI (VESPORTSCAMP) -->
-                <a href="https://vesportscamps.com/" target="_blank" rel="noopener noreferrer" class="w-[110px] h-[45px] bg-indigo-950 border border-indigo-800 rounded-xl flex items-center justify-center text-center p-1 hover:bg-indigo-800 hover:scale-105 transition-all shadow-sm overflow-hidden" title="Vesportscamp Kayıtları Devam Ediyor - Sayfaya Git">
+                <a href="https://vesportscamps.com/" target="_blank" rel="noopener noreferrer" class="w-[110px] h-[45px] shrink-0 bg-indigo-950 border border-indigo-800 rounded-xl flex items-center justify-center text-center p-1 hover:bg-indigo-800 hover:scale-105 transition-all shadow-sm overflow-hidden" title="Vesportscamp Kayıtları Devam Ediyor - Sayfaya Git">
                     <span class="text-[8.5px] font-black text-white uppercase tracking-tighter leading-tight">VESPORTSCAMP<br>KAYITLARI<br>DEVAM EDİYOR</span>
                 </a>
             `;
         } else {
             adHtml = `
                 <!-- REKLAM ALANI (GENEL) -->
-                <div class="w-[110px] h-[45px] bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center p-1 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm overflow-hidden" title="Bu alana reklam verebilirsiniz">
+                <div class="w-[110px] h-[45px] shrink-0 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center p-1 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm overflow-hidden" title="Bu alana reklam verebilirsiniz">
                     <span class="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-tight">Buraya Reklam<br>Verebilirsiniz</span>
                 </div>
             `;
@@ -942,11 +942,11 @@
 
                 </div>
 
-                <div class="w-full lg:w-[130px] shrink-0 flex flex-col justify-center items-end lg:items-center gap-3 lg:border-l border-slate-100 lg:pl-4 mt-2 lg:mt-0 pt-3 lg:pt-0">
+                <div class="w-full lg:w-[130px] shrink-0 flex flex-row lg:flex-col justify-between lg:justify-center items-center gap-3 lg:border-l border-slate-100 lg:pl-4 mt-3 lg:mt-0 pt-2 lg:pt-0">
                      ${adHtml}
                      
                      <!-- WHATSAPP BUTONU -->
-                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#c8102e] hover:text-red-800 font-medium text-sm flex items-center gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap">
+                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#c8102e] hover:text-red-800 font-medium text-sm flex items-center gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">
                          WhatsApp <i class="fab fa-whatsapp text-lg"></i> <i class="fas fa-arrow-right text-[10px] ml-1"></i>
                      </button>
                 </div>
