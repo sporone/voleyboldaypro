@@ -134,7 +134,7 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        /* YENİ EKLENEN BUGÜN ANİMASYONU */
+        /* BUGÜN ANİMASYONU */
         @keyframes glow-pulse {
             0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
             70% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
@@ -382,7 +382,7 @@
     </div>
 </div>
 
-<!-- TEK VE TEMİZ WHATSAPP MODALI -->
+<!-- WHATSAPP MODALI -->
 <div id="whatsapp-modal" class="modal-overlay">
     <div class="modal-content shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
@@ -481,7 +481,9 @@
         "kartalyıldızları": "https://volleybox.net/media/upload/teams/1755158375UwNm0.png",
         "büyükçekmecevoleybol": "https://volleybox.net/media/upload/teams/1763621163oB8wn.png",
         "olimpia2023": "https://volleybox.net/media/upload/teams/1767960411J725i.png",
-        "yankı": "https://instagram.fteq3-1.fna.fbcdn.net/v/t51.82787-19/601293533_18005125478820892_313570829212903084_n.jpg?stp=dst-jpg_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4zMzkuYzIifQ&_nc_ht=instagram.fteq3-1.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2gGMnHEJ9P1vPMd-YpejkfITgR3RnrAGAefmdVItm6M10vNeWJ7r1vxOqFaO3XaG_IY&_nc_ohc=8pAGXm9ABTgQ7kNvwFv0dJl&_nc_gid=duH-Q9-gOfRlv25qkdjImA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfyjP8iVyTOj8TRPqEeaIoOZV0QCNro2Xt6E0_rRdTvGhw&oe=69C729C7&_nc_sid=7a9f4b"
+        "yankı": "https://instagram.fteq3-1.fna.fbcdn.net/v/t51.82787-19/601293533_18005125478820892_313570829212903084_n.jpg?stp=dst-jpg_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4zMzkuYzIifQ&_nc_ht=instagram.fteq3-1.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2gGMnHEJ9P1vPMd-YpejkfITgR3RnrAGAefmdVItm6M10vNeWJ7r1vxOqFaO3XaG_IY&_nc_ohc=8pAGXm9ABTgQ7kNvwFv0dJl&_nc_gid=duH-Q9-gOfRlv25qkdjImA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfyjP8iVyTOj8TRPqEeaIoOZV0QCNro2Xt6E0_rRdTvGhw&oe=69C729C7&_nc_sid=7a9f4b",
+        "saydam": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIPOC8G1XcIvN2JV3lUVk6pEoiiiAhXOLNIw&s",
+        "saydamakademi": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHpjGOtnAjjELRRtBEBu37CiuEI4_tUIIcfQ&s"
     };
 
     const MOTIVATION_QUOTES = [
@@ -510,18 +512,10 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        
         const modalInstallBtn = document.getElementById('pwa-install-btn');
-        if (modalInstallBtn) {
-            modalInstallBtn.classList.remove('hidden');
-            modalInstallBtn.classList.add('flex');
-        }
-
+        if (modalInstallBtn) { modalInstallBtn.classList.remove('hidden'); modalInstallBtn.classList.add('flex'); }
         const banner = document.getElementById('install-banner');
-        if(banner) {
-            banner.classList.remove('hidden');
-            banner.classList.add('flex');
-        }
+        if(banner) { banner.classList.remove('hidden'); banner.classList.add('flex'); }
     });
 
     const pwaBtn = document.getElementById('pwa-install-btn');
@@ -529,7 +523,7 @@
         pwaBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                await deferredPrompt.userChoice;
                 deferredPrompt = null;
                 closeInstallGuide();
             }
@@ -540,88 +534,85 @@
     if (bannerInstallBtn) {
         bannerInstallBtn.addEventListener('click', async () => {
             const banner = document.getElementById('install-banner');
-            if(banner) {
-                banner.classList.remove('flex');
-                banner.classList.add('hidden');
-            }
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-            }
+            if(banner) { banner.classList.remove('flex'); banner.classList.add('hidden'); }
+            if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
         });
     }
 
     window.addEventListener('appinstalled', () => {
         const banner = document.getElementById('install-banner');
-        if(banner) {
-            banner.classList.remove('flex');
-            banner.classList.add('hidden');
-        }
+        if(banner) { banner.classList.remove('flex'); banner.classList.add('hidden'); }
         deferredPrompt = null;
     });
 
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log('PWA SW: Web sunucunuza sw.js eklendiğinde indirme tamamen aktif olur.');
-            });
-        });
+        window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error')); });
     }
 
-    // OYUNCU LİSTESİ FORMU (Numara + İsim + Mevki)
+    function calculateTeamStats(teamCoreName) {
+        const teamNorm = normalize(teamCoreName);
+        let played = 0; let wins = 0; let losses = 0; let pending = 0; let delayed = 0;
+        const todayVal = dateToValue(getTodayString());
+
+        state.allMatches.forEach(m => {
+            const t1Core = getCoreName(m.t1);
+            const t2Core = getCoreName(m.t2);
+            const t1Norm = normalize(t1Core);
+            const t2Norm = normalize(t2Core);
+            
+            if (t1Norm === teamNorm || t2Norm === teamNorm) {
+                if (isMatchPlayed(m)) {
+                    const s1 = parseInt(m.s1);
+                    const s2 = parseInt(m.s2);
+                    if (!isNaN(s1) && !isNaN(s2)) {
+                        played++;
+                        if (t1Norm === teamNorm) {
+                            if (s1 > s2) wins++; else if (s1 < s2) losses++;
+                        } else {
+                            if (s2 > s1) wins++; else if (s2 < s1) losses++;
+                        }
+                    }
+                } else {
+                    if (dateToValue(m.date) < todayVal) delayed++;
+                    else pending++;
+                }
+            }
+        });
+        return { played, wins, losses, pending, delayed };
+    }
+
     function initRosterForm() {
         const playersList = document.getElementById('players-list');
-        if (!playersList) return;
-
-        // Form daha önce oluşturulduysa (içinde eleman varsa) üzerine yazmayı durdur, yazılanlar silinmesin.
-        if (playersList.children.length > 0) return;
-
+        if (!playersList || playersList.children.length > 0) return;
         let numberOptions = '<option value="">No</option>';
         for(let n = 1; n <= 99; n++) {
             let numStr = n < 10 ? '0' + n : n.toString();
             numberOptions += `<option value="${numStr}">${numStr}</option>`;
         }
-
         let html = '';
         for (let i = 1; i <= 18; i++) {
             html += `
             <div class="flex flex-row items-center gap-1.5 w-full mb-1.5">
                 <span class="text-[11px] font-black text-slate-400 w-4 text-right shrink-0">${i}.</span>
-                <select id="player-number-${i}" class="bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-700 outline-none w-[55px] shrink-0">
-                    ${numberOptions}
-                </select>
+                <select id="player-number-${i}" class="bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-700 outline-none w-[55px] shrink-0">${numberOptions}</select>
                 <input type="text" id="player-name-${i}" placeholder="Sporcu Adı" class="flex-1 min-w-0 bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-800 outline-none">
                 <select id="player-position-${i}" class="bg-white border border-slate-200 rounded-lg p-2 text-[11px] font-bold text-slate-700 outline-none w-[80px] sm:w-[95px] shrink-0">
                     <option value="">Mevki</option>
-                    <option value="Pasör">Pasör</option>
-                    <option value="Orta">Orta</option>
-                    <option value="Smaçör">Smaçör</option>
-                    <option value="Pasör Çaprazı">P. Çaprazı</option>
-                    <option value="Libero">Libero</option>
+                    <option value="Pasör">Pasör</option><option value="Orta">Orta</option><option value="Smaçör">Smaçör</option><option value="Pasör Çaprazı">P. Çaprazı</option><option value="Libero">Libero</option>
                 </select>
-            </div>
-            `;
+            </div>`;
         }
         playersList.innerHTML = html;
     }
 
-    function showInstallGuide() { 
-        const modal = document.getElementById('install-guide-modal');
-        if (modal) modal.style.display = 'flex'; 
-    }
-    
-    function closeInstallGuide() { 
-        const modal = document.getElementById('install-guide-modal');
-        if (modal) modal.style.display = 'none'; 
-    }
+    function showInstallGuide() { const modal = document.getElementById('install-guide-modal'); if (modal) modal.style.display = 'flex'; }
+    function closeInstallGuide() { const modal = document.getElementById('install-guide-modal'); if (modal) modal.style.display = 'none'; }
 
     function setDailyQuote() {
         const today = new Date();
         const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-        const quoteIndex = dayOfYear % MOTIVATION_QUOTES.length;
         const qt = document.getElementById('daily-quote-text');
-        if (qt) qt.innerText = MOTIVATION_QUOTES[quoteIndex];
+        if (qt) qt.innerText = MOTIVATION_QUOTES[dayOfYear % MOTIVATION_QUOTES.length];
     }
 
     function makeScrollable(elementId) {
@@ -644,8 +635,7 @@
         const trTime = getTurkeyTime();
         const d = String(trTime.getDate()).padStart(2, '0');
         const m = String(trTime.getMonth() + 1).padStart(2, '0');
-        const y = trTime.getFullYear();
-        return `${d}.${m}.${y}`;
+        return `${d}.${m}.${trTime.getFullYear()}`;
     }
 
     function startLiveClock() {
@@ -660,26 +650,11 @@
             const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
             if(dateEl) dateEl.innerText = `${tr.getDate()} ${months[tr.getMonth()]} ${days[tr.getDay()]}`;
         }
-        update();
-        setInterval(update, 10000);
+        update(); setInterval(update, 10000);
     }
 
-    function cleanTeamName(str) {
-        if (!str) return "";
-        return str.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').trim();
-    }
-
-    function getCoreName(str) {
-        if (!str) return "";
-        let s = cleanTeamName(str);
-        s = s.replace(/\s+[A-E]$/i, '');
-        return s.trim();
-    }
-
-    function getBaseTeamName(str) {
-        if (!str) return "";
-        return cleanTeamName(str).trim();
-    }
+    function cleanTeamName(str) { if (!str) return ""; return str.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').trim(); }
+    function getCoreName(str) { if (!str) return ""; let s = cleanTeamName(str); s = s.replace(/\s+[A-E]$/i, ''); return s.trim(); }
 
     function normalize(str) {
         if (!str) return "";
@@ -687,85 +662,36 @@
             .replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)$/gi, '')
             .replace(/\s+(sk|s\.k|spor|kulübü|derneği|gençlik)\s+/gi, ' ')
             .replace(/sk$/g, '').replace(/s\.k$/g, '')
-            .replace(/spor/g, '').replace(/kulübü/g, '')
+            .replace(/kulübü/g, '')
             .replace(/\s+/g, '').replace(/[\.\,\-\(\)]/g, ''); 
     }
 
-    function isPlaceholderTeam(str) {
-        if (!str) return true;
-        const s = str.toLowerCase();
-        return s.includes(".si") || s.includes(".sü") || s.includes(".cü") || 
-               s.includes(".cı") || s.includes(".sı") || s.includes("galibi") || 
-               s.includes("mağlubu") || s.includes("yükselen") || s.includes("düşen");
-    }
+    function isPlaceholderTeam(str) { if (!str) return true; const s = str.toLowerCase(); return s.includes(".si") || s.includes(".sü") || s.includes(".cü") || s.includes(".cı") || s.includes(".sı") || s.includes("galibi") || s.includes("mağlubu") || s.includes("yükselen") || s.includes("düşen"); }
 
     function buildGroupName(kume, c, ktg, tur, gr) {
         const parts = [];
-        const cleanPart = (str) => {
-            if (!str || str === "-") return '';
-            return str.trim().replace(/^[\.\-\_]+|[\.\-\_]+$/g, '').trim();
-        };
-
-        const pKume = cleanPart(kume);
-        
-        // Cinsiyet ve Kategori kısaltmaları genelde küme adında (örn: KESL, KKGL) bulunduğu için
-        // "E", "KE", "K", "KK" gibi tekrarları ekrandan kaldırarak sadeleştiriyoruz.
-        const pTur = cleanPart(tur);
-        
+        const cleanPart = (str) => (!str || str === "-") ? '' : str.trim().replace(/^[\.\-\_]+|[\.\-\_]+$/g, '').trim();
+        const pKume = cleanPart(kume); const pTur = cleanPart(tur);
         if (pKume) parts.push(pKume);
-        
-        // "LE" (Lig Etabı) gereksiz kalabalık yaptığı için gizliyoruz. Ancak Finalleri ekliyoruz.
         if (pTur && pTur.toUpperCase() !== "LE" && pTur.toUpperCase() !== "L.E.") {
-            if (pTur.toUpperCase() === "YF") parts.push("Yarı Final");
-            else if (pTur.toUpperCase() === "ÇF") parts.push("Çeyrek Final");
-            else if (pTur.toUpperCase() === "F") parts.push("Final");
-            else parts.push(pTur);
+            if (pTur.toUpperCase() === "YF") parts.push("Yarı Final"); else if (pTur.toUpperCase() === "ÇF") parts.push("Çeyrek Final"); else if (pTur.toUpperCase() === "F") parts.push("Final"); else parts.push(pTur);
         }
-        
         let pGr = cleanPart(gr);
         if (pGr) {
             pGr = pGr.replace(/grubu/i, '').replace(/grup/i, '').replace(/gr\./i, '').replace(/gr/i, '').trim();
-            pGr = cleanPart(pGr); 
-            
-            if (pGr) {
-                if (/^\d+$/.test(pGr)) {
-                    parts.push(pGr + ". Grup");
-                } else {
-                    parts.push(pGr + " Grubu");
-                }
-            }
+            if (pGr) parts.push(/^\d+$/.test(pGr) ? pGr + ". Grup" : pGr + " Grubu");
         }
-        
         return parts.length > 0 ? parts.join(' ').replace(/\s+/g, ' ') : '';
     }
 
     function wrapProxy(url) {
         if (!url) return "";
         const cleanUrl = url.toString().replace(/^"|"$/g, '').trim();
-        // Blogspot, Blogger, Google, Facebook ve Instagram görselleri proxy'e takılmadan doğrudan ve hızlı yüklenecek
-        if (cleanUrl.startsWith('data:') || 
-            cleanUrl.includes('tbf.org.tr') || 
-            cleanUrl.includes('wikipedia') || 
-            cleanUrl.includes('blogspot.com') || 
-            cleanUrl.includes('blogger.com') || 
-            cleanUrl.includes('googleusercontent.com') ||
-            cleanUrl.includes('fbcdn.net') || 
-            cleanUrl.includes('instagram.com') || 
-            cleanUrl.includes('facebook.com')) {
-            return cleanUrl;
-        }
+        if (cleanUrl.startsWith('data:') || cleanUrl.includes('tbf.org.tr') || cleanUrl.includes('wikipedia') || cleanUrl.includes('blogspot.com') || cleanUrl.includes('blogger.com') || cleanUrl.includes('googleusercontent.com') || cleanUrl.includes('fbcdn.net') || cleanUrl.includes('instagram.com') || cleanUrl.includes('facebook.com')) return cleanUrl;
         return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}`;
     }
 
-    function fixLogoUrl(url) {
-        if (!url) return "";
-        url = url.toString().replace(/^"|"$/g, '').trim();
-        if (url.includes('drive.google.com')) {
-            const idMatch = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^\&]+)/);
-            if (idMatch && idMatch[1]) return `https://docs.google.com/uc?export=download&id=${idMatch[1]}`;
-        }
-        return url;
-    }
+    function fixLogoUrl(url) { if (!url) return ""; url = url.toString().replace(/^"|"$/g, '').trim(); if (url.includes('drive.google.com')) { const idMatch = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^\&]+)/); if (idMatch && idMatch[1]) return `https://docs.google.com/uc?export=download&id=${idMatch[1]}`; } return url; }
 
     function parseCSVLine(line) {
         const parts = []; let curr = ''; let inQuotes = false;
@@ -775,86 +701,48 @@
             else if (char === ',' && !inQuotes) { parts.push(curr); curr = ''; }
             else curr += char;
         }
-        parts.push(curr);
-        return parts;
+        parts.push(curr); return parts;
     }
 
-    // YENİ KURAL MOTORU: Maçın oynanıp oynanmadığını kesin olarak denetler
-    function isMatchPlayed(m) {
-        return (m.s1 !== '-' && m.s1 !== '') || (m.s2 !== '-' && m.s2 !== '');
-    }
+    function isMatchPlayed(m) { return (m.s1 !== '-' && m.s1 !== '') || (m.s2 !== '-' && m.s2 !== ''); }
 
     async function fetchData() {
         try {
             const overlay = document.getElementById('loading-overlay');
             if (overlay) overlay.classList.remove('hidden');
             const timestamp = Date.now();
-            
-            const mPromise = fetch(`${MATCHES_URL}&cb=${timestamp}`).then(r => r.text());
-            const lPromise = fetch(`${LOGOS_URL}&cb=${timestamp}`).then(r => r.text());
-
-            const results = await Promise.all([mPromise, lPromise]);
-            
-            state.logoMap = parseLogos(results[1]);
-            state.allMatches = parseMatches(results[0]);
-
+            const results = await Promise.all([ fetch(`${MATCHES_URL}&cb=${timestamp}`).then(r => r.text()), fetch(`${LOGOS_URL}&cb=${timestamp}`).then(r => r.text()) ]);
+            state.logoMap = parseLogos(results[1]); state.allMatches = parseMatches(results[0]);
             if (state.allMatches.length > 0) {
-                const dates = getSortedDates();
-                const todayStr = getTodayString();
-                if (!state.currentDate) {
-                    if (dates.includes(todayStr)) state.currentDate = todayStr;
-                    else state.currentDate = dates[0] || ""; // BOŞ TARİH KORUMASI
-                } else if (!dates.includes(state.currentDate)) {
-                    state.currentDate = dates[0] || "";
-                }
+                const dates = getSortedDates(); const todayStr = getTodayString();
+                if (!state.currentDate) state.currentDate = dates.includes(todayStr) ? todayStr : (dates[0] || "");
+                else if (!dates.includes(state.currentDate)) state.currentDate = dates[0] || "";
             }
             state.loading = false;
             if (overlay) overlay.classList.add('hidden');
-            
-            // URL'den takım kontrolü (Sayfa ilk açıldığında linkte takım varsa otomatik seç)
             const rawHash = window.location.hash.replace('#', '');
-            const hashTeam = rawHash ? decodeURIComponent(rawHash) : '';
-            if (hashTeam) {
+            if (rawHash) {
+                const hashTeam = decodeURIComponent(rawHash);
                 let originalName = null;
-                // Türkçe karakterleri ve özel kodlamaları tolere eden akıllı eşleştirici
                 const toEnglish = (s) => s.replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
-                const searchHash = toEnglish(hashTeam);
-                
+                const searchHash = toEnglish(normalize(hashTeam));
                 for (let m of state.allMatches) {
                     if (toEnglish(normalize(getCoreName(m.t1))) === searchHash) { originalName = getCoreName(m.t1); break; }
                     if (toEnglish(normalize(getCoreName(m.t2))) === searchHash) { originalName = getCoreName(m.t2); break; }
                 }
-                if (originalName) {
-                    selectTeam(originalName);
-                    return; // selectTeam zaten updateUI() çağırır
-                }
+                if (originalName) { selectTeam(originalName); return; }
             }
-            
             updateUI();
-        } catch (error) { 
-            console.error(error);
-            showError("Veri yüklenirken bir hata oluştu."); 
-            const overlay = document.getElementById('loading-overlay');
-            if (overlay) overlay.classList.add('hidden');
-        }
+        } catch (error) { showError("Veri yüklenirken hata oluştu."); if (document.getElementById('loading-overlay')) document.getElementById('loading-overlay').classList.add('hidden'); }
     }
 
     function parseLogos(csv) {
-        const lines = csv.split(/\r?\n/);
-        const map = {}; 
+        const lines = csv.split(/\r?\n/); const map = {}; 
         lines.forEach(line => {
             const p = parseCSVLine(line);
-            if (p.length >= 2) {
-                const name = normalize(p[0].replace(/^"|"$/g, ''));
-                const url = fixLogoUrl(p[1]);
-                if (name && url && url.startsWith('http')) map[name] = url;
-            }
+            if (p.length >= 2) { const name = normalize(p[0].replace(/^"|"$/g, '')); const url = fixLogoUrl(p[1]); if (name && url && url.startsWith('http')) map[name] = url; }
         });
-
-        for (const key in CONSTANT_LOGOS) {
-            map[normalize(key)] = CONSTANT_LOGOS[key];
-        }
-
+        for (const key in CONSTANT_LOGOS) { map[normalize(key)] = CONSTANT_LOGOS[key]; }
         return map;
     }
 
@@ -863,61 +751,33 @@
         return lines.slice(1).filter(l => l.trim()).map(line => {
             const p = parseCSVLine(line);
             return {
-                date: (p[0] || "").trim(), 
-                venue: (p[1] || "").trim(), 
-                time: (p[2] || "").trim(),
-                t1: cleanTeamName(p[3]), 
-                s1: (p[4] || "").trim() || "-", 
-                s2: (p[5] || "").trim() || "-", 
-                t2: cleanTeamName(p[6]),
-                sets: (p[7] || "").trim() || "Oynanmadı", 
-                dk: (p[8] || "").trim(), 
-                c: (p[9] || "").trim(), 
-                kume: (p[10] || "").trim(), 
-                ktg: (p[11] || "").trim(), 
-                tur: (p[12] || "").trim(), 
-                gr: (p[13] || "").trim(),
-                gender: (p[9] || "M").trim(), 
-                league: (p[10] || "LİG").trim() 
+                date: (p[0] || "").trim(), venue: (p[1] || "").trim(), time: (p[2] || "").trim(), t1: cleanTeamName(p[3]), 
+                s1: (p[4] || "").trim() || "-", s2: (p[5] || "").trim() || "-", t2: cleanTeamName(p[6]),
+                sets: (p[7] || "").trim() || "Oynanmadı", dk: (p[8] || "").trim(), c: (p[9] || "").trim(), 
+                kume: (p[10] || "").trim(), ktg: (p[11] || "").trim(), tur: (p[12] || "").trim(), gr: (p[13] || "").trim(),
+                gender: (p[9] || "M").trim(), league: (p[10] || "LİG").trim() 
             };
         });
     }
 
     function getLogoHtml(teamName, extraClasses = "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0") {
         const normalizedName = normalize(teamName);
-        let rawUrl = null;
-        
+        let rawUrl = null; let bestKeyLength = -1;
         for (const key in state.logoMap) {
-            if (key.length > 2 && (normalizedName.includes(key) || key.includes(normalizedName))) {
-                rawUrl = state.logoMap[key]; 
-                break;
-            }
+            if (normalizedName.includes(key) && key.length > bestKeyLength) { bestKeyLength = key.length; rawUrl = state.logoMap[key]; }
         }
-        
-        const url = wrapProxy(rawUrl);
-        const initials = teamName.substring(0, 2).toUpperCase() || "VO";
-        
-        return `
-            <div class="team-logo-circle ${extraClasses}">
-                <span class="fallback-text">${initials}</span>
-                ${rawUrl ? `<img src="${url}" loading="lazy" onerror="this.style.display='none';">` : ''}
-            </div>`;
+        const url = wrapProxy(rawUrl); const initials = teamName.substring(0, 2).toUpperCase() || "VO";
+        return `<div class="team-logo-circle ${extraClasses}"><span class="fallback-text">${initials}</span>${rawUrl ? `<img src="${url}" loading="lazy" onerror="this.style.display='none';">` : ''}</div>`;
     }
 
     function parseSetScoresHtml(sets) {
-        let r1 = ''; let r2 = '';
-        let matches = [];
-        if (sets && !sets.toLowerCase().includes("oynanmadı") && sets !== "-") {
-            matches = [...sets.matchAll(/\((\d+)-(\d+)\)/g)];
-        }
+        let r1 = ''; let r2 = ''; let matches = [];
+        if (sets && !sets.toLowerCase().includes("oynanmadı") && sets !== "-") matches = [...sets.matchAll(/\((\d+)-(\d+)\)/g)];
         for (let i = 0; i < 5; i++) {
             if (i < matches.length) {
-                const v1 = parseInt(matches[i][1]); 
-                const v2 = parseInt(matches[i][2]);
-                const c1 = v1 > v2 ? 'text-[#c8102e]' : 'text-slate-400';
-                const c2 = v2 > v1 ? 'text-[#c8102e]' : 'text-slate-400';
-                r1 += `<span class="w-5 md:w-6 text-center ${c1}">${v1}</span>`;
-                r2 += `<span class="w-5 md:w-6 text-center ${c2}">${v2}</span>`;
+                const v1 = parseInt(matches[i][1]); const v2 = parseInt(matches[i][2]);
+                r1 += `<span class="w-5 md:w-6 text-center ${v1 > v2 ? 'text-[#c8102e]' : 'text-slate-400'}">${v1}</span>`;
+                r2 += `<span class="w-5 md:w-6 text-center ${v2 > v1 ? 'text-[#c8102e]' : 'text-slate-400'}">${v2}</span>`;
             } else {
                 r1 += `<span class="w-5 md:w-6 text-center text-slate-300">-</span>`;
                 r2 += `<span class="w-5 md:w-6 text-center text-slate-300">-</span>`;
@@ -927,120 +787,49 @@
     }
 
     function checkLiveStatus(m) {
-        // Eğer skor girilmişse Canlı statüsünden kesinlikle çıkar
         if (isMatchPlayed(m)) return false;
-        
-        const trTime = getTurkeyTime();
-        // DÜZELTME: Tarayıcıların farklı tarih formatı atamasını engellemek için kendi kesin fonksiyonumuzu kullandık.
-        const todayStr = getTodayString();
-        
+        const trTime = getTurkeyTime(); const todayStr = getTodayString();
         if (m.date === todayStr) {
             const [mH, mM] = m.time.split(':').map(Number);
-            const matchMins = mH * 60 + (mM || 0);
-            const currentMins = trTime.getHours() * 60 + trTime.getMinutes();
+            const matchMins = mH * 60 + (mM || 0); const currentMins = trTime.getHours() * 60 + trTime.getMinutes();
             if (currentMins >= matchMins) return true;
         }
         return false;
     }
 
-    const dateToValue = (d) => {
-        if (!d) return 0;
-        const p = d.split('.').map(Number);
-        if (p.length !== 3) return 0;
-        return new Date(p[2], p[1]-1, p[0]).getTime();
-    };
-
-    const timeToMins = (t) => {
-        const parts = (t || "00:00").split(':');
-        return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
-    };
+    const dateToValue = (d) => { if (!d) return 0; const p = d.split('.').map(Number); if (p.length !== 3) return 0; return new Date(p[2], p[1]-1, p[0]).getTime(); };
+    const timeToMins = (t) => { const parts = (t || "00:00").split(':'); return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0); };
 
     function createMatchCard(m, showAd = false) {
-        const isLive = checkLiveStatus(m);
-        // Kesme işareti (') içeren takım isimlerinin butonu bozmaması için özel kodlama eklendi
-        const encodedMatch = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
-        const setScores = parseSetScoresHtml(m.sets);
-
-        const leagueGroupText = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
-        
-        // --- TVF SKOR GİRİLMEDİ UYARISI MANTIĞI (60 DK KONTROLÜ VE GEÇMİŞ MAÇ) ---
-        let missingScoreWarning = '';
+        const isLive = checkLiveStatus(m); const encodedMatch = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
+        const setScores = parseSetScoresHtml(m.sets); const leagueGroupText = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
+        let warning = '';
         if (!isMatchPlayed(m)) {
-            const trTime = getTurkeyTime();
-            const matchDate = m.date.split('.').map(Number); // [DD, MM, YYYY]
-            const [mH, mM] = m.time.split(':').map(Number);
-            
-            if (matchDate.length === 3) {
-                // Aylar 0-11 indeksli olduğu için matchDate[1] - 1 yapıyoruz
-                const matchDateTime = new Date(matchDate[2], matchDate[1] - 1, matchDate[0], mH, mM).getTime();
-                const currentTimeMs = trTime.getTime();
-                
-                // 60 dakika gecikme kontrolü VEYA tarihin geçmesi
-                if (currentTimeMs >= matchDateTime + 3600000) {
-                    missingScoreWarning = `
-                        <div class="text-slate-400 text-[9px] md:text-[10px] font-medium text-right opacity-70 tracking-tight mt-1.5 w-full">
-                            TVF tarafından skor girilmemiştir.
-                        </div>
-                    `;
-                }
+            const trTime = getTurkeyTime(); const matchDate = m.date.split('.').map(Number); const [mH, mM] = m.time.split(':').map(Number);
+            if (matchDate.length === 3 && trTime.getTime() >= new Date(matchDate[2], matchDate[1] - 1, matchDate[0], mH, mM).getTime() + 3600000) {
+                warning = `<div class="text-slate-400 text-[9px] md:text-[10px] font-medium text-right opacity-70 mt-1.5 w-full">TVF tarafından skor girilmemiştir.</div>`;
             }
         }
+        let adHtml = showAd ? `<a href="https://vesportscamps.com/" target="_blank" class="flex-1 lg:flex-none w-full lg:w-[120px] h-[45px] shrink-0 bg-indigo-950 border border-indigo-800 rounded-xl flex items-center justify-center text-center px-3 lg:px-1 py-1 hover:bg-indigo-800 transition-all shadow-sm overflow-hidden"><span class="text-[10px] sm:text-[11px] font-black text-white uppercase leading-tight lg:hidden truncate">Vesportscamp Kayıtları Devam Ediyor</span><span class="text-[8.5px] font-black text-white uppercase leading-tight hidden lg:block">VESPORTSCAMP<br>KAYITLARI<br>DEVAM EDİYOR</span></a>` : `<div class="flex-1 lg:flex-none w-full lg:w-[120px] h-[45px] shrink-0 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center px-3 lg:px-1 py-1"><span class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase leading-tight lg:hidden truncate">Buraya Reklam Verebilirsiniz</span><span class="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-tight hidden lg:block">Buraya Reklam<br>Verebilirsiniz</span></div>`;
 
-        let adHtml = '';
-        if (showAd) {
-            adHtml = `
-                <!-- REKLAM 1 ALANI (VESPORTSCAMP) -->
-                <a href="https://vesportscamps.com/" target="_blank" rel="noopener noreferrer" class="flex-1 lg:flex-none w-full lg:w-[120px] h-[45px] shrink-0 bg-indigo-950 border border-indigo-800 rounded-xl flex items-center justify-center text-center px-3 lg:px-1 py-1 hover:bg-indigo-800 hover:scale-105 transition-all shadow-sm overflow-hidden" title="Vesportscamp Kayıtları Devam Ediyor - Sayfaya Git">
-                    <span class="text-[10px] sm:text-[11px] font-black text-white uppercase tracking-wider leading-tight block lg:hidden truncate">Vesportscamp Kayıtları Devam Ediyor</span>
-                    <span class="text-[8.5px] font-black text-white uppercase tracking-tighter leading-tight hidden lg:block">VESPORTSCAMP<br>KAYITLARI<br>DEVAM EDİYOR</span>
-                </a>
-            `;
-        } else {
-            adHtml = `
-                <!-- REKLAM ALANI (GENEL) -->
-                <div class="flex-1 lg:flex-none w-full lg:w-[120px] h-[45px] shrink-0 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center px-3 lg:px-1 py-1 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm overflow-hidden" title="Bu alana reklam verebilirsiniz">
-                    <span class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-wider leading-tight block lg:hidden truncate">Buraya Reklam Verebilirsiniz</span>
-                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-tight hidden lg:block">Buraya Reklam<br>Verebilirsiniz</span>
-                </div>
-            `;
-        }
-
-        return `
-            <div class="match-card bg-white p-4 lg:p-5 shadow-sm flex flex-col lg:flex-row items-center gap-4 lg:gap-6 relative overflow-hidden group/card w-full border border-slate-200 rounded-[1.25rem]">
+        return `<div class="match-card bg-white p-4 lg:p-5 shadow-sm flex flex-col lg:flex-row items-center gap-4 lg:gap-6 relative overflow-hidden group/card w-full border border-slate-200 rounded-[1.25rem]">
                 <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2">
-                    
-                    <div class="bg-indigo-50 rounded-xl py-2 px-3 text-[10.5px] text-indigo-700 font-bold leading-relaxed border border-indigo-100/50 shadow-sm flex items-center gap-1.5 uppercase tracking-tight">
-                        <i class="fas fa-trophy text-amber-500 text-xs"></i> ${leagueGroupText}
+                    <div class="bg-indigo-50 rounded-xl py-2 px-3 text-[10.5px] text-indigo-700 font-bold border border-indigo-100/50 flex items-center gap-1.5 uppercase truncate tracking-tight"><i class="fas fa-trophy text-amber-500 text-xs"></i> ${leagueGroupText}</div>
+                    <div class="bg-slate-50 rounded-xl p-2.5 text-[11px] text-slate-500 font-semibold relative border border-slate-100 flex flex-col gap-1.5">
+                        <div class="flex items-center gap-2"><i class="far fa-calendar-alt text-slate-400"></i> ${m.date} - ${m.time}</div>
+                        <div class="flex items-start gap-2"><i class="fas fa-map-marker-alt mt-0.5 text-slate-400"></i> <span class="leading-tight">${m.venue}</span></div>
+                        ${isLive ? '<div class="absolute top-2 right-2 flex items-center gap-1 text-rose-500 font-black text-[9px] animate-pulse uppercase"><span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>CANLI</div>' : ''}
                     </div>
-
-                    <div class="bg-slate-50 rounded-xl p-2.5 text-[11px] text-slate-500 font-semibold leading-relaxed relative border border-slate-100 flex flex-col gap-1.5">
-                        <div class="flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-slate-400"></i> ${m.date} - ${m.time}
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <i class="fas fa-map-marker-alt mt-0.5 text-slate-400"></i> <span class="leading-tight">${m.venue}</span>
-                        </div>
-                        ${isLive ? '<div class="absolute top-2 right-2 flex items-center gap-1 text-rose-500 font-black text-[9px] uppercase animate-pulse"><span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>CANLI</div>' : ''}
-                    </div>
-
                 </div>
-
-                <div class="flex-1 flex flex-col justify-center w-full overflow-hidden border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
+                <div class="flex-1 flex flex-col justify-center w-full border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
                     <div class="flex flex-row items-center justify-between w-full">
-                        <div class="flex flex-col gap-2 md:gap-3 flex-1 pr-2 md:pr-4 min-w-0 py-1">
-                            <div class="flex items-center gap-3 w-full h-8 md:h-10">
-                                ${getLogoHtml(m.t1, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
-                                <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t1}</span>
-                            </div>
-                            <div class="flex items-center gap-3 w-full h-8 md:h-10">
-                                ${getLogoHtml(m.t2, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
-                                <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t2}</span>
-                            </div>
+                        <div class="flex flex-col gap-2 md:gap-3 flex-1 pr-2 min-w-0 py-1">
+                            <div class="flex items-center gap-3 w-full h-8 md:h-10">${getLogoHtml(m.t1, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}<span class="text-sm font-bold text-slate-900 uppercase truncate tracking-tight">${m.t1}</span></div>
+                            <div class="flex items-center gap-3 w-full h-8 md:h-10">${getLogoHtml(m.t2, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}<span class="text-sm font-bold text-slate-900 uppercase truncate tracking-tight">${m.t2}</span></div>
                         </div>
-
                         <div class="flex flex-col items-end shrink-0 py-1">
                             <div class="flex items-stretch gap-3 md:gap-5">
-                                <div class="bg-indigo-950 rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] md:text-sm overflow-hidden shrink-0">
+                                <div class="bg-indigo-950 rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] overflow-hidden shrink-0">
                                     <div class="flex-1 min-h-[32px] md:min-h-[40px] flex items-center justify-center border-b border-indigo-800/80">${m.s1 === '-' ? '' : m.s1}</div>
                                     <div class="flex-1 min-h-[32px] md:min-h-[40px] flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
                                 </div>
@@ -1049,724 +838,204 @@
                                     <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row2}</div>
                                 </div>
                             </div>
-                            ${missingScoreWarning}
+                            ${warning}
                         </div>
                     </div>
                 </div>
-
                 <div class="w-full lg:w-[130px] shrink-0 flex flex-row lg:flex-col justify-between lg:justify-center items-center gap-4 lg:gap-3 lg:border-l border-slate-100 lg:pl-4 mt-3 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0">
                      ${adHtml}
-                     
-                     <!-- WHATSAPP BUTONU -->
-                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#25D366] hover:text-[#128c7e] font-bold text-sm flex items-center justify-end gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">
-                         WhatsApp <i class="fab fa-whatsapp text-lg"></i> <i class="fas fa-arrow-right text-[10px] ml-1 hidden lg:inline-block text-slate-300"></i>
-                     </button>
+                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#25D366] hover:text-[#128c7e] font-bold text-sm flex items-center justify-end gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">WhatsApp <i class="fab fa-whatsapp text-lg"></i></button>
                 </div>
             </div>`;
     }
 
     function openWhatsappModal(mStr) {
-        const m = JSON.parse(decodeURIComponent(mStr));
-        state.currentSharingMatch = m;
-        const modal = document.getElementById('whatsapp-modal');
-        if (modal) modal.style.display = 'flex';
-        const noteInput = document.getElementById('whatsapp-note');
-        if (noteInput) noteInput.value = '';
-
+        const m = JSON.parse(decodeURIComponent(mStr)); state.currentSharingMatch = m;
+        const modal = document.getElementById('whatsapp-modal'); if (modal) modal.style.display = 'flex';
+        const noteInput = document.getElementById('whatsapp-note'); if (noteInput) noteInput.value = '';
         const modalInfo = document.getElementById('whatsapp-modal-match-info');
         if (modalInfo) {
-            modalInfo.innerHTML = `
-                <div class="flex flex-col items-center gap-2 w-[40%]">
-                    ${getLogoHtml(m.t1, "w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 shadow-sm shrink-0")}
-                    <span class="text-[10px] md:text-xs font-bold text-slate-800 text-center leading-tight">${m.t1}</span>
-                </div>
-                <div class="flex flex-col items-center justify-center w-[20%]">
-                    <span class="text-sm md:text-lg font-black text-indigo-900 whitespace-nowrap">${m.s1 !== "-" && m.s1 !== "" ? m.s1 + " - " + m.s2 : "VS"}</span>
-                    <span class="text-[9px] font-bold text-slate-400 mt-1">${m.time}</span>
-                </div>
-                <div class="flex flex-col items-center gap-2 w-[40%]">
-                    ${getLogoHtml(m.t2, "w-10 h-10 md:w-12 md:h-12 bg-white border border-slate-200 shadow-sm shrink-0")}
-                    <span class="text-[10px] md:text-xs font-bold text-slate-800 text-center leading-tight">${m.t2}</span>
-                </div>
-            `;
+            modalInfo.innerHTML = `<div class="flex flex-col items-center gap-2 w-[40%]">${getLogoHtml(m.t1, "w-10 h-10")} <span class="text-[10px] font-bold text-center leading-tight">${m.t1}</span></div>
+                <div class="flex flex-col items-center justify-center w-[20%]"><span class="text-sm md:text-lg font-black text-indigo-900">${m.s1 !== "-" ? m.s1 + " - " + m.s2 : "VS"}</span></div>
+                <div class="flex flex-col items-center gap-2 w-[40%]">${getLogoHtml(m.t2, "w-10 h-10")} <span class="text-[10px] font-bold text-center leading-tight">${m.t2}</span></div>`;
         }
-
-        const isPlayed = isMatchPlayed(m);
         const rosterSection = document.getElementById('whatsapp-roster-section');
-        if (rosterSection) {
-            if (!isPlayed) {
-                rosterSection.classList.remove('hidden');
-                rosterSection.classList.add('flex');
-                // Formun ekrana basılmasını (görünür olmasını) tam burada garantiliyoruz
-                initRosterForm();
-            } else {
-                rosterSection.classList.add('hidden');
-                rosterSection.classList.remove('flex');
-            }
-        }
+        if (rosterSection) { if (!isMatchPlayed(m)) { rosterSection.classList.remove('hidden'); rosterSection.classList.add('flex'); initRosterForm(); } else { rosterSection.classList.add('hidden'); rosterSection.classList.remove('flex'); } }
     }
 
-    function closeWhatsappModal() { 
-        const modal = document.getElementById('whatsapp-modal');
-        if (modal) modal.style.display = 'none'; 
-    }
+    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
 
     const whatsappBtn = document.getElementById('whatsapp-send-btn');
     if (whatsappBtn) {
         whatsappBtn.onclick = function() {
             if (!state.currentSharingMatch) return;
-            const m = state.currentSharingMatch;
-            const noteInput = document.getElementById('whatsapp-note');
-            const note = noteInput ? noteInput.value.trim() : '';
-            const isPlayed = isMatchPlayed(m);
-            
-            // WhatsApp mesajında da aynı temizlenmiş Kategori/Lig adını kullanıyoruz
-            const category = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
-            
-            let header = isPlayed ? "MAÇ SONUCU" : "MAÇ GÜNÜ";
-            let msg = `*${header}*\n🏆 Kategori: ${category}\n\n`; 
-            
+            const m = state.currentSharingMatch; const note = document.getElementById('whatsapp-note').value.trim(); const isPlayed = isMatchPlayed(m);
+            const category = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
+            let msg = `*${isPlayed ? "MAÇ SONUCU" : "MAÇ GÜNÜ"}*\n🏆 Kategori: ${category}\n\n`; 
             if (note) msg += `📝 ${note}\n\n`;
-            
             if (isPlayed) {
-                // Takımlar alt alta, skorlar yanlarında
-                msg += `🏐 *${m.t1}* : ${m.s1}\n`;
-                msg += `🏐 *${m.t2}* : ${m.s2}\n\n`;
-                
-                msg += `*Setler:*\n`;
+                msg += `🏐 *${m.t1}* : ${m.s1}\n🏐 *${m.t2}* : ${m.s2}\n\n*Setler:*\n`;
                 const setMatches = [...m.sets.matchAll(/\((\d+)-(\d+)\)/g)];
-                if (setMatches.length > 0) {
-                    setMatches.forEach((sm, idx) => {
-                        const v1 = parseInt(sm[1]);
-                        const v2 = parseInt(sm[2]);
-                        
-                        // Set numarası ve skorları 2 haneli formata çevir (Örn: 1 -> 01, 7 -> 07)
-                        const strV1 = String(v1).padStart(2, '0');
-                        const strV2 = String(v2).padStart(2, '0');
-                        const strSet = String(idx + 1).padStart(2, '0');
-                        
-                        msg += `Set ${strSet}: ${strV1} - ${strV2}\n`;
-                    });
-                } else {
-                    msg += `${m.sets.replace(/<[^>]*>/g, '')}\n`;
-                }
-                msg += `\n`;
-            } else {
-                msg += `🏐 *${m.t1}*\n🆚\n🏐 *${m.t2}*\n\n⏰ Saat: ${m.time}\n`;
-            }
+                if (setMatches.length > 0) setMatches.forEach((sm, idx) => msg += `Set ${String(idx + 1).padStart(2, '0')}: ${String(sm[1]).padStart(2, '0')} - ${String(sm[2]).padStart(2, '0')}\n`);
+                else msg += `${m.sets.replace(/<[^>]*>/g, '')}\n`;
+            } else msg += `🏐 *${m.t1}*\n🆚\n🏐 *${m.t2}*\n\n⏰ Saat: ${m.time}\n`;
             msg += `📍 Salon: ${m.venue}\n📅 Tarih: ${m.date}\n\n`;
-
             if (!isPlayed) {
-                const coachInput = document.getElementById('coach-name');
-                const coachName = coachInput ? coachInput.value.trim() : '';
-                if (coachName) msg += `*Antrenör:* ${coachName}\n`;
-                
-                const serveInput = document.getElementById('team-serve-status');
-                const serveStatus = serveInput ? serveInput.value : '';
-                if (serveStatus) msg += `*Servis Durumu:* ${serveStatus}\n`;
-
-                const meetingTime = document.getElementById('meeting-time') ? document.getElementById('meeting-time').value : '';
-                const meetingLoc = document.getElementById('meeting-location') ? document.getElementById('meeting-location').value.trim() : '';
-                
-                if (meetingTime || meetingLoc) {
-                    msg += `\n*Toplanma Bilgileri:*\n`;
-                    if (meetingTime) msg += `⏰ Saat: ${meetingTime}\n`;
-                    if (meetingLoc) msg += `📍 Yer: ${meetingLoc}\n`;
+                const cName = document.getElementById('coach-name').value.trim(); if (cName) msg += `*Antrenör:* ${cName}\n`;
+                const sStat = document.getElementById('team-serve-status').value; if (sStat) msg += `*Servis:* ${sStat}\n`;
+                const mT = document.getElementById('meeting-time').value; const mL = document.getElementById('meeting-location').value.trim();
+                if (mT || mL) msg += `\n*Toplanma:*\n${mT ? '⏰ Saat: ' + mT + '\n' : ''}${mL ? '📍 Yer: ' + mL + '\n' : ''}`;
+                let pl = ''; for(let i=1; i<=18; i++) {
+                    const pN = document.getElementById(`player-name-${i}`).value.trim(); if (pN) pl += `${i}. #${document.getElementById('player-number-'+i).value} ${pN} - ${document.getElementById('player-position-'+i).value}\n`;
                 }
-                
-                let playersMsg = '';
-                for(let i=1; i<=18; i++) {
-                    const pInput = document.getElementById(`player-name-${i}`);
-                    const pPos = document.getElementById(`player-position-${i}`);
-                    const pNum = document.getElementById(`player-number-${i}`);
-                    
-                    const pName = pInput && pInput.value ? pInput.value.trim() : '';
-                    const posText = pPos && pPos.value ? pPos.value : ''; 
-                    const numText = pNum && pNum.value ? `#${pNum.value}` : '';
-                    
-                    if (pName || posText || numText) {
-                        let lineText = `${i}.`;
-                        if (numText) lineText += ` ${numText}`;
-                        if (pName) lineText += ` ${pName}`;
-                        if (posText) lineText += ` - ${posText}`;
-                        
-                        playersMsg += lineText + '\n';
-                    }
-                }
-                if (playersMsg) {
-                    msg += `\n*Maç Kadrosu:*\n${playersMsg}\n`;
-                }
+                if (pl) msg += `\n*Kadro:*\n${pl}`;
             }
-
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
             closeWhatsappModal();
         };
     }
 
+    // GÜNCELLENEN GRUPLAMA MANTIĞI: ERTELENENLER EN ALTA
     function renderMatchGroups(matchArray, container) {
         const todayVal = dateToValue(getTodayString());
+        const played = matchArray.filter(m => isMatchPlayed(m));
+        const live = matchArray.filter(m => !isMatchPlayed(m) && checkLiveStatus(m));
+        const delayed = matchArray.filter(m => !isMatchPlayed(m) && dateToValue(m.date) < todayVal);
+        const pending = matchArray.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m) && dateToValue(m.date) >= todayVal);
+        const sortFunc = (a, b) => dateToValue(a.date) - dateToValue(b.date) || timeToMins(a.time) - timeToMins(b.time);
         
-        // 1. Oynanmış ve Skoru girilmiş maçlar
-        let played = matchArray.filter(m => isMatchPlayed(m));
+        // 1. CANLI MAÇLAR
+        if (live.length) { 
+            container.insertAdjacentHTML('beforeend', `<div class="w-full mt-2 border-b border-slate-100 pb-2 mb-1 text-rose-600 font-black flex items-center gap-2">CANLI MAÇLAR</div>`); 
+            live.sort(sortFunc).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
+        }
         
-        // 2. Canlı maçlar (Bugün ve saati geçmiş ama skor yok)
-        let live = matchArray.filter(m => !isMatchPlayed(m) && checkLiveStatus(m));
+        // 2. GELECEK MAÇLAR
+        if (pending.length) { 
+            container.insertAdjacentHTML('beforeend', `<div class="w-full mt-6 border-b border-slate-100 pb-2 mb-1 text-indigo-950 font-black flex items-center gap-2">GELECEK MAÇLAR</div>`); 
+            pending.sort(sortFunc).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
+        }
         
-        // 3. Ertelenmiş / Skoru Girilmemiş maçlar (Tarihi bugünden küçük ve skor yok)
-        let delayed = matchArray.filter(m => !isMatchPlayed(m) && dateToValue(m.date) < todayVal);
-
-        // 4. Gelecek maçlar (Tarihi bugün veya sonrası, canlı değil ve skor yok)
-        let pending = matchArray.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m) && dateToValue(m.date) >= todayVal);
-
-        live.sort((a, b) => {
-            const diff = dateToValue(a.date) - dateToValue(b.date);
-            if (diff !== 0) return diff;
-            return timeToMins(a.time) - timeToMins(b.time);
-        });
-
-        delayed.sort((a, b) => {
-            // En yeni tarihli ertelenen maçlar önce
-            const diff = dateToValue(b.date) - dateToValue(a.date);
-            if (diff !== 0) return diff;
-            return timeToMins(b.time) - timeToMins(a.time);
-        });
-
-        pending.sort((a, b) => {
-            const diff = dateToValue(a.date) - dateToValue(b.date);
-            if (diff !== 0) return diff;
-            return timeToMins(a.time) - timeToMins(b.time);
-        });
-
-        played.sort((a, b) => {
-            const diff = dateToValue(b.date) - dateToValue(a.date);
-            if (diff !== 0) return diff;
-            return timeToMins(b.time) - timeToMins(a.time);
-        });
-
-        if (live.length > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-2"><h2 class="text-xl font-black text-rose-600 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span> Canlı Maçlar</h2></div>`);
-            live.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
+        // 3. BİTEN MAÇLAR
+        if (played.length) { 
+            container.insertAdjacentHTML('beforeend', `<div class="w-full mt-6 border-b border-slate-100 pb-2 mb-1 text-slate-700 font-black flex items-center gap-2">BİTEN MAÇLAR</div>`); 
+            played.sort((a,b) => dateToValue(b.date) - dateToValue(a.date)).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
         }
 
-        if (delayed.length > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-6 first:mt-2"><h2 class="text-xl font-black text-amber-500 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><i class="fas fa-history text-amber-400"></i> Ertelenmiş / Skor Girilmeyen</h2></div>`);
-            delayed.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
-        }
-
-        if (pending.length > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-6 first:mt-2"><h2 class="text-xl font-black text-indigo-950 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><i class="fas fa-calendar-alt text-indigo-500"></i> Gelecek Maçlar</h2></div>`);
-            pending.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
-        }
-
-        if (played.length > 0) {
-            container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-6 first:mt-2"><h2 class="text-xl font-black text-slate-700 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><i class="fas fa-check-circle text-green-500"></i> Biten Maçlar</h2></div>`);
-            played.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
+        // 4. ERTELENEN / SKOR GİRMEYEN (En Alt Bölüm)
+        if (delayed.length) { 
+            container.insertAdjacentHTML('beforeend', `<div class="w-full mt-6 border-b border-slate-100 pb-2 mb-1 text-amber-500 font-black flex items-center gap-2">ERTELENEN / SKOR GİRMEYEN</div>`); 
+            delayed.sort((a,b) => dateToValue(b.date) - dateToValue(a.date)).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
         }
     }
 
     function selectTeam(teamCoreName) {
         state.selectedTeam = teamCoreName;
-        const searchInput = document.getElementById('team-search');
-        if (searchInput) searchInput.value = teamCoreName;
-        state.searchQuery = teamCoreName;
-        
-        // URL'yi değiştir (GitHub Pages uyumlu olması için # işareti ile ekliyoruz)
-        const teamNorm = normalize(teamCoreName);
-        history.pushState(null, null, '#' + teamNorm);
-        
-        document.querySelectorAll('.status-btn').forEach(btn => {
-            if (btn && btn.classList) btn.classList.remove('active', 'text-indigo-600')
-        });
-        
-        const allFilterBtn = document.getElementById('filter-all');
-        if (allFilterBtn) {
-            allFilterBtn.classList.add('active', 'text-indigo-600');
-            state.selectedStatus = 'all';
-        }
-        
-        const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm));
-        if (!teamPlaysToday) {
-            const nextMatch = state.allMatches.find(m => normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm);
-            if (nextMatch && nextMatch.date) state.currentDate = nextMatch.date;
-        }
-        updateUI();
+        if (document.getElementById('team-search')) document.getElementById('team-search').value = teamCoreName;
+        state.searchQuery = teamCoreName; history.pushState(null, null, '#' + normalize(teamCoreName));
+        document.querySelectorAll('.status-btn').forEach(btn => btn.classList.remove('active', 'text-indigo-600'));
+        if (document.getElementById('filter-all')) document.getElementById('filter-all').classList.add('active', 'text-indigo-600');
+        state.selectedStatus = 'all'; updateUI();
     }
 
-    function clearSelectedTeam() {
-        state.selectedTeam = null;
-        const searchInput = document.getElementById('team-search');
-        if (searchInput) searchInput.value = '';
-        
-        // URL'yi temizle (Ana sayfaya döner)
-        history.pushState(null, null, window.location.pathname + window.location.search);
-        
-        handleSearch('');
-    }
+    function clearSelectedTeam() { state.selectedTeam = null; if (document.getElementById('team-search')) document.getElementById('team-search').value = ''; history.pushState(null, null, window.location.pathname); handleSearch(''); }
 
     function renderMatches() {
-        const container = document.getElementById('match-container');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        let matchesToRender = [];
-        const todayVal = dateToValue(getTodayString());
-
+        const container = document.getElementById('match-container'); if (!container) return; container.innerHTML = '';
+        let matches = []; const todayVal = dateToValue(getTodayString());
         if (state.selectedTeam) {
-            const selectedNorm = normalize(state.selectedTeam);
-            matchesToRender = state.allMatches.filter(m => 
-                normalize(getCoreName(m.t1)) === selectedNorm || 
-                normalize(getCoreName(m.t2)) === selectedNorm
-            );
+            const norm = normalize(state.selectedTeam);
+            matches = state.allMatches.filter(m => normalize(getCoreName(m.t1)) === norm || normalize(getCoreName(m.t2)) === norm);
         } else {
-            matchesToRender = state.allMatches.filter(m => m.date === state.currentDate);
-
-            // GÜNCELLENEN SEKMELER VE FİLTRE MANTIĞI
-            if (state.selectedStatus === 'played') {
-                matchesToRender = matchesToRender.filter(m => isMatchPlayed(m));
-            } else if (state.selectedStatus === 'pending') {
-                matchesToRender = matchesToRender.filter(m => !isMatchPlayed(m) && dateToValue(m.date) >= todayVal);
-            } else if (state.selectedStatus === 'delayed') {
-                matchesToRender = matchesToRender.filter(m => !isMatchPlayed(m) && dateToValue(m.date) < todayVal);
-            }
-            
-            if (state.searchQuery) {
-                const q = normalize(state.searchQuery);
-                matchesToRender = matchesToRender.filter(m => normalize(m.t1).includes(q) || normalize(m.t2).includes(q) || normalize(m.league).includes(q));
-            }
+            matches = state.allMatches.filter(m => m.date === state.currentDate);
+            if (state.selectedStatus === 'played') matches = matches.filter(isMatchPlayed);
+            else if (state.selectedStatus === 'pending') matches = matches.filter(m => !isMatchPlayed(m) && dateToValue(m.date) >= todayVal);
+            else if (state.selectedStatus === 'delayed') matches = matches.filter(m => !isMatchPlayed(m) && dateToValue(m.date) < todayVal);
+            if (state.searchQuery) { const q = normalize(state.searchQuery); matches = matches.filter(m => normalize(m.t1).includes(q) || normalize(m.t2).includes(q) || normalize(m.league).includes(q)); }
         }
-
-        const badge = document.getElementById('match-count-badge');
-        if (badge) badge.innerText = matchesToRender.length;
-
-        const emptyState = document.getElementById('empty-state');
-        const emptyStateText = document.getElementById('empty-state-text');
-
-        if (matchesToRender.length === 0) {
-            if (emptyState) emptyState.classList.remove('hidden');
-            if(state.selectedTeam) {
-                if (emptyStateText) emptyStateText.innerText = "Bu takımın henüz planlanmış maçı bulunmamaktadır.";
-            } else {
-                if (emptyStateText) emptyStateText.innerText = "Eşleşen maç bulunamadı.";
-            }
-        } else {
-            if (emptyState) emptyState.classList.add('hidden');
-            renderMatchGroups(matchesToRender, container);
-        }
-    }
-
-    // YENİ EKLENEN: Takım İstatistiklerini Hesaplama (Oynanan, Galibiyet, Mağlubiyet, Oynanacak, Ertelenen)
-    function calculateTeamStats(teamCoreName) {
-        const teamNorm = normalize(teamCoreName);
-        let played = 0;
-        let wins = 0;
-        let losses = 0;
-        let pending = 0;
-        let delayed = 0;
-        const todayVal = dateToValue(getTodayString());
-
-        state.allMatches.forEach(m => {
-            const t1Norm = normalize(getCoreName(m.t1));
-            const t2Norm = normalize(getCoreName(m.t2));
-            
-            if (t1Norm === teamNorm || t2Norm === teamNorm) {
-                if (isMatchPlayed(m)) {
-                    const s1 = parseInt(m.s1);
-                    const s2 = parseInt(m.s2);
-                    
-                    if (!isNaN(s1) && !isNaN(s2)) {
-                        played++;
-                        if (t1Norm === teamNorm) {
-                            if (s1 > s2) wins++;
-                            else if (s1 < s2) losses++;
-                        } else {
-                            if (s2 > s1) wins++;
-                            else if (s2 < s1) losses++;
-                        }
-                    }
-                } else {
-                    if (dateToValue(m.date) < todayVal) {
-                        delayed++; // Ertelenen (tarihi geçmiş, skor yok)
-                    } else {
-                        pending++; // Oynanacak
-                    }
-                }
-            }
-        });
-
-        return { played, wins, losses, pending, delayed };
+        if (document.getElementById('match-count-badge')) document.getElementById('match-count-badge').innerText = matches.length;
+        if (!matches.length) { if (document.getElementById('empty-state')) document.getElementById('empty-state').classList.remove('hidden'); }
+        else { if (document.getElementById('empty-state')) document.getElementById('empty-state').classList.add('hidden'); renderMatchGroups(matches, container); }
     }
 
     function updateUI() { 
-        const statusTabs = document.getElementById('status-tabs');
-        const dailyQuoteContainer = document.getElementById('daily-quote-container');
-        const dateTabsWrapper = document.getElementById('date-tabs-wrapper');
-        const regionTabsWrapper = document.getElementById('region-tabs-wrapper');
-        const playingTeamsWrapper = document.getElementById('playing-teams-wrapper');
-        
-        const selectedTeamDisplay = document.getElementById('selected-team-display');
-        const selectedTeamLogo = document.getElementById('selected-team-logo');
-        const selectedTeamStats = document.getElementById('selected-team-stats');
-        
+        const sT = document.getElementById('status-tabs'), dQ = document.getElementById('daily-quote-container'), dW = document.getElementById('date-tabs-wrapper'), rW = document.getElementById('region-tabs-wrapper'), pW = document.getElementById('playing-teams-wrapper'), sD = document.getElementById('selected-team-display');
         if (state.selectedTeam) {
-            if (statusTabs) statusTabs.classList.add('opacity-30', 'pointer-events-none');
-            if (dailyQuoteContainer) dailyQuoteContainer.classList.add('opacity-30', 'pointer-events-none');
-            if (dateTabsWrapper) dateTabsWrapper.classList.add('hidden');
-            if (regionTabsWrapper) regionTabsWrapper.classList.add('hidden');
-            if (playingTeamsWrapper) playingTeamsWrapper.classList.add('hidden');
-            
-            if (selectedTeamDisplay) {
-                selectedTeamDisplay.classList.remove('hidden');
-                selectedTeamDisplay.classList.add('flex');
-            }
-            if (selectedTeamLogo) {
-                selectedTeamLogo.innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 sm:w-14 sm:h-14 bg-white shrink-0 border-none shadow-none");
-            }
-            if (selectedTeamStats) {
-                const stats = calculateTeamStats(state.selectedTeam);
-                selectedTeamStats.innerHTML = `
-                    <div class="flex flex-col items-center justify-center">
-                        <span class="text-[8px] sm:text-[9px] text-indigo-300 font-bold uppercase tracking-widest">Oynanan</span>
-                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.played}</span>
-                    </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
-                    <div class="flex flex-col items-center justify-center">
-                        <span class="text-[8px] sm:text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Galibiyet</span>
-                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.wins}</span>
-                    </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
-                    <div class="flex flex-col items-center justify-center">
-                        <span class="text-[8px] sm:text-[9px] text-rose-400 font-bold uppercase tracking-widest">Mağlubiyet</span>
-                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.losses}</span>
-                    </div>
-                    <div class="hidden sm:block w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
-                    <div class="hidden sm:flex flex-col items-center justify-center">
-                        <span class="text-[8px] sm:text-[9px] text-amber-400 font-bold uppercase tracking-widest">Ertelenen</span>
-                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.delayed}</span>
-                    </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
-                    <div class="flex flex-col items-center justify-center">
-                        <span class="text-[8px] sm:text-[9px] text-indigo-300 font-bold uppercase tracking-widest">Oynanacak</span>
-                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.pending}</span>
-                    </div>
-                `;
+            [sT, dQ, dW, rW, pW].forEach(el => el && el.classList.add(el === dW || el === rW || el === pW ? 'hidden' : 'opacity-30', el === dW || el === rW || el === pW ? 'hidden' : 'pointer-events-none'));
+            if (sD) { sD.classList.remove('hidden'); sD.classList.add('flex'); }
+            if (document.getElementById('selected-team-logo')) document.getElementById('selected-team-logo').innerHTML = getLogoHtml(state.selectedTeam, "w-12 h-12 bg-white");
+            if (document.getElementById('selected-team-stats')) {
+                const s = calculateTeamStats(state.selectedTeam);
+                document.getElementById('selected-team-stats').innerHTML = `<div class="flex flex-col items-center justify-center"><span class="text-[8px] text-indigo-300 font-bold uppercase">Oynanan</span><span class="text-lg font-black">${s.played}</span></div><div class="w-px h-8 bg-indigo-700/50 mx-2"></div><div class="flex flex-col items-center justify-center"><span class="text-[8px] text-emerald-400 font-bold uppercase">Galibiyet</span><span class="text-lg font-black">${s.wins}</span></div><div class="w-px h-8 bg-indigo-700/50 mx-2"></div><div class="flex flex-col items-center justify-center"><span class="text-[8px] text-rose-400 font-bold uppercase">Mağlubiyet</span><span class="text-lg font-black">${s.losses}</span></div><div class="hidden sm:block w-px h-8 bg-indigo-700/50 mx-2"></div><div class="hidden sm:flex flex-col items-center justify-center"><span class="text-[8px] text-amber-400 font-bold uppercase">Ertelenen</span><span class="text-lg font-black">${s.delayed}</span></div><div class="w-px h-8 bg-indigo-700/50 mx-2"></div><div class="flex flex-col items-center justify-center"><span class="text-[8px] text-indigo-300 font-bold uppercase">Oynanacak</span><span class="text-lg font-black">${s.pending}</span></div>`;
             }
         } else {
-            if (statusTabs) statusTabs.classList.remove('opacity-30', 'pointer-events-none');
-            if (dailyQuoteContainer) dailyQuoteContainer.classList.remove('opacity-30', 'pointer-events-none');
-            if (dateTabsWrapper) dateTabsWrapper.classList.remove('hidden');
-            if (regionTabsWrapper) regionTabsWrapper.classList.remove('hidden');
-            if (playingTeamsWrapper) playingTeamsWrapper.classList.remove('hidden');
-            
-            if (selectedTeamDisplay) {
-                selectedTeamDisplay.classList.add('hidden');
-                selectedTeamDisplay.classList.remove('flex');
-            }
+            [sT, dQ, dW, rW, pW].forEach(el => el && el.classList.remove('hidden', 'opacity-30', 'pointer-events-none'));
+            if (sD) { sD.classList.add('hidden'); sD.classList.remove('flex'); }
         }
-
-        renderDateTabs(); 
-        renderTopLogos();
-        renderAlphabetTeams();
-        renderMatches(); 
+        renderDateTabs(); renderTopLogos(); renderAlphabetTeams(); renderMatches(); 
     }
     
     function renderDateTabs() {
-        const container = document.getElementById('date-tabs');
-        if (!container) return;
-        
-        const dates = getSortedDates();
-        const todayStr = getTodayString();
-        container.innerHTML = '';
-        
+        const container = document.getElementById('date-tabs'); if (!container) return;
+        const dates = getSortedDates(); const todayStr = getTodayString(); container.innerHTML = '';
         dates.forEach(date => {
-            if (!date) return; // Boş tarih güvenliği
-            const isActive = date === state.currentDate;
-            const isToday = date === todayStr;
-            
-            const btn = document.createElement('button');
-            
-            // Butonun genel temel ayarları
-            let classes = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all duration-300 shrink-0 uppercase border select-none flex items-center justify-center gap-1.5 `;
-            
-            if (isActive) {
-                if (isToday) {
-                    classes += `bg-indigo-600 text-white border-indigo-600 today-active-tab`;
-                } else {
-                    classes += `bg-indigo-600 text-white border-indigo-600 shadow-lg`;
-                }
-                btn.id = 'active-date-tab'; // Kaydırma işlemi için işaretliyoruz
-            } else {
-                if (isToday) {
-                    classes += `bg-indigo-50 text-indigo-700 border-indigo-300 hover:bg-indigo-100 shadow-sm`;
-                } else {
-                    classes += `bg-white text-slate-500 border-slate-100 hover:bg-slate-50`;
-                }
-            }
-            
-            btn.className = classes;
-            
-            // Eğer tarih bugünse yanına dikkat çekici bir sinyal ekle
-            if (isToday) {
-                btn.innerHTML = `<span class="relative flex h-2 w-2 mr-0.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span> ${date}`;
-            } else {
-                btn.innerText = date;
-            }
-
-            btn.onclick = () => { 
-                state.currentDate = date; 
-                updateUI(); 
-            };
+            if (!date) return;
+            const btn = document.createElement('button'); const isA = date === state.currentDate; const isT = date === todayStr;
+            btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border select-none flex items-center gap-1.5 ${isA ? (isT ? 'bg-indigo-600 text-white border-indigo-600 today-active-tab' : 'bg-indigo-600 text-white border-indigo-600 shadow-lg') : (isT ? 'bg-indigo-50 text-indigo-700 border-indigo-300' : 'bg-white text-slate-500 border-slate-100')}`;
+            if (isA) btn.id = 'active-date-tab';
+            btn.innerHTML = isT ? `<span class="relative flex h-2 w-2 mr-0.5"><span class="animate-ping absolute h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative h-2 w-2 bg-amber-500 rounded-full"></span></span> ${date}` : date;
+            btn.onclick = () => { state.currentDate = date; updateUI(); };
             container.appendChild(btn);
         });
-
-        // Sayfa açıldığında Aktif Olan Sekmeyi ekranın ortasına animasyonla kaydır
-        setTimeout(() => {
-            const activeTab = document.getElementById('active-date-tab');
-            if (activeTab && container) {
-                const scrollPos = activeTab.offsetLeft - (container.offsetWidth / 2) + (activeTab.offsetWidth / 2);
-                container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-            }
-        }, 150);
+        setTimeout(() => { const t = document.getElementById('active-date-tab'); if (t) container.scrollTo({ left: t.offsetLeft - (container.offsetWidth/2) + (t.offsetWidth/2), behavior: 'smooth' }); }, 150);
     }
 
     function renderTopLogos() {
-        const container = document.getElementById('top-logos-container');
-        const wrapper = document.getElementById('top-logos-wrapper');
-        if (!container || !wrapper) return;
-        
-        const teamsMap = new Map();
-
-        if (state.currentDate) {
-            const matchesOnDate = state.allMatches.filter(m => m.date === state.currentDate);
-            matchesOnDate.forEach(m => {
-                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
-                    const core = getCoreName(m.t1);
-                    teamsMap.set(normalize(core), core);
-                }
-                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) {
-                    const core = getCoreName(m.t2);
-                    teamsMap.set(normalize(core), core);
-                }
-            });
-        }
-
-        if (teamsMap.size === 0) {
-            state.allMatches.forEach(m => {
-                if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
-                    const core = getCoreName(m.t1);
-                    teamsMap.set(normalize(core), core);
-                }
-                if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) {
-                    const core = getCoreName(m.t2);
-                    teamsMap.set(normalize(core), core);
-                }
-            });
-        }
-
-        const teams = Array.from(teamsMap.values()).sort((a, b) => a.localeCompare(b, 'tr')).slice(0, 50);
-        
-        if (teams.length === 0) { 
-            wrapper.classList.add('hidden'); 
-            return; 
-        } else { 
-            wrapper.classList.remove('hidden'); 
-        }
-
-        container.innerHTML = '';
-
-        teams.forEach(teamCore => {
-            const isActive = normalize(state.selectedTeam) === normalize(teamCore);
+        const c = document.getElementById('top-logos-container'), w = document.getElementById('top-logos-wrapper'); if (!c || !w) return;
+        const m = new Map(); const rel = state.currentDate ? state.allMatches.filter(x => x.date === state.currentDate) : state.allMatches;
+        rel.forEach(x => { if (x.t1 && x.t1 !== "-" && !isPlaceholderTeam(x.t1)) m.set(normalize(getCoreName(x.t1)), getCoreName(x.t1)); if (x.t2 && x.t2 !== "-" && !isPlaceholderTeam(x.t2)) m.set(normalize(getCoreName(x.t2)), getCoreName(x.t2)); });
+        const teams = Array.from(m.values()).sort((a,b) => a.localeCompare(b, 'tr')).slice(0, 50);
+        if (!teams.length) { w.classList.add('hidden'); return; } w.classList.remove('hidden'); c.innerHTML = '';
+        teams.forEach(t => {
+            const isActive = normalize(state.selectedTeam) === normalize(t);
             const chip = document.createElement('div');
-            
-            chip.className = `flex items-center justify-center p-1 rounded-full border-2 transition-all cursor-pointer select-none shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300 hover:scale-105 shadow-sm'}`;
-            chip.title = teamCore; 
-            
-            chip.onclick = () => {
-                if (isActive) { 
-                    clearSelectedTeam();
-                } else {
-                    selectTeam(teamCore);
-                }
-            };
-            
-            chip.innerHTML = getLogoHtml(teamCore, "w-10 h-10 sm:w-12 sm:h-12 bg-transparent shrink-0");
-            container.appendChild(chip);
+            chip.className = `flex items-center justify-center p-1 rounded-full border-2 transition-all cursor-pointer shrink-0 ${isActive ? 'border-indigo-600 bg-indigo-50 shadow-lg scale-110' : 'border-slate-200 bg-white hover:border-indigo-300'}`;
+            chip.onclick = () => isActive ? clearSelectedTeam() : selectTeam(t);
+            chip.innerHTML = getLogoHtml(t, "w-10 h-10"); c.appendChild(chip);
         });
     }
 
     function renderAlphabetTeams() {
-        const container = document.getElementById('playing-teams');
-        const wrapper = document.getElementById('playing-teams-wrapper');
-        const alphabetContainer = document.getElementById('alphabet-index');
-        if (!container || !wrapper) return;
-        
-        const teamsMap = new Map();
-        
-        state.allMatches.forEach(m => {
-            if (m.t1 && m.t1 !== "-" && !isPlaceholderTeam(m.t1)) {
-                const core = getCoreName(m.t1);
-                teamsMap.set(normalize(core), core);
-            }
-            if (m.t2 && m.t2 !== "-" && !isPlaceholderTeam(m.t2)) {
-                const core = getCoreName(m.t2);
-                teamsMap.set(normalize(core), core);
-            }
-        });
-
-        const teams = Array.from(teamsMap.values()).sort((a, b) => a.localeCompare(b, 'tr'));
-        
-        const countBadge = document.getElementById('total-team-count');
-        if (countBadge) countBadge.innerText = teams.length;
-        
-        if (teams.length === 0) { 
-            wrapper.classList.add('hidden'); 
-            return; 
-        } else { 
-            wrapper.classList.remove('hidden'); 
+        const c = document.getElementById('playing-teams'), w = document.getElementById('playing-teams-wrapper'), aC = document.getElementById('alphabet-index'); if (!c || !w) return;
+        const m = new Map(); state.allMatches.forEach(x => { if (x.t1 && x.t1 !== "-" && !isPlaceholderTeam(x.t1)) m.set(normalize(getCoreName(x.t1)), getCoreName(x.t1)); if (x.t2 && x.t2 !== "-" && !isPlaceholderTeam(x.t2)) m.set(normalize(getCoreName(x.t2)), getCoreName(x.t2)); });
+        const teams = Array.from(m.values()).sort((a,b) => a.localeCompare(b, 'tr'));
+        if (document.getElementById('total-team-count')) document.getElementById('total-team-count').innerText = teams.length;
+        if (!teams.length) { w.classList.add('hidden'); return; } w.classList.remove('hidden');
+        const alph = ['Hepsi', '0-9', 'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'İ', 'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'Q', 'R', 'S', 'Ş', 'T', 'U', 'Ü', 'V', 'W', 'X', 'Y', 'Z'];
+        const byL = {}; alph.forEach(l => byL[l] = []);
+        teams.forEach(t => { const f = t.charAt(0).toLocaleUpperCase('tr-TR'); if (/[0-9]/.test(f)) byL['0-9'].push(t); else if (byL[f]) byL[f].push(t); else { const fb = t.charAt(0).toUpperCase(); if (byL[fb]) byL[fb].push(t); } byL['Hepsi'].push(t); });
+        if (aC) { aC.innerHTML = ''; alph.forEach(l => { if (!byL[l].length && l !== 'Hepsi') return; const btn = document.createElement('button'); btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${state.selectedAlphabet === l ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'} ${l === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`; btn.innerText = l; btn.onclick = () => { state.selectedAlphabet = state.selectedAlphabet === l ? null : l; updateUI(); }; aC.appendChild(btn); }); }
+        c.innerHTML = !state.selectedAlphabet ? '<span class="text-[11px] text-slate-400 font-medium py-3 px-2 flex items-center gap-2">Takımları görmek için bir harf seçin.</span>' : '';
+        if (state.selectedAlphabet) {
+            let toShow = byL[state.selectedAlphabet] || []; if (state.searchQuery && !state.selectedTeam) { const q = normalize(state.searchQuery); toShow = toShow.filter(x => normalize(x).includes(q)); }
+            if (!toShow.length) c.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-2 px-1">Eşleşen takım bulunamadı.</span>';
+            toShow.forEach(t => { const isActive = normalize(state.selectedTeam) === normalize(t); const chip = document.createElement('div'); chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border transition-all cursor-pointer shrink-0 ${isActive ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-200'}`; chip.innerHTML = `${getLogoHtml(t, "w-6 h-6 bg-transparent")} <span class="text-[11px] font-bold">${t}</span>`; chip.onclick = () => isActive ? clearSelectedTeam() : selectTeam(t); c.appendChild(chip); });
         }
-
-        const alphabet = ['Hepsi', '0-9', 'A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'H', 'I', 'İ', 'J', 'K', 'L', 'M', 'N', 'O', 'Ö', 'P', 'Q', 'R', 'S', 'Ş', 'T', 'U', 'Ü', 'V', 'W', 'X', 'Y', 'Z'];
-        const teamsByLetter = {};
-        alphabet.forEach(l => teamsByLetter[l] = []);
-        
-        teams.forEach(teamCore => {
-            const firstChar = teamCore.charAt(0).toLocaleUpperCase('tr-TR');
-            if (/[0-9]/.test(firstChar)) {
-                teamsByLetter['0-9'].push(teamCore);
-            } else {
-                if (teamsByLetter[firstChar]) {
-                    teamsByLetter[firstChar].push(teamCore);
-                } else {
-                    const fallbackChar = teamCore.charAt(0).toUpperCase();
-                    if (teamsByLetter[fallbackChar]) teamsByLetter[fallbackChar].push(teamCore);
-                }
-            }
-            teamsByLetter['Hepsi'].push(teamCore);
-        });
-
-        if (alphabetContainer) {
-            alphabetContainer.innerHTML = '';
-            alphabet.forEach(letter => {
-                const hasTeams = teamsByLetter[letter] && teamsByLetter[letter].length > 0;
-                
-                // DÜZELTME: Eğer o harfte takım yoksa ve 'Hepsi' butonu değilse, butonu oluşturma (atla)
-                if (!hasTeams && letter !== 'Hepsi') return;
-
-                const isActive = state.selectedAlphabet === letter;
-                const btn = document.createElement('button');
-                
-                btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'} ${letter === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`;
-                btn.innerText = letter;
-                btn.onclick = () => {
-                    state.selectedAlphabet = isActive ? null : letter;
-                    updateUI(); 
-                };
-                
-                alphabetContainer.appendChild(btn);
-            });
-        }
-
-        container.innerHTML = '';
-
-        if (!state.selectedAlphabet) {
-            container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-3 px-2 flex items-center gap-2"><i class="fas fa-hand-pointer text-indigo-400"></i> Takımları görmek için yukarıdan bir harf veya "Hepsi" seçeneğine tıklayın.</span>';
-            return;
-        }
-        
-        let teamsToShow = teamsByLetter[state.selectedAlphabet] || [];
-        
-        if (state.searchQuery && !state.selectedTeam) {
-            const q = normalize(state.searchQuery);
-            teamsToShow = teamsToShow.filter(t => normalize(t).includes(q));
-        }
-
-        if (teamsToShow.length === 0) {
-            container.innerHTML = '<span class="text-[11px] text-slate-400 font-medium py-2 px-1">Eşleşen takım bulunamadı.</span>';
-        }
-
-        teamsToShow.forEach(teamCore => {
-            const isActive = normalize(state.selectedTeam) === normalize(teamCore);
-            const chip = document.createElement('div');
-            chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-2xl border transition-all cursor-pointer select-none shrink-0 ${isActive ? 'bg-indigo-600 border-indigo-600 shadow-md' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
-            chip.innerHTML = `${getLogoHtml(teamCore, "w-6 h-6 bg-transparent shrink-0")} <span class="text-[11px] font-bold ${isActive ? 'text-white' : 'text-slate-700'}">${teamCore}</span>`;
-            
-            chip.onclick = () => {
-                if (isActive) { 
-                    clearSelectedTeam();
-                } else {
-                    selectTeam(teamCore);
-                }
-            };
-            container.appendChild(chip);
-        });
     }
 
-    function handleSearch(val) {
-        state.searchQuery = val;
-        
-        if (val && state.selectedTeam && normalize(val) !== normalize(state.selectedTeam)) {
-            state.selectedTeam = null;
-        }
-        updateUI();
-    }
-
-    function setStatusFilter(status) {
-        state.selectedStatus = status;
-        document.querySelectorAll('.status-btn').forEach(btn => {
-            if(btn && btn.classList) {
-                btn.classList.remove('active', 'text-indigo-600');
-                btn.classList.add('text-slate-500');
-            }
-        });
-        const activeBtn = document.getElementById(`filter-${status}`);
-        if (activeBtn) {
-            activeBtn.classList.add('active', 'text-indigo-600');
-            activeBtn.classList.remove('text-slate-500');
-        }
-        updateUI();
-    }
-    
-    function showError(m) { 
-        const t = document.createElement('div'); t.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-sm animate-bounce"; t.innerText = m; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); 
-    }
-    
-    function getSortedDates() {
-        // DÜZELTME: Boş tarihlerin sistemi çökertmesini engellemek için d => d filtresi eklendi
-        return [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => {
-            const pA = a.split('.').map(Number); const pB = b.split('.').map(Number);
-            return new Date(pA[2] || 0, (pA[1] || 1)-1, pA[0] || 1) - new Date(pB[2] || 0, (pB[1] || 1)-1, pB[0] || 1);
-        });
-    }
+    function handleSearch(val) { state.searchQuery = val; if (val && state.selectedTeam && normalize(val) !== normalize(state.selectedTeam)) state.selectedTeam = null; updateUI(); }
+    function setStatusFilter(status) { state.selectedStatus = status; document.querySelectorAll('.status-btn').forEach(btn => { btn.classList.remove('active', 'text-indigo-600'); btn.classList.add('text-slate-500'); }); if (document.getElementById(`filter-${status}`)) { document.getElementById(`filter-${status}`).classList.add('active', 'text-indigo-600'); document.getElementById(`filter-${status}`).classList.remove('text-slate-500'); } updateUI(); }
+    function showError(m) { const t = document.createElement('div'); t.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl z-[200] font-bold text-sm"; t.innerText = m; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    function getSortedDates() { return [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const pA = a.split('.').map(Number); const pB = b.split('.').map(Number); return new Date(pA[2] || 0, (pA[1] || 1)-1, pA[0] || 1) - new Date(pB[2] || 0, (pB[1] || 1)-1, pB[0] || 1); }); }
 
     window.onload = () => { 
-        initRosterForm(); 
-        setDailyQuote();
-        startLiveClock(); 
-        fetchData(); 
-        makeScrollable('status-tabs'); 
-        makeScrollable('date-tabs'); 
-        makeScrollable('top-logos-container');
-        makeScrollable('region-tabs');
-        makeScrollable('alphabet-index'); 
-        
-        // Kullanıcı tarayıcıda ileri-geri yaparsa veya URL'yi manuel değiştirirse algıla
+        setDailyQuote(); startLiveClock(); fetchData(); makeScrollable('status-tabs'); makeScrollable('date-tabs'); makeScrollable('top-logos-container'); makeScrollable('region-tabs'); makeScrollable('alphabet-index'); 
         window.addEventListener('hashchange', () => {
-            const rawHash = window.location.hash.replace('#', '');
-            const hashTeam = rawHash ? decodeURIComponent(rawHash) : '';
-            if (!hashTeam && state.selectedTeam) {
-                clearSelectedTeam();
-            } else if (hashTeam) {
-                let originalName = null;
-                const toEnglish = (s) => s.replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
-                const searchHash = toEnglish(hashTeam);
-                
-                for (let m of state.allMatches) {
-                    if (toEnglish(normalize(getCoreName(m.t1))) === searchHash) { originalName = getCoreName(m.t1); break; }
-                    if (toEnglish(normalize(getCoreName(m.t2))) === searchHash) { originalName = getCoreName(m.t2); break; }
-                }
-                if (originalName && state.selectedTeam !== originalName) {
-                    selectTeam(originalName);
-                }
+            const h = decodeURIComponent(window.location.hash.replace('#', ''));
+            if (!h && state.selectedTeam) clearSelectedTeam();
+            else if (h) {
+                const search = normalize(h);
+                for (let m of state.allMatches) { if (normalize(getCoreName(m.t1)) === search) { selectTeam(getCoreName(m.t1)); break; } if (normalize(getCoreName(m.t2)) === search) { selectTeam(getCoreName(m.t2)); break; } }
             }
         });
     };
