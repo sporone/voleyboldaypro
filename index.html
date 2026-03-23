@@ -249,6 +249,7 @@
                         <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap text-indigo-600">Hepsi</button>
                         <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
                         <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
+                        <button onclick="setStatusFilter('delayed')" id="filter-delayed" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Ertelenen</button>
                     </div>
 
                     <div id="daily-quote-container" class="flex-1 w-full flex items-center justify-center bg-indigo-50/50 border border-indigo-100 rounded-2xl py-3.5 px-6 transition-opacity duration-300">
@@ -949,7 +950,7 @@
 
         const leagueGroupText = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
         
-        // --- TVF SKOR GİRİLMEDİ UYARISI MANTIĞI (60 DK KONTROLÜ) ---
+        // --- TVF SKOR GİRİLMEDİ UYARISI MANTIĞI (60 DK KONTROLÜ VE GEÇMİŞ MAÇ) ---
         let missingScoreWarning = '';
         if (!isMatchPlayed(m)) {
             const trTime = getTurkeyTime();
@@ -961,7 +962,7 @@
                 const matchDateTime = new Date(matchDate[2], matchDate[1] - 1, matchDate[0], mH, mM).getTime();
                 const currentTimeMs = trTime.getTime();
                 
-                // 60 dakika gecikme kontrolü (60 * 60 * 1000 = 3600000 ms)
+                // 60 dakika gecikme kontrolü VEYA tarihin geçmesi
                 if (currentTimeMs >= matchDateTime + 3600000) {
                     missingScoreWarning = `
                         <div class="text-slate-400 text-[9px] md:text-[10px] font-medium text-right opacity-70 tracking-tight mt-1.5 w-full">
@@ -1190,17 +1191,31 @@
     }
 
     function renderMatchGroups(matchArray, container) {
-        // SKOR GİRİLMİŞ (s1 !== '-') BÜTÜN MAÇLAR ARTIK DİREKT OLARAK 'BITEN MAÇLAR' KATEGORİSİNDE.
+        const todayVal = dateToValue(getTodayString());
+        
+        // 1. Oynanmış ve Skoru girilmiş maçlar
         let played = matchArray.filter(m => isMatchPlayed(m));
         
-        // SKOR EKSİK İSE (Canlı veya Gelecek Maç)
+        // 2. Canlı maçlar (Bugün ve saati geçmiş ama skor yok)
         let live = matchArray.filter(m => !isMatchPlayed(m) && checkLiveStatus(m));
-        let pending = matchArray.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m));
+        
+        // 3. Ertelenmiş / Skoru Girilmemiş maçlar (Tarihi bugünden küçük ve skor yok)
+        let delayed = matchArray.filter(m => !isMatchPlayed(m) && dateToValue(m.date) < todayVal);
+
+        // 4. Gelecek maçlar (Tarihi bugün veya sonrası, canlı değil ve skor yok)
+        let pending = matchArray.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m) && dateToValue(m.date) >= todayVal);
 
         live.sort((a, b) => {
             const diff = dateToValue(a.date) - dateToValue(b.date);
             if (diff !== 0) return diff;
             return timeToMins(a.time) - timeToMins(b.time);
+        });
+
+        delayed.sort((a, b) => {
+            // En yeni tarihli ertelenen maçlar önce
+            const diff = dateToValue(b.date) - dateToValue(a.date);
+            if (diff !== 0) return diff;
+            return timeToMins(b.time) - timeToMins(a.time);
         });
 
         pending.sort((a, b) => {
@@ -1217,8 +1232,12 @@
 
         if (live.length > 0) {
             container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-2"><h2 class="text-xl font-black text-rose-600 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span> Canlı Maçlar</h2></div>`);
-            // Canlı maçlarda da 1. sıradaki karta Reklam 1 ataması eklendi (index === 0 ise showAd=true)
             live.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
+        }
+
+        if (delayed.length > 0) {
+            container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-6 first:mt-2"><h2 class="text-xl font-black text-amber-500 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><i class="fas fa-history text-amber-400"></i> Ertelenmiş / Skor Girilmeyen</h2></div>`);
+            delayed.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
         }
 
         if (pending.length > 0) {
@@ -1228,7 +1247,6 @@
 
         if (played.length > 0) {
             container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-6 first:mt-2"><h2 class="text-xl font-black text-slate-700 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><i class="fas fa-check-circle text-green-500"></i> Biten Maçlar</h2></div>`);
-            // Biten maçlarda da 1. sıradaki karta Reklam 1 ataması eklendi
             played.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
         }
     }
@@ -1279,6 +1297,7 @@
         container.innerHTML = '';
         
         let matchesToRender = [];
+        const todayVal = dateToValue(getTodayString());
 
         if (state.selectedTeam) {
             const selectedNorm = normalize(state.selectedTeam);
@@ -1289,9 +1308,14 @@
         } else {
             matchesToRender = state.allMatches.filter(m => m.date === state.currentDate);
 
-            // SKOR FİLTRELERİ GÜNCELLENDİ (Kesin kural motoru üzerinden geçer)
-            if (state.selectedStatus === 'played') matchesToRender = matchesToRender.filter(m => isMatchPlayed(m));
-            else if (state.selectedStatus === 'pending') matchesToRender = matchesToRender.filter(m => !isMatchPlayed(m));
+            // GÜNCELLENEN SEKMELER VE FİLTRE MANTIĞI
+            if (state.selectedStatus === 'played') {
+                matchesToRender = matchesToRender.filter(m => isMatchPlayed(m));
+            } else if (state.selectedStatus === 'pending') {
+                matchesToRender = matchesToRender.filter(m => !isMatchPlayed(m) && dateToValue(m.date) >= todayVal);
+            } else if (state.selectedStatus === 'delayed') {
+                matchesToRender = matchesToRender.filter(m => !isMatchPlayed(m) && dateToValue(m.date) < todayVal);
+            }
             
             if (state.searchQuery) {
                 const q = normalize(state.searchQuery);
@@ -1318,20 +1342,21 @@
         }
     }
 
-    // YENİ EKLENEN: Takım İstatistiklerini Hesaplama (Oynanan, Galibiyet, Mağlubiyet, Oynanacak)
+    // YENİ EKLENEN: Takım İstatistiklerini Hesaplama (Oynanan, Galibiyet, Mağlubiyet, Oynanacak, Ertelenen)
     function calculateTeamStats(teamCoreName) {
         const teamNorm = normalize(teamCoreName);
         let played = 0;
         let wins = 0;
         let losses = 0;
         let pending = 0;
+        let delayed = 0;
+        const todayVal = dateToValue(getTodayString());
 
         state.allMatches.forEach(m => {
             const t1Norm = normalize(getCoreName(m.t1));
             const t2Norm = normalize(getCoreName(m.t2));
             
             if (t1Norm === teamNorm || t2Norm === teamNorm) {
-                // Maç oynandı mı ve skor girilmiş mi kontrolü
                 if (isMatchPlayed(m)) {
                     const s1 = parseInt(m.s1);
                     const s2 = parseInt(m.s2);
@@ -1347,13 +1372,16 @@
                         }
                     }
                 } else {
-                    // Oynanmamış (gelecek) maçlar
-                    pending++;
+                    if (dateToValue(m.date) < todayVal) {
+                        delayed++; // Ertelenen (tarihi geçmiş, skor yok)
+                    } else {
+                        pending++; // Oynanacak
+                    }
                 }
             }
         });
 
-        return { played, wins, losses, pending };
+        return { played, wins, losses, pending, delayed };
     }
 
     function updateUI() { 
@@ -1388,19 +1416,24 @@
                         <span class="text-[8px] sm:text-[9px] text-indigo-300 font-bold uppercase tracking-widest">Oynanan</span>
                         <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.played}</span>
                     </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-3 sm:mx-4"></div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
                     <div class="flex flex-col items-center justify-center">
                         <span class="text-[8px] sm:text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Galibiyet</span>
                         <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.wins}</span>
                     </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-3 sm:mx-4"></div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
                     <div class="flex flex-col items-center justify-center">
                         <span class="text-[8px] sm:text-[9px] text-rose-400 font-bold uppercase tracking-widest">Mağlubiyet</span>
                         <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.losses}</span>
                     </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-3 sm:mx-4"></div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
                     <div class="flex flex-col items-center justify-center">
-                        <span class="text-[8px] sm:text-[9px] text-amber-400 font-bold uppercase tracking-widest">Oynanacak</span>
+                        <span class="text-[8px] sm:text-[9px] text-amber-400 font-bold uppercase tracking-widest">Ertelenen</span>
+                        <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.delayed}</span>
+                    </div>
+                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
+                    <div class="flex flex-col items-center justify-center">
+                        <span class="text-[8px] sm:text-[9px] text-indigo-300 font-bold uppercase tracking-widest">Oynanacak</span>
                         <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.pending}</span>
                     </div>
                 `;
