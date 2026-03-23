@@ -455,7 +455,19 @@
         "atayıldız": "https://r.resimlink.com/5R7M_ogbF.png",
         "atlasolimpik": "https://r.resimlink.com/C8zNJjyer.png",
         "ava": "https://r.resimlink.com/gdTpqOo19.png",
-        "avcılardemirordu": "https://r.resimlink.com/1uSvAayc.png"
+        "avcılardemirordu": "https://r.resimlink.com/1uSvAayc.png",
+        "alipeçen": "https://alipecen.com/wp-content/uploads/2018/11/Hoddies_basketbol_on.png",
+        "atakentyıldızları": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDYeKHXpnTSEbU1J9Qgr061VVEzw3xqBpEVA&s",
+        "altınadım": "https://instagram.fteq3-3.fna.fbcdn.net/v/t51.82787-19/580560856_17900598594312173_3028650775025713811_n.jpg?stp=dst-jpg_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby45MTguYzIifQ&_nc_ht=instagram.fteq3-3.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2gEcHMkR6ko3f9vevQwZXl845NIS6oWpm1bW-_1RSM-503xcjMX73Q0r6bBiHa4Y5nU&_nc_ohc=xkSCUr7XrQwQ7kNvwEEez-Z&_nc_gid=CDFmi0Y2mHs5lrRmCiQhAw&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_Afz6L6fr9K8BD8S-DdkDpyLG_CkRQwkNxGgJYCr5XsLbhQ&oe=69C74AE6&_nc_sid=7a9f4b",
+        "ataşehirkartalları": "https://instagram.fteq3-5.fna.fbcdn.net/v/t51.2885-19/305686022_773595857090817_6753023741618540072_n.jpg?stp=dst-jpg_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby44MDUuYzIifQ&_nc_ht=instagram.fteq3-5.fna.fbcdn.net&_nc_cat=109&_nc_oc=Q6cZ2gGeO_zg6443Ep8WkC-t0quaH4NPUBqeTei9gMmKxxREaYfeJrqwW_YqWmpclxaSUJ4&_nc_ohc=JmLeN459wPEQ7kNvwHSDoyU&_nc_gid=pXI5FGXTDiF2GHsnQQ9J8Q&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfyMSQzDcsay6cxJeXOa4EJ6gsuz1fzS8g9kzLyGWlkp7A&oe=69C72268&_nc_sid=7a9f4b",
+        "ateş": "https://volleybox.net/media/upload/teams/big_17315073075S1PN.png",
+        "avcılaratak": "https://volleybox.net/media/upload/teams/1754053447D2uQm.png",
+        "süreyyapaşa": "https://volleybox.net/media/upload/teams/1757585791Z83AG.png",
+        "maçsayısı": "https://volleybox.net/media/upload/teams/1739540774BGbP1.png",
+        "kartalyıldızları": "https://volleybox.net/media/upload/teams/1755158375UwNm0.png",
+        "büyükçekmecevoleybol": "https://volleybox.net/media/upload/teams/1763621163oB8wn.png",
+        "olimpia2023": "https://volleybox.net/media/upload/teams/1767960411J725i.png",
+        "yankı": "https://instagram.fteq3-1.fna.fbcdn.net/v/t51.82787-19/601293533_18005125478820892_313570829212903084_n.jpg?stp=dst-jpg_s150x150_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4zMzkuYzIifQ&_nc_ht=instagram.fteq3-1.fna.fbcdn.net&_nc_cat=104&_nc_oc=Q6cZ2gGMnHEJ9P1vPMd-YpejkfITgR3RnrAGAefmdVItm6M10vNeWJ7r1vxOqFaO3XaG_IY&_nc_ohc=8pAGXm9ABTgQ7kNvwFv0dJl&_nc_gid=duH-Q9-gOfRlv25qkdjImA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_AfyjP8iVyTOj8TRPqEeaIoOZV0QCNro2Xt6E0_rRdTvGhw&oe=69C729C7&_nc_sid=7a9f4b"
     };
 
     const MOTIVATION_QUOTES = [
@@ -681,14 +693,20 @@
         };
 
         const pKume = cleanPart(kume);
-        const pC = cleanPart(c);
-        const pKtg = cleanPart(ktg);
+        
+        // Cinsiyet ve Kategori kısaltmaları genelde küme adında (örn: KESL, KKGL) bulunduğu için
+        // "E", "KE", "K", "KK" gibi tekrarları ekrandan kaldırarak sadeleştiriyoruz.
         const pTur = cleanPart(tur);
         
         if (pKume) parts.push(pKume);
-        if (pC) parts.push(pC);
-        if (pKtg) parts.push(pKtg);
-        if (pTur) parts.push(pTur);
+        
+        // "LE" (Lig Etabı) gereksiz kalabalık yaptığı için gizliyoruz. Ancak Finalleri ekliyoruz.
+        if (pTur && pTur.toUpperCase() !== "LE" && pTur.toUpperCase() !== "L.E.") {
+            if (pTur.toUpperCase() === "YF") parts.push("Yarı Final");
+            else if (pTur.toUpperCase() === "ÇF") parts.push("Çeyrek Final");
+            else if (pTur.toUpperCase() === "F") parts.push("Final");
+            else parts.push(pTur);
+        }
         
         let pGr = cleanPart(gr);
         if (pGr) {
@@ -710,8 +728,18 @@
     function wrapProxy(url) {
         if (!url) return "";
         const cleanUrl = url.toString().replace(/^"|"$/g, '').trim();
-        // Blogspot, Blogger ve Google görselleri proxy'e takılmadan doğrudan ve hızlı yüklenecek şekilde eklendi
-        if (cleanUrl.startsWith('data:') || cleanUrl.includes('tbf.org.tr') || cleanUrl.includes('wikipedia') || cleanUrl.includes('blogspot.com') || cleanUrl.includes('blogger.com') || cleanUrl.includes('googleusercontent.com')) return cleanUrl;
+        // Blogspot, Blogger, Google, Facebook ve Instagram görselleri proxy'e takılmadan doğrudan ve hızlı yüklenecek
+        if (cleanUrl.startsWith('data:') || 
+            cleanUrl.includes('tbf.org.tr') || 
+            cleanUrl.includes('wikipedia') || 
+            cleanUrl.includes('blogspot.com') || 
+            cleanUrl.includes('blogger.com') || 
+            cleanUrl.includes('googleusercontent.com') ||
+            cleanUrl.includes('fbcdn.net') || 
+            cleanUrl.includes('instagram.com') || 
+            cleanUrl.includes('facebook.com')) {
+            return cleanUrl;
+        }
         return `https://wsrv.nl/?url=${encodeURIComponent(cleanUrl)}`;
     }
 
@@ -874,7 +902,8 @@
 
     function createMatchCard(m, showAd = false) {
         const isLive = checkLiveStatus(m);
-        const encodedMatch = encodeURIComponent(JSON.stringify(m));
+        // Kesme işareti (') içeren takım isimlerinin butonu bozmaması için özel kodlama eklendi
+        const encodedMatch = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
         const setScores = parseSetScoresHtml(m.sets);
 
         const leagueGroupText = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
@@ -883,14 +912,14 @@
         if (showAd) {
             adHtml = `
                 <!-- REKLAM 1 ALANI (VESPORTSCAMP) -->
-                <a href="https://vesportscamps.com/" target="_blank" rel="noopener noreferrer" class="w-[110px] h-[45px] shrink-0 bg-indigo-950 border border-indigo-800 rounded-xl flex items-center justify-center text-center p-1 hover:bg-indigo-800 hover:scale-105 transition-all shadow-sm overflow-hidden" title="Vesportscamp Kayıtları Devam Ediyor - Sayfaya Git">
+                <a href="https://vesportscamps.com/" target="_blank" rel="noopener noreferrer" class="w-[120px] h-[45px] shrink-0 bg-indigo-950 border border-indigo-800 rounded-xl flex items-center justify-center text-center p-1 hover:bg-indigo-800 hover:scale-105 transition-all shadow-sm overflow-hidden" title="Vesportscamp Kayıtları Devam Ediyor - Sayfaya Git">
                     <span class="text-[8.5px] font-black text-white uppercase tracking-tighter leading-tight">VESPORTSCAMP<br>KAYITLARI<br>DEVAM EDİYOR</span>
                 </a>
             `;
         } else {
             adHtml = `
                 <!-- REKLAM ALANI (GENEL) -->
-                <div class="w-[110px] h-[45px] shrink-0 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center p-1 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm overflow-hidden" title="Bu alana reklam verebilirsiniz">
+                <div class="w-[120px] h-[45px] shrink-0 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center p-1 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm overflow-hidden" title="Bu alana reklam verebilirsiniz">
                     <span class="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-tight">Buraya Reklam<br>Verebilirsiniz</span>
                 </div>
             `;
@@ -942,11 +971,12 @@
 
                 </div>
 
-                <div class="w-full lg:w-[130px] shrink-0 flex flex-row lg:flex-col justify-between lg:justify-center items-center gap-3 lg:border-l border-slate-100 lg:pl-4 mt-3 lg:mt-0 pt-2 lg:pt-0">
+                <!-- DÜZELTME: Mobil görünümde dikey olarak sağa hizalandı ve taşma sorunu çözüldü -->
+                <div class="w-full lg:w-[130px] shrink-0 flex flex-col justify-center items-end lg:items-center gap-3 lg:border-l border-slate-100 lg:pl-4 mt-3 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0">
                      ${adHtml}
                      
                      <!-- WHATSAPP BUTONU -->
-                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#c8102e] hover:text-red-800 font-medium text-sm flex items-center gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">
+                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#c8102e] hover:text-red-800 font-bold text-sm flex items-center gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">
                          WhatsApp <i class="fab fa-whatsapp text-lg"></i> <i class="fas fa-arrow-right text-[10px] ml-1"></i>
                      </button>
                 </div>
@@ -1007,7 +1037,10 @@
             const noteInput = document.getElementById('whatsapp-note');
             const note = noteInput ? noteInput.value.trim() : '';
             const isPlayed = m.s1 !== "-" && m.s1 !== "";
-            const category = `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
+            
+            // WhatsApp mesajında da aynı temizlenmiş Kategori/Lig adını kullanıyoruz
+            const category = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
+            
             let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
             let msg = `*${header}*\nKategori: ${category}\n\n`; 
             
@@ -1108,6 +1141,10 @@
         if (searchInput) searchInput.value = teamCoreName;
         state.searchQuery = teamCoreName;
         
+        // URL'yi değiştir (GitHub Pages uyumlu olması için # işareti ile ekliyoruz)
+        const teamNorm = normalize(teamCoreName);
+        history.pushState(null, null, '#' + teamNorm);
+        
         document.querySelectorAll('.status-btn').forEach(btn => {
             if (btn && btn.classList) btn.classList.remove('active', 'text-indigo-600')
         });
@@ -1118,7 +1155,6 @@
             state.selectedStatus = 'all';
         }
         
-        const teamNorm = normalize(teamCoreName);
         const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm));
         if (!teamPlaysToday) {
             const nextMatch = state.allMatches.find(m => normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm);
@@ -1131,6 +1167,10 @@
         state.selectedTeam = null;
         const searchInput = document.getElementById('team-search');
         if (searchInput) searchInput.value = '';
+        
+        // URL'yi temizle (Ana sayfaya döner)
+        history.pushState(null, null, window.location.pathname + window.location.search);
+        
         handleSearch('');
     }
 
@@ -1423,20 +1463,20 @@
             alphabetContainer.innerHTML = '';
             alphabet.forEach(letter => {
                 const hasTeams = teamsByLetter[letter] && teamsByLetter[letter].length > 0;
-                const isActive = state.selectedAlphabet === letter;
                 
+                // DÜZELTME: Eğer o harfte takım yoksa ve 'Hepsi' butonu değilse, butonu oluşturma (atla)
+                if (!hasTeams && letter !== 'Hepsi') return;
+
+                const isActive = state.selectedAlphabet === letter;
                 const btn = document.createElement('button');
-                if (hasTeams || letter === 'Hepsi') {
-                    btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'} ${letter === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`;
-                    btn.innerText = letter;
-                    btn.onclick = () => {
-                        state.selectedAlphabet = isActive ? null : letter;
-                        updateUI(); 
-                    };
-                } else {
-                    btn.className = `w-8 h-8 shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black text-slate-300 bg-slate-50/50 cursor-not-allowed border border-slate-100/50`;
-                    btn.innerText = letter;
-                }
+                
+                btn.className = `shrink-0 flex items-center justify-center rounded-xl text-[11px] font-black transition-all ${isActive ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'} ${letter === 'Hepsi' ? 'px-4 h-8' : 'w-8 h-8'}`;
+                btn.innerText = letter;
+                btn.onclick = () => {
+                    state.selectedAlphabet = isActive ? null : letter;
+                    updateUI(); 
+                };
+                
                 alphabetContainer.appendChild(btn);
             });
         }
