@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- PWA (UYGULAMA) META ETİKETLERİ -->
+    <!-- FAVICON VE LOGO TANIMLAMALARI -->
+    <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
+    <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
+
+    <!-- SOSYAL MEDYA PAYLAŞIM ÖNİZLEME (OG TAGS) -->
+    <meta property="og:title" content="Voleybol Day Pro | Canlı Veri Portalı">
+    <meta property="og:description" content="Takım odaklı canlı voleybol maç verileri ve kolay paylaşım portalı.">
+    <meta property="og:image" content="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
+    <meta property="og:type" content="website">
+
+    <!-- PWA META ETİKETLERİ -->
     <meta name="theme-color" content="#1e1b4b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Voleybol Day">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1004/1004554.png">
-    <!-- DİNAMİK MANİFEST DOSYASI (TEK DOSYADA PWA İÇİN) -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Voleybol Day Pro","short_name":"VoleybolDay","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#1e1b4b","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/1004/1004554.png","sizes":"512x512","type":"image/png"}]}'>
+    
+    <!-- DİNAMİK MANİFEST DOSYASI (LOGO GÜNCELLENDİ) -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Voleybol Day Pro","short_name":"VoleybolDay","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#1e1b4b","icons":[{"src":"https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA","sizes":"512x512","type":"image/png"}]}'>
 
     <title>Voleybol Day Pro | Canlı Veri Portalı</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -171,7 +181,7 @@
 <div id="install-banner" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-[350px] bg-indigo-900 text-white p-4 rounded-2xl shadow-2xl z-[100] items-center justify-between border border-indigo-700 animate-bounce">
     <div class="flex items-center gap-3">
         <div class="bg-white/20 p-2 rounded-xl text-indigo-100 flex items-center justify-center shrink-0">
-            <i class="fas fa-mobile-screen-button text-xl"></i>
+            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA" class="w-8 h-8 rounded-lg">
         </div>
         <div class="flex flex-col">
             <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300">Uygulamayı İndir</span>
@@ -895,7 +905,6 @@
         };
     }
 
-    // GÜNCELLENEN GRUPLAMA MANTIĞI: ERTELENENLER EN ALTA
     function renderMatchGroups(matchArray, container) {
         const todayVal = dateToValue(getTodayString());
         const played = matchArray.filter(m => isMatchPlayed(m));
@@ -904,25 +913,18 @@
         const pending = matchArray.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m) && dateToValue(m.date) >= todayVal);
         const sortFunc = (a, b) => dateToValue(a.date) - dateToValue(b.date) || timeToMins(a.time) - timeToMins(b.time);
         
-        // 1. CANLI MAÇLAR
         if (live.length) { 
             container.insertAdjacentHTML('beforeend', `<div class="w-full mt-2 border-b border-slate-100 pb-2 mb-1 text-rose-600 font-black flex items-center gap-2">CANLI MAÇLAR</div>`); 
             live.sort(sortFunc).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
         }
-        
-        // 2. GELECEK MAÇLAR
         if (pending.length) { 
             container.insertAdjacentHTML('beforeend', `<div class="w-full mt-6 border-b border-slate-100 pb-2 mb-1 text-indigo-950 font-black flex items-center gap-2">GELECEK MAÇLAR</div>`); 
             pending.sort(sortFunc).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
         }
-        
-        // 3. BİTEN MAÇLAR
         if (played.length) { 
             container.insertAdjacentHTML('beforeend', `<div class="w-full mt-6 border-b border-slate-100 pb-2 mb-1 text-slate-700 font-black flex items-center gap-2">BİTEN MAÇLAR</div>`); 
             played.sort((a,b) => dateToValue(b.date) - dateToValue(a.date)).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
         }
-
-        // 4. ERTELENEN / SKOR GİRMEYEN (En Alt Bölüm)
         if (delayed.length) { 
             container.insertAdjacentHTML('beforeend', `<div class="w-full mt-6 border-b border-slate-100 pb-2 mb-1 text-amber-500 font-black flex items-center gap-2">ERTELENEN / SKOR GİRMEYEN</div>`); 
             delayed.sort((a,b) => dateToValue(b.date) - dateToValue(a.date)).forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i === 0))); 
