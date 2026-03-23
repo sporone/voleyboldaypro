@@ -245,10 +245,11 @@
                 </div>
 
                 <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
+                    <!-- DÜZELTME: onclick işlevleri doğru fonksiyon olan setStatusFilter'a yönlendirildi -->
                     <div id="status-tabs" class="drag-scroll flex items-center bg-slate-100 p-2 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar select-none transition-opacity duration-300">
-                        <button onclick="setView('matches', 'all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap text-indigo-600">Hepsi</button>
-                        <button onclick="setView('matches', 'played')" id="filter-played" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
-                        <button onclick="setView('matches', 'pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
+                        <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all whitespace-nowrap text-indigo-600">Hepsi</button>
+                        <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Bitenler</button>
+                        <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn flex-1 md:flex-none px-6 py-3.5 rounded-xl text-[11px] font-black uppercase transition-all text-slate-500 whitespace-nowrap">Gelecek</button>
                     </div>
 
                     <div id="daily-quote-container" class="flex-1 w-full flex items-center justify-center bg-indigo-50/50 border border-indigo-100 rounded-2xl py-3.5 px-6 transition-opacity duration-300">
@@ -765,6 +766,11 @@
         return parts;
     }
 
+    // YENİ KURAL MOTORU: Maçın oynanıp oynanmadığını kesin olarak denetler
+    function isMatchPlayed(m) {
+        return (m.s1 !== '-' && m.s1 !== '') || (m.s2 !== '-' && m.s2 !== '');
+    }
+
     async function fetchData() {
         try {
             const overlay = document.getElementById('loading-overlay');
@@ -784,17 +790,39 @@
                 const todayStr = getTodayString();
                 if (!state.currentDate) {
                     if (dates.includes(todayStr)) state.currentDate = todayStr;
-                    else state.currentDate = dates[0];
+                    else state.currentDate = dates[0] || ""; // BOŞ TARİH KORUMASI
                 } else if (!dates.includes(state.currentDate)) {
-                    state.currentDate = dates[0];
+                    state.currentDate = dates[0] || "";
                 }
             }
             state.loading = false;
             if (overlay) overlay.classList.add('hidden');
+            
+            // URL'den takım kontrolü (Sayfa ilk açıldığında linkte takım varsa otomatik seç)
+            const rawHash = window.location.hash.replace('#', '');
+            const hashTeam = rawHash ? decodeURIComponent(rawHash) : '';
+            if (hashTeam) {
+                let originalName = null;
+                // Türkçe karakterleri ve özel kodlamaları tolere eden akıllı eşleştirici
+                const toEnglish = (s) => s.replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
+                const searchHash = toEnglish(hashTeam);
+                
+                for (let m of state.allMatches) {
+                    if (toEnglish(normalize(getCoreName(m.t1))) === searchHash) { originalName = getCoreName(m.t1); break; }
+                    if (toEnglish(normalize(getCoreName(m.t2))) === searchHash) { originalName = getCoreName(m.t2); break; }
+                }
+                if (originalName) {
+                    selectTeam(originalName);
+                    return; // selectTeam zaten updateUI() çağırır
+                }
+            }
+            
             updateUI();
         } catch (error) { 
             console.error(error);
             showError("Veri yüklenirken bir hata oluştu."); 
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.classList.add('hidden');
         }
     }
 
@@ -822,11 +850,22 @@
         return lines.slice(1).filter(l => l.trim()).map(line => {
             const p = parseCSVLine(line);
             return {
-                date: p[0] || "", venue: p[1] || "", time: p[2] || "",
-                t1: cleanTeamName(p[3]), s1: p[4] || "-", s2: p[5] || "-", t2: cleanTeamName(p[6]),
-                sets: p[7] || "Oynanmadı", 
-                dk: p[8] || "", c: p[9] || "", kume: p[10] || "", ktg: p[11] || "", tur: p[12] || "", gr: p[13] || "",
-                gender: p[9] || "M", league: p[10] || "LİG" 
+                date: (p[0] || "").trim(), 
+                venue: (p[1] || "").trim(), 
+                time: (p[2] || "").trim(),
+                t1: cleanTeamName(p[3]), 
+                s1: (p[4] || "").trim() || "-", 
+                s2: (p[5] || "").trim() || "-", 
+                t2: cleanTeamName(p[6]),
+                sets: (p[7] || "").trim() || "Oynanmadı", 
+                dk: (p[8] || "").trim(), 
+                c: (p[9] || "").trim(), 
+                kume: (p[10] || "").trim(), 
+                ktg: (p[11] || "").trim(), 
+                tur: (p[12] || "").trim(), 
+                gr: (p[13] || "").trim(),
+                gender: (p[9] || "M").trim(), 
+                league: (p[10] || "LİG").trim() 
             };
         });
     }
@@ -875,15 +914,18 @@
     }
 
     function checkLiveStatus(m) {
+        // Eğer skor girilmişse Canlı statüsünden kesinlikle çıkar
+        if (isMatchPlayed(m)) return false;
+        
         const trTime = getTurkeyTime();
-        const todayStr = trTime.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const s1 = parseInt(m.s1); const s2 = parseInt(m.s2);
-        if (!isNaN(s1) && !isNaN(s2) && (s1 >= 3 || s2 >= 3)) return false;
+        // DÜZELTME: Tarayıcıların farklı tarih formatı atamasını engellemek için kendi kesin fonksiyonumuzu kullandık.
+        const todayStr = getTodayString();
+        
         if (m.date === todayStr) {
             const [mH, mM] = m.time.split(':').map(Number);
             const matchMins = mH * 60 + (mM || 0);
             const currentMins = trTime.getHours() * 60 + trTime.getMinutes();
-            if (m.s1 !== "-" || currentMins >= matchMins) return true;
+            if (currentMins >= matchMins) return true;
         }
         return false;
     }
@@ -907,6 +949,29 @@
         const setScores = parseSetScoresHtml(m.sets);
 
         const leagueGroupText = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || m.league;
+        
+        // --- TVF SKOR GİRİLMEDİ UYARISI MANTIĞI (60 DK KONTROLÜ) ---
+        let missingScoreWarning = '';
+        if (!isMatchPlayed(m)) {
+            const trTime = getTurkeyTime();
+            const matchDate = m.date.split('.').map(Number); // [DD, MM, YYYY]
+            const [mH, mM] = m.time.split(':').map(Number);
+            
+            if (matchDate.length === 3) {
+                // Aylar 0-11 indeksli olduğu için matchDate[1] - 1 yapıyoruz
+                const matchDateTime = new Date(matchDate[2], matchDate[1] - 1, matchDate[0], mH, mM).getTime();
+                const currentTimeMs = trTime.getTime();
+                
+                // 60 dakika gecikme kontrolü (60 * 60 * 1000 = 3600000 ms)
+                if (currentTimeMs >= matchDateTime + 3600000) {
+                    missingScoreWarning = `
+                        <div class="text-slate-400 text-[9px] md:text-[10px] font-medium text-right opacity-70 tracking-tight mt-1.5 w-full">
+                            TVF tarafından skor girilmemiştir.
+                        </div>
+                    `;
+                }
+            }
+        }
 
         let adHtml = '';
         if (showAd) {
@@ -945,33 +1010,35 @@
 
                 </div>
 
-                <div class="flex-1 flex flex-row items-center justify-between w-full overflow-hidden border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
-                    
-                    <div class="flex flex-col gap-2 md:gap-3 flex-1 pr-2 md:pr-4 min-w-0 py-1">
-                        <div class="flex items-center gap-3 w-full h-8 md:h-10">
-                            ${getLogoHtml(m.t1, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
-                            <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t1}</span>
+                <div class="flex-1 flex flex-col justify-center w-full overflow-hidden border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100">
+                    <div class="flex flex-row items-center justify-between w-full">
+                        <div class="flex flex-col gap-2 md:gap-3 flex-1 pr-2 md:pr-4 min-w-0 py-1">
+                            <div class="flex items-center gap-3 w-full h-8 md:h-10">
+                                ${getLogoHtml(m.t1, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
+                                <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t1}</span>
+                            </div>
+                            <div class="flex items-center gap-3 w-full h-8 md:h-10">
+                                ${getLogoHtml(m.t2, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
+                                <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t2}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3 w-full h-8 md:h-10">
-                            ${getLogoHtml(m.t2, "w-8 h-8 md:w-10 md:h-10 bg-white border border-slate-100 shadow-sm shrink-0")}
-                            <span class="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">${m.t2}</span>
+
+                        <div class="flex flex-col items-end shrink-0 py-1">
+                            <div class="flex items-stretch gap-3 md:gap-5">
+                                <div class="bg-[#1a1a1a] rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] md:text-sm">
+                                    <div class="h-8 md:h-10 flex items-center justify-center border-b border-gray-700">${m.s1 === '-' ? '' : m.s1}</div>
+                                    <div class="h-8 md:h-10 flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
+                                </div>
+                                <div class="flex flex-col gap-2 md:gap-3 font-bold text-[13px] md:text-sm">
+                                    <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row1}</div>
+                                    <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row2}</div>
+                                </div>
+                            </div>
+                            ${missingScoreWarning}
                         </div>
                     </div>
-
-                    <div class="flex items-stretch gap-3 md:gap-5 shrink-0 py-1">
-                        <div class="bg-[#1a1a1a] rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] md:text-sm">
-                            <div class="h-8 md:h-10 flex items-center justify-center border-b border-gray-700">${m.s1 === '-' ? '' : m.s1}</div>
-                            <div class="h-8 md:h-10 flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
-                        </div>
-                        <div class="flex flex-col gap-2 md:gap-3 font-bold text-[13px] md:text-sm">
-                            <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row1}</div>
-                            <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row2}</div>
-                        </div>
-                    </div>
-
                 </div>
 
-                <!-- DÜZELTME: Mobil görünümde dikey olarak sağa hizalandı ve taşma sorunu çözüldü -->
                 <div class="w-full lg:w-[130px] shrink-0 flex flex-col justify-center items-end lg:items-center gap-3 lg:border-l border-slate-100 lg:pl-4 mt-3 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0">
                      ${adHtml}
                      
@@ -999,7 +1066,7 @@
                     <span class="text-[10px] md:text-xs font-bold text-slate-800 text-center leading-tight">${m.t1}</span>
                 </div>
                 <div class="flex flex-col items-center justify-center w-[20%]">
-                    <span class="text-sm md:text-lg font-black text-indigo-900 whitespace-nowrap">${m.s1 !== "-" ? m.s1 + " - " + m.s2 : "VS"}</span>
+                    <span class="text-sm md:text-lg font-black text-indigo-900 whitespace-nowrap">${m.s1 !== "-" && m.s1 !== "" ? m.s1 + " - " + m.s2 : "VS"}</span>
                     <span class="text-[9px] font-bold text-slate-400 mt-1">${m.time}</span>
                 </div>
                 <div class="flex flex-col items-center gap-2 w-[40%]">
@@ -1009,7 +1076,7 @@
             `;
         }
 
-        const isPlayed = m.s1 !== "-" && m.s1 !== "";
+        const isPlayed = isMatchPlayed(m);
         const rosterSection = document.getElementById('whatsapp-roster-section');
         if (rosterSection) {
             if (!isPlayed) {
@@ -1036,7 +1103,7 @@
             const m = state.currentSharingMatch;
             const noteInput = document.getElementById('whatsapp-note');
             const note = noteInput ? noteInput.value.trim() : '';
-            const isPlayed = m.s1 !== "-" && m.s1 !== "";
+            const isPlayed = isMatchPlayed(m);
             
             // WhatsApp mesajında da aynı temizlenmiş Kategori/Lig adını kullanıyoruz
             const category = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
@@ -1097,9 +1164,12 @@
     }
 
     function renderMatchGroups(matchArray, container) {
-        let played = matchArray.filter(m => m.s1 !== '-' && !m.sets.toLowerCase().includes("oynanmadı") && !checkLiveStatus(m));
-        let live = matchArray.filter(m => checkLiveStatus(m));
-        let pending = matchArray.filter(m => (m.s1 === '-' || m.sets.toLowerCase().includes("oynanmadı")) && !checkLiveStatus(m));
+        // SKOR GİRİLMİŞ (s1 !== '-') BÜTÜN MAÇLAR ARTIK DİREKT OLARAK 'BITEN MAÇLAR' KATEGORİSİNDE.
+        let played = matchArray.filter(m => isMatchPlayed(m));
+        
+        // SKOR EKSİK İSE (Canlı veya Gelecek Maç)
+        let live = matchArray.filter(m => !isMatchPlayed(m) && checkLiveStatus(m));
+        let pending = matchArray.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m));
 
         live.sort((a, b) => {
             const diff = dateToValue(a.date) - dateToValue(b.date);
@@ -1121,7 +1191,8 @@
 
         if (live.length > 0) {
             container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-2"><h2 class="text-xl font-black text-rose-600 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></span> Canlı Maçlar</h2></div>`);
-            live.forEach(m => container.insertAdjacentHTML('beforeend', createMatchCard(m, false)));
+            // Canlı maçlarda da 1. sıradaki karta Reklam 1 ataması eklendi (index === 0 ise showAd=true)
+            live.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
         }
 
         if (pending.length > 0) {
@@ -1131,7 +1202,8 @@
 
         if (played.length > 0) {
             container.insertAdjacentHTML('beforeend', `<div class="w-full mb-1 mt-6 first:mt-2"><h2 class="text-xl font-black text-slate-700 flex items-center gap-2 uppercase tracking-tighter pb-2 border-b border-slate-100"><i class="fas fa-check-circle text-green-500"></i> Biten Maçlar</h2></div>`);
-            played.forEach(m => container.insertAdjacentHTML('beforeend', createMatchCard(m, false)));
+            // Biten maçlarda da 1. sıradaki karta Reklam 1 ataması eklendi
+            played.forEach((m, index) => container.insertAdjacentHTML('beforeend', createMatchCard(m, index === 0)));
         }
     }
 
@@ -1158,7 +1230,7 @@
         const teamPlaysToday = state.allMatches.some(m => m.date === state.currentDate && (normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm));
         if (!teamPlaysToday) {
             const nextMatch = state.allMatches.find(m => normalize(getCoreName(m.t1)) === teamNorm || normalize(getCoreName(m.t2)) === teamNorm);
-            if (nextMatch) state.currentDate = nextMatch.date;
+            if (nextMatch && nextMatch.date) state.currentDate = nextMatch.date;
         }
         updateUI();
     }
@@ -1191,8 +1263,9 @@
         } else {
             matchesToRender = state.allMatches.filter(m => m.date === state.currentDate);
 
-            if (state.selectedStatus === 'played') matchesToRender = matchesToRender.filter(m => m.s1 !== '-' && !m.sets.toLowerCase().includes("oynanmadı"));
-            else if (state.selectedStatus === 'pending') matchesToRender = matchesToRender.filter(m => m.s1 === '-' || m.sets.toLowerCase().includes("oynanmadı"));
+            // SKOR FİLTRELERİ GÜNCELLENDİ (Kesin kural motoru üzerinden geçer)
+            if (state.selectedStatus === 'played') matchesToRender = matchesToRender.filter(m => isMatchPlayed(m));
+            else if (state.selectedStatus === 'pending') matchesToRender = matchesToRender.filter(m => !isMatchPlayed(m));
             
             if (state.searchQuery) {
                 const q = normalize(state.searchQuery);
@@ -1233,7 +1306,7 @@
             
             if (t1Norm === teamNorm || t2Norm === teamNorm) {
                 // Maç oynandı mı ve skor girilmiş mi kontrolü
-                if (m.s1 !== '-' && m.s1 !== '' && !m.sets.toLowerCase().includes('oynanmadı')) {
+                if (isMatchPlayed(m)) {
                     const s1 = parseInt(m.s1);
                     const s2 = parseInt(m.s2);
                     
@@ -1332,6 +1405,7 @@
         const dates = getSortedDates();
         container.innerHTML = '';
         dates.forEach(date => {
+            if (!date) return; // Boş tarih güvenliği
             const isActive = date === state.currentDate;
             const btn = document.createElement('button');
             btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border select-none ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`;
@@ -1546,9 +1620,10 @@
     }
     
     function getSortedDates() {
-        return [...new Set(state.allMatches.map(m => m.date))].sort((a,b) => {
+        // DÜZELTME: Boş tarihlerin sistemi çökertmesini engellemek için d => d filtresi eklendi
+        return [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => {
             const pA = a.split('.').map(Number); const pB = b.split('.').map(Number);
-            return new Date(pA[2], pA[1]-1, pA[0]) - new Date(pB[2], pB[1]-1, pB[0]);
+            return new Date(pA[2] || 0, (pA[1] || 1)-1, pA[0] || 1) - new Date(pB[2] || 0, (pB[1] || 1)-1, pB[0] || 1);
         });
     }
 
@@ -1562,6 +1637,27 @@
         makeScrollable('top-logos-container');
         makeScrollable('region-tabs');
         makeScrollable('alphabet-index'); 
+        
+        // Kullanıcı tarayıcıda ileri-geri yaparsa veya URL'yi manuel değiştirirse algıla
+        window.addEventListener('hashchange', () => {
+            const rawHash = window.location.hash.replace('#', '');
+            const hashTeam = rawHash ? decodeURIComponent(rawHash) : '';
+            if (!hashTeam && state.selectedTeam) {
+                clearSelectedTeam();
+            } else if (hashTeam) {
+                let originalName = null;
+                const toEnglish = (s) => s.replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
+                const searchHash = toEnglish(hashTeam);
+                
+                for (let m of state.allMatches) {
+                    if (toEnglish(normalize(getCoreName(m.t1))) === searchHash) { originalName = getCoreName(m.t1); break; }
+                    if (toEnglish(normalize(getCoreName(m.t2))) === searchHash) { originalName = getCoreName(m.t2); break; }
+                }
+                if (originalName && state.selectedTeam !== originalName) {
+                    selectTeam(originalName);
+                }
+            }
+        });
     };
     setInterval(updateUI, 60000);
 </script>
