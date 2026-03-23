@@ -134,6 +134,19 @@
             to { transform: scale(1); opacity: 1; }
         }
 
+        /* YENİ EKLENEN BUGÜN ANİMASYONU */
+        @keyframes glow-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .today-active-tab {
+            animation: glow-pulse 2s infinite;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5);
+            z-index: 10;
+        }
+
         .live-pulse {
             position: relative;
         }
@@ -1027,9 +1040,9 @@
 
                         <div class="flex flex-col items-end shrink-0 py-1">
                             <div class="flex items-stretch gap-3 md:gap-5">
-                                <div class="bg-[#1a1a1a] rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] md:text-sm">
-                                    <div class="h-8 md:h-10 flex items-center justify-center border-b border-gray-700">${m.s1 === '-' ? '' : m.s1}</div>
-                                    <div class="h-8 md:h-10 flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
+                                <div class="bg-indigo-950 rounded-md flex flex-col w-8 md:w-9 text-white font-bold text-[13px] md:text-sm overflow-hidden shrink-0">
+                                    <div class="flex-1 min-h-[32px] md:min-h-[40px] flex items-center justify-center border-b border-indigo-800/80">${m.s1 === '-' ? '' : m.s1}</div>
+                                    <div class="flex-1 min-h-[32px] md:min-h-[40px] flex items-center justify-center">${m.s2 === '-' ? '' : m.s2}</div>
                                 </div>
                                 <div class="flex flex-col gap-2 md:gap-3 font-bold text-[13px] md:text-sm">
                                     <div class="h-8 md:h-10 flex items-center gap-1 md:gap-2">${setScores.row1}</div>
@@ -1426,8 +1439,8 @@
                         <span class="text-[8px] sm:text-[9px] text-rose-400 font-bold uppercase tracking-widest">Mağlubiyet</span>
                         <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.losses}</span>
                     </div>
-                    <div class="w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
-                    <div class="flex flex-col items-center justify-center">
+                    <div class="hidden sm:block w-px h-8 bg-indigo-700/50 mx-2 sm:mx-4"></div>
+                    <div class="hidden sm:flex flex-col items-center justify-center">
                         <span class="text-[8px] sm:text-[9px] text-amber-400 font-bold uppercase tracking-widest">Ertelenen</span>
                         <span class="text-lg sm:text-[22px] font-black leading-none mt-1">${stats.delayed}</span>
                     </div>
@@ -1462,19 +1475,58 @@
         if (!container) return;
         
         const dates = getSortedDates();
+        const todayStr = getTodayString();
         container.innerHTML = '';
+        
         dates.forEach(date => {
             if (!date) return; // Boş tarih güvenliği
             const isActive = date === state.currentDate;
+            const isToday = date === todayStr;
+            
             const btn = document.createElement('button');
-            btn.className = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all shrink-0 uppercase border select-none ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`;
-            btn.innerText = date;
+            
+            // Butonun genel temel ayarları
+            let classes = `px-7 py-3.5 rounded-2xl text-[11px] font-black transition-all duration-300 shrink-0 uppercase border select-none flex items-center justify-center gap-1.5 `;
+            
+            if (isActive) {
+                if (isToday) {
+                    classes += `bg-indigo-600 text-white border-indigo-600 today-active-tab`;
+                } else {
+                    classes += `bg-indigo-600 text-white border-indigo-600 shadow-lg`;
+                }
+                btn.id = 'active-date-tab'; // Kaydırma işlemi için işaretliyoruz
+            } else {
+                if (isToday) {
+                    classes += `bg-indigo-50 text-indigo-700 border-indigo-300 hover:bg-indigo-100 shadow-sm`;
+                } else {
+                    classes += `bg-white text-slate-500 border-slate-100 hover:bg-slate-50`;
+                }
+            }
+            
+            btn.className = classes;
+            
+            // Eğer tarih bugünse yanına dikkat çekici bir sinyal ekle
+            if (isToday) {
+                btn.innerHTML = `<span class="relative flex h-2 w-2 mr-0.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span> ${date}`;
+            } else {
+                btn.innerText = date;
+            }
+
             btn.onclick = () => { 
                 state.currentDate = date; 
                 updateUI(); 
             };
             container.appendChild(btn);
         });
+
+        // Sayfa açıldığında Aktif Olan Sekmeyi ekranın ortasına animasyonla kaydır
+        setTimeout(() => {
+            const activeTab = document.getElementById('active-date-tab');
+            if (activeTab && container) {
+                const scrollPos = activeTab.offsetLeft - (container.offsetWidth / 2) + (activeTab.offsetWidth / 2);
+                container.scrollTo({ left: scrollPos, behavior: 'smooth' });
+            }
+        }, 150);
     }
 
     function renderTopLogos() {
