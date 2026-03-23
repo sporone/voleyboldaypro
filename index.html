@@ -1044,8 +1044,8 @@
                      ${adHtml}
                      
                      <!-- WHATSAPP BUTONU -->
-                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#c8102e] hover:text-red-800 font-bold text-sm flex items-center justify-end gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">
-                         WhatsApp <i class="fab fa-whatsapp text-lg"></i> <i class="fas fa-arrow-right text-[10px] ml-1 hidden lg:inline-block"></i>
+                     <button onclick="openWhatsappModal('${encodedMatch}')" class="text-[#25D366] hover:text-[#128c7e] font-bold text-sm flex items-center justify-end gap-1.5 transition-all group-hover/card:translate-x-1 whitespace-nowrap shrink-0">
+                         WhatsApp <i class="fab fa-whatsapp text-lg"></i> <i class="fas fa-arrow-right text-[10px] ml-1 hidden lg:inline-block text-slate-300"></i>
                      </button>
                 </div>
             </div>`;
@@ -1109,13 +1109,38 @@
             // WhatsApp mesajında da aynı temizlenmiş Kategori/Lig adını kullanıyoruz
             const category = buildGroupName(m.kume, m.c, m.ktg, m.tur, m.gr) || `${m.league} (${m.gender === 'E' ? 'Erkek' : 'Kadın'})`;
             
-            let header = isPlayed ? "MAC SONUCU" : "MAC GUNU";
-            let msg = `*${header}*\nKategori: ${category}\n\n`; 
+            let header = isPlayed ? "MAÇ SONUCU" : "MAÇ GÜNÜ";
+            let msg = `*${header}*\n🏆 Kategori: ${category}\n\n`; 
             
-            if (note) msg += `${note}\n\n`;
-            if (isPlayed) msg += `*${m.t1} ${m.s1} - ${m.s2} ${m.t2}*\n\nSetler: ${m.sets.replace(/<[^>]*>/g, '')}\n`;
-            else msg += `*${m.t1} vs ${m.t2}*\n\nSaat: ${m.time}\n`;
-            msg += `Salon: ${m.venue}\nTarih: ${m.date}\n\n`;
+            if (note) msg += `📝 ${note}\n\n`;
+            
+            if (isPlayed) {
+                // Takımlar alt alta, skorlar yanlarında
+                msg += `🏐 *${m.t1}* : ${m.s1}\n`;
+                msg += `🏐 *${m.t2}* : ${m.s2}\n\n`;
+                
+                msg += `*Setler:*\n`;
+                const setMatches = [...m.sets.matchAll(/\((\d+)-(\d+)\)/g)];
+                if (setMatches.length > 0) {
+                    setMatches.forEach((sm, idx) => {
+                        const v1 = parseInt(sm[1]);
+                        const v2 = parseInt(sm[2]);
+                        
+                        // Set numarası ve skorları 2 haneli formata çevir (Örn: 1 -> 01, 7 -> 07)
+                        const strV1 = String(v1).padStart(2, '0');
+                        const strV2 = String(v2).padStart(2, '0');
+                        const strSet = String(idx + 1).padStart(2, '0');
+                        
+                        msg += `Set ${strSet}: ${strV1} - ${strV2}\n`;
+                    });
+                } else {
+                    msg += `${m.sets.replace(/<[^>]*>/g, '')}\n`;
+                }
+                msg += `\n`;
+            } else {
+                msg += `🏐 *${m.t1}*\n🆚\n🏐 *${m.t2}*\n\n⏰ Saat: ${m.time}\n`;
+            }
+            msg += `📍 Salon: ${m.venue}\n📅 Tarih: ${m.date}\n\n`;
 
             if (!isPlayed) {
                 const coachInput = document.getElementById('coach-name');
