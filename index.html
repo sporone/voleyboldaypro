@@ -158,7 +158,7 @@
     // 1. KONFİGÜRASYON VE SABİTLER
     const REGIONS = {
         istanbul: { name: "TVF İSTANBUL", matches: 'https://docs.google.com/spreadsheets/d/1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic/export?format=csv&gid=0', adText: "İSTANBUL REKLAM 1" },
-        kocaeli: { name: "TVF KOCAELİ", matches: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQL7iZm3gPNyfRhAqJgbETM9o90dnZL5dhRRiw8nwi7iRFSRerVJQS6_1DvtJfjnvd9sUjf4qTpzQNf/pub?gid=0&single=true&output=csv', adText: "KOCAELİ REKLAM 1" },
+        kocaeli: { name: "TVF KOCAELİ", matches: 'https://docs.google.com/spreadsheets/d/1VkQ0KW4gRmc21O7R9CHb-nj5Cedajr1-ZosP09Y0CVY/export?format=csv&gid=0', adText: "KOCAELİ REKLAM 1" },
         ankara: { name: "TVF ANKARA", matches: 'https://docs.google.com/spreadsheets/d/1VkQ0KW4gRmc21O7R9CHb-nj5Cedajr1-ZosP09Y0CVY/export?format=csv&gid=0', adText: "ANKARA REKLAM 1" }
     };
 
@@ -360,7 +360,10 @@
             document.getElementById('loading-overlay').classList.remove('hidden');
             // Logoları sadece ilk açılışta veya boşsa Sheets'ten çek
             if (Object.keys(state.logos).length === 0) await fetchLogos();
-            const r = await fetch(`${REGIONS[state.selectedRegion].matches}${REGIONS[state.selectedRegion].matches.includes('?') ? '&' : '?'}cb=${Date.now()}`);
+            
+            // Kocaeli verilerinin hızlı güncellenmesi için cache: 'no-store' eklendi
+            const r = await fetch(`${REGIONS[state.selectedRegion].matches}${REGIONS[state.selectedRegion].matches.includes('?') ? '&' : '?'}cb=${Date.now()}`, { cache: 'no-store' });
+            
             state.allMatches = parseMatches(await r.text());
             const ds = getSortedDates(), td = getTodayString();
             if (ds.length > 0) state.currentDate = ds.includes(td) ? td : ds[0];
