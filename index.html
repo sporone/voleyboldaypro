@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- KARMA İÇERİK (MIXED CONTENT) ENGELLEYİCİ - TÜM HTTP İSTEKLERİNİ HTTPS'YE ZORLAR -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    
     <!-- FAVICON VE Apple Touch Icon -->
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
     <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
@@ -96,7 +99,7 @@
 
     <div class="-mt-24 px-3 sm:px-6 container mx-auto relative z-20">
         <div class="relative max-w-6xl mx-auto flex flex-col">
-            <!-- SEÇİLİ TAKIM PANELİ (Artık bağımsız değil, normal akışta durur ve üste binmez) -->
+            <!-- SEÇİLİ TAKIM PANELİ -->
             <div id="selected-team-display" class="hidden mx-auto flex-col items-center w-full max-w-[98%] sm:max-w-2xl px-2 mb-4 sm:mb-6">
                 <div onclick="clearSelectedTeam()" class="bg-indigo-950/95 backdrop-blur-xl border border-indigo-500/30 p-2 sm:p-2.5 rounded-2xl shadow-2xl flex items-center w-full cursor-pointer hover:scale-[1.02] transition-all overflow-hidden text-white">
                     <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-xl p-0.5 shadow-inner shrink-0 ml-1"></div>
@@ -303,7 +306,7 @@
         searchQuery: "", 
         selectedAlphabet: null, 
         selectedTeam: null, 
-        selectedTeamGroup: "all", // YENİ: Seçili takımın alt grubunu tutar
+        selectedTeamGroup: "all", 
         selectedRegion: "istanbul", 
         currentSharingMatch: null 
     };
@@ -368,13 +371,16 @@
                     const teamName = parts[0].trim();
                     let logoUrl = parts[1].trim().replace(/^"|"$/g, '');
 
+                    // YENİ KURAL: HTTP ise HTTPS yap
+                    logoUrl = logoUrl.replace(/^http:\/\//i, 'https://');
+
                     let fileId = null;
                     if (logoUrl.includes('drive.google.com/file/d/')) { const match = logoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } 
                     else if (logoUrl.includes('drive.google.com/open?id=')) { const match = logoUrl.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } 
                     else if (logoUrl.includes('drive.google.com/uc?id=')) { const match = logoUrl.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; }
 
                     if (fileId) logoUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
-                    if(logoUrl.startsWith('http')) state.logos[teamName] = logoUrl;
+                    if(logoUrl.startsWith('https')) state.logos[teamName] = logoUrl;
                 }
             });
         } catch (e) {}
@@ -574,7 +580,7 @@
 
     function setTeamGroupFilter(g) {
         state.selectedTeamGroup = g;
-        updateUI(); // Filtre değiştiğinde maçları ve istatistikleri yenile
+        updateUI(); 
     }
 
     function renderMatches() {
@@ -585,10 +591,9 @@
             const selCore = getCoreName(state.selectedTeam).toLocaleLowerCase('tr-TR');
             let teamMatches = state.allMatches.filter(m => getCoreName(m.t1).toLocaleLowerCase('tr-TR') === selCore || getCoreName(m.t2).toLocaleLowerCase('tr-TR') === selCore);
             
-            // --- GRUP / KATEGORİ FİLTRELEME BUTONLARI ---
             const groups = [...new Set(teamMatches.map(m => [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer"))].sort();
             
-            if (groups.length > 1) { // Sadece takım birden fazla ligde oynuyorsa filtreleri göster
+            if (groups.length > 1) { 
                 let tabsHtml = `<div class="w-full flex gap-3 overflow-x-auto no-scrollbar pb-5 select-none">
                     <button onclick="setTeamGroupFilter('all')" class="px-5 py-3 rounded-2xl text-[11px] font-black uppercase whitespace-nowrap transition-all border shrink-0 ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">Tüm Maçlar</button>`;
                 
@@ -600,7 +605,6 @@
                 container.insertAdjacentHTML('beforeend', tabsHtml);
             }
 
-            // Seçili gruba göre maçları daralt
             matches = state.selectedTeamGroup === 'all' ? teamMatches : teamMatches.filter(m => {
                 const g = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer";
                 return g === state.selectedTeamGroup;
@@ -644,7 +648,6 @@
             const t1Core = getCoreName(m.t1).toLocaleLowerCase('tr-TR'), t2Core = getCoreName(m.t2).toLocaleLowerCase('tr-TR');
             const match1 = (t1Core === selCore), match2 = (t2Core === selCore);
             if (match1 || match2) { 
-                // İstatistikleri de seçili kategoriye göre ayarla
                 const g = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer";
                 if (state.selectedTeamGroup !== 'all' && g !== state.selectedTeamGroup) return;
 
