@@ -319,7 +319,7 @@
         n = n.replace(/^\(h\)\s*[-–—]?\s*/i, '');
         n = n.replace(/\s+[a-z]$/i, ''); 
         return n.replace(/[\.\,\-\(\)\s]/g, '')
-            .replace(/(sk|s\.k|spor|kulübü|derneği|gençlik|voleybol|belediye|bld|belediyespor|akademi|okulları|voleybolakademi|aslan|kartal|aslanları|üniversitesi|üniversite|universitesi|universite)$/gi, ''); 
+            .replace(/(sk|s\.k|spor|kulübü|derneği|voleybol|belediye|bld|belediyespor|akademi|okulları|voleybolakademi|aslan|kartal|aslanları)$/gi, ''); 
     }
 
     function cleanTeamName(s) { return s ? s.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').trim() : ""; }
