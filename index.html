@@ -149,7 +149,8 @@
                 <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 hidden text-slate-900 font-bold">
                     <div class="flex items-center justify-between mb-3 px-1"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center"><i class="fas fa-users mr-2 opacity-50"></i> Sistemdeki Takımlar <span id="total-team-count" class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md ml-2">0</span></h3></div>
                     <div id="alphabet-index" class="drag-scroll flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-50 px-1 select-none"></div>
-                    <div id="playing-teams" class="flex flex-wrap gap-2.5 max-h-[140px] overflow-y-auto px-1 custom-scrollbar select-none text-slate-900 pt-1"></div>
+                    <!-- YENİ 6'LI GRID ALANI BURADA YER ALIR (Scroll kaldırıldı, tam boy gösterilir) -->
+                    <div id="playing-teams" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 px-1 select-none text-slate-900 pt-1 pb-2 w-full"></div>
                 </div>
             </div>
         </div>
@@ -311,7 +312,7 @@
         currentSharingMatch: null 
     };
 
-    // --- LOGO & İSİM KONTROLLERİ ---
+    // --- LOGO & İSİM KONTROLLER ---
     function normalizeForLogo(s) { 
         if (!s) return ""; 
         let n = s.toString().trim().toLocaleLowerCase('tr-TR');
@@ -472,7 +473,6 @@
         c.innerHTML = ''; Array.from(p.values()).sort((a,b) => a.localeCompare(b, 'tr')).forEach(t => {
             const isActive = state.selectedTeam === t;
             const chip = document.createElement('div');
-            // Yeni modern logo container stili
             chip.className = `flex items-center justify-center p-1.5 rounded-full bg-white transition-all cursor-pointer shrink-0 ${isActive ? 'scale-110 shadow-md ring-4 ring-indigo-100' : 'shadow-sm border border-slate-100 hover:scale-105 hover:shadow-md'}`;
             chip.innerHTML = getLogoHtml(t, "w-11 h-11 border-none shadow-none"); 
             chip.onclick = () => isActive ? clearSelectedTeam() : selectTeam(t);
@@ -503,24 +503,50 @@
 
     function renderAlphabetTeams() {
         const c = document.getElementById('playing-teams'), aC = document.getElementById('alphabet-index'), m = new Map();
+        const teamGroups = {}; 
+        
+        // Hangi takımın kaç grubu olduğunu hesaplayıp kaydediyoruz
         state.allMatches.forEach(x => { 
-            if(x.t1 && !isPlaceholderTeam(x.t1)) { const core = getCoreName(x.t1); m.set(core, core); }
-            if(x.t2 && !isPlaceholderTeam(x.t2)) { const core = getCoreName(x.t2); m.set(core, core); }
+            const g = [x.kume, x.ktg, x.tur, x.gr].filter(Boolean).join(' ').trim() || "Diğer";
+            if(x.t1 && !isPlaceholderTeam(x.t1)) { 
+                const core = getCoreName(x.t1); m.set(core, core); 
+                if(!teamGroups[core]) teamGroups[core] = new Set();
+                teamGroups[core].add(g);
+            }
+            if(x.t2 && !isPlaceholderTeam(x.t2)) { 
+                const core = getCoreName(x.t2); m.set(core, core); 
+                if(!teamGroups[core]) teamGroups[core] = new Set();
+                teamGroups[core].add(g);
+            }
         });
+        
         const teams = Array.from(m.values()).sort((a,b) => a.localeCompare(b, 'tr'));
         document.getElementById('total-team-count').innerText = teams.length;
+        
         const alph = ['Hepsi','0-9','A','B','C','Ç','D','E','F','G','H','I','İ','J','K','L','M','N','O','Ö','P','R','S','Ş','T','U','Ü','V','Y','Z']; aC.innerHTML = '';
         alph.forEach(l => {
             const b = document.createElement('button');
             b.className = `shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-[10px] font-black ${state.selectedAlphabet === l ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
             b.innerText = l; b.onclick = () => { state.selectedAlphabet = (state.selectedAlphabet === l ? null : l); updateUI(); }; aC.appendChild(b);
         });
-        c.innerHTML = !state.selectedAlphabet ? '<span class="text-[11px] text-slate-400 py-3 text-center w-full">Filtrelemek için harf seçin.</span>' : '';
+        
+        // Yeni tasarımda boş durumu ve grid sisteminin yerleşimi
+        c.innerHTML = !state.selectedAlphabet ? '<div class="col-span-full text-[11px] text-slate-400 py-6 text-center w-full">Filtrelemek için harf seçin.</div>' : '';
+        
         if (state.selectedAlphabet) {
             teams.filter(t => state.selectedAlphabet === 'Hepsi' || (state.selectedAlphabet === '0-9' ? /[0-9]/.test(t.charAt(0)) : t.charAt(0).toLocaleUpperCase('tr-TR') === state.selectedAlphabet)).forEach(t => {
+                const groupCount = teamGroups[t] ? teamGroups[t].size : 0;
                 const chip = document.createElement('div');
-                chip.className = `flex items-center gap-2.5 px-3 py-2 rounded-xl border cursor-pointer transition-all ${state.selectedTeam === t ? 'bg-indigo-50 border-indigo-500 shadow-sm' : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm'}`;
-                chip.innerHTML = `${getLogoHtml(t, "w-6 h-6 shadow-none")} <span class="text-[11px] font-bold ${state.selectedTeam === t ? 'text-indigo-800' : 'text-slate-700'} uppercase">${t}</span>`;
+                
+                // YENİ: Dikey hizalanmış, ortalanmış, 6'lı grid sistemine uygun takım kartı
+                chip.className = `flex flex-col items-center justify-center text-center p-3 rounded-[1.2rem] border cursor-pointer transition-all overflow-hidden ${state.selectedTeam === t ? 'bg-indigo-50 border-indigo-500 shadow-md ring-2 ring-indigo-200' : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm hover:-translate-y-0.5'}`;
+                
+                chip.innerHTML = `
+                    ${getLogoHtml(t, "w-12 h-12 shadow-sm border border-slate-100 mb-2")} 
+                    <span class="text-[11px] font-black ${state.selectedTeam === t ? 'text-indigo-800' : 'text-slate-700'} uppercase truncate w-full" title="${t}">${t}</span>
+                    <span class="text-[9px] font-bold text-slate-400 mt-1 bg-slate-50 px-2 py-0.5 rounded-md">${groupCount} Grup</span>
+                `;
+                
                 chip.onclick = () => state.selectedTeam === t ? clearSelectedTeam() : selectTeam(t); c.appendChild(chip);
             });
         }
@@ -533,7 +559,9 @@
         
         const displayS1 = (m.s1 === '-' || m.s1 === '') ? '0' : m.s1;
         const displayS2 = (m.s2 === '-' || m.s2 === '') ? '0' : m.s2;
-        const adHtml = (index % 3 === 0) ? `<div class="flex-1 sm:flex-none w-full sm:w-[140px] h-12 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center px-3 text-slate-400"><span class="text-[9px] font-black uppercase leading-tight">${REGIONS[state.selectedRegion].adText}</span></div>` : `<a href="https://vesportscamps.com/" target="_blank" class="flex-1 sm:flex-none w-full sm:w-[140px] h-12 bg-indigo-950 rounded-xl flex items-center justify-center text-center px-3 hover:bg-[#1e1b4b] transition-all shadow-md hover:-translate-y-0.5"><span class="text-[9px] font-black text-white uppercase leading-tight text-center">VESPORTSCAMP KAYITLARI DEVAM EDİYOR</span></a>`;
+        
+        // YENİ: Reklamın mobilde flex-1 ile genişlemesi sağlandı (sm:flex-none yerine lg:flex-none)
+        const adHtml = (index % 3 === 0) ? `<div class="flex-1 lg:flex-none w-full lg:w-[140px] h-12 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center px-3 text-slate-400"><span class="text-[9px] font-black uppercase leading-tight">${REGIONS[state.selectedRegion].adText}</span></div>` : `<a href="https://vesportscamps.com/" target="_blank" class="flex-1 lg:flex-none w-full lg:w-[140px] h-12 bg-indigo-950 rounded-xl flex items-center justify-center text-center px-3 hover:bg-[#1e1b4b] transition-all shadow-md hover:-translate-y-0.5"><span class="text-[9px] font-black text-white uppercase leading-tight text-center">VESPORTSCAMP KAYITLARI DEVAM EDİYOR</span></a>`;
 
         return `<div class="match-card bg-white p-5 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch lg:items-center gap-5 lg:gap-6 w-full relative overflow-hidden">
             <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2.5">
@@ -559,9 +587,10 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full lg:w-[140px] flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0">
+            <div class="w-full lg:w-[140px] flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0 mt-1 lg:mt-0">
                 ${adHtml}
-                <button onclick="openWhatsappModal('${encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27")}')" class="text-[#25D366] hover:text-[#20bd5a] font-black text-[12px] sm:text-[14px] flex items-center justify-center gap-2 shrink-0 bg-green-50 px-3 py-2 rounded-lg w-full transition-colors border border-green-100">WhatsApp <i class="fab fa-whatsapp text-xl"></i></button>
+                <!-- YENİ: WhatsApp kutusu kaldırıldı. Sadece Text ve İkon hizalandı -->
+                <button onclick="openWhatsappModal('${encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27")}')" class="text-[#25D366] hover:text-[#20bd5a] font-black text-[13px] sm:text-[15px] flex items-center justify-center gap-1.5 shrink-0 transition-colors pr-1">WhatsApp <i class="fab fa-whatsapp text-xl sm:text-2xl"></i></button>
             </div>
         </div>`;
     }
