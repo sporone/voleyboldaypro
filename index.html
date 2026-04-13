@@ -594,12 +594,35 @@
             const groups = [...new Set(teamMatches.map(m => [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer"))].sort();
             
             if (groups.length > 1) { 
-                let tabsHtml = `<div class="w-full flex gap-3 overflow-x-auto no-scrollbar pb-5 select-none">
-                    <button onclick="setTeamGroupFilter('all')" class="px-5 py-3 rounded-2xl text-[11px] font-black uppercase whitespace-nowrap transition-all border shrink-0 ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">Tüm Maçlar</button>`;
+                // YENİ: Seçili takımın mini logosunu alıyoruz
+                const miniLogo = getLogoHtml(state.selectedTeam, "w-8 h-8 sm:w-9 sm:h-9 shadow-none border-none bg-transparent");
+                
+                // YENİ: Hangi grupta kaç maç olduğunu hesaplıyoruz
+                const groupCounts = {};
+                teamMatches.forEach(m => {
+                    const g = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer";
+                    groupCounts[g] = (groupCounts[g] || 0) + 1;
+                });
+
+                // YENİ: Modern ufak kart tasarımı, logo ve maç sayısı eklendi (GRID SİSTEMİ 5'Lİ)
+                let tabsHtml = `<div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pb-5 select-none">
+                    <button onclick="setTeamGroupFilter('all')" class="flex items-center justify-start gap-2.5 px-3 py-2 rounded-[1.2rem] transition-all border w-full overflow-hidden ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">
+                        ${miniLogo}
+                        <div class="flex flex-col items-start leading-none gap-1.5 overflow-hidden w-full">
+                            <span class="text-[11px] font-black uppercase truncate w-full text-left">Tüm Maçlar</span>
+                            <span class="text-[9px] font-bold ${state.selectedTeamGroup === 'all' ? 'text-indigo-200' : 'text-slate-400'}">${teamMatches.length} Maç</span>
+                        </div>
+                    </button>`;
                 
                 groups.forEach(g => {
                     const isActive = state.selectedTeamGroup === g;
-                    tabsHtml += `<button onclick="setTeamGroupFilter('${g.replace(/'/g, "\\'")}')" class="px-5 py-3 rounded-2xl text-[11px] font-black uppercase whitespace-nowrap transition-all border shrink-0 ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">${g}</button>`;
+                    tabsHtml += `<button onclick="setTeamGroupFilter('${g.replace(/'/g, "\\'")}')" class="flex items-center justify-start gap-2.5 px-3 py-2 rounded-[1.2rem] transition-all border w-full overflow-hidden ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">
+                        ${miniLogo}
+                        <div class="flex flex-col items-start leading-none gap-1.5 overflow-hidden w-full">
+                            <span class="text-[11px] font-black uppercase truncate w-full text-left" title="${g}">${g}</span>
+                            <span class="text-[9px] font-bold ${isActive ? 'text-indigo-200' : 'text-slate-400'}">${groupCounts[g]} Maç</span>
+                        </div>
+                    </button>`;
                 });
                 tabsHtml += `</div>`;
                 container.insertAdjacentHTML('beforeend', tabsHtml);
