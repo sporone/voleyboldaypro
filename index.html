@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- KARMA İÇERİK (MIXED CONTENT) ENGELLEYİCİ - TÜM HTTP İSTEKLERİNİ HTTPS'YE ZORLAR -->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     
     <!-- FAVICON VE Apple Touch Icon -->
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
     <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA">
 
-    <title>Voleybol Day Pro | Canlı Veri Portalı</title>
+    <title>Voleybol Day Pro | Master Base v3.2.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         :root { --brand-primary: #6366f1; --brand-secondary: #f43f5e; --brand-dark: #1e1b4b; color-scheme: light; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f7f9; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; color: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f7f9; scroll-behavior: smooth; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+        
+        /* Master UI Styles */
         .match-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #f1f5f9; border-radius: 1.5rem; }
         .match-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: #e2e8f0; }
         .sticky-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
@@ -29,19 +29,30 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .status-btn.active { background-color: white; color: var(--brand-primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12); }
+        
         .team-logo-circle { border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex-shrink: 0; background: white; }
         .team-logo-circle img { width: 100%; height: 100%; object-fit: contain; padding: 2px; z-index: 2; }
         .fallback-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 9px; color: #94a3b8; text-transform: uppercase; background: #f8fafc; border-radius: 50%; }
+
+        .concave-corner { 
+            position: absolute; top: 0; left: 0; background: white; width: 42px; height: 42px; 
+            border-bottom-right-radius: 20px; z-index: 10; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+        }
+        .concave-corner::after { content: ''; position: absolute; right: -12px; top: 0; width: 12px; height: 12px; background: transparent; box-shadow: -5px -5px 0 4px white; border-top-left-radius: 12px; }
+        .concave-corner::before { content: ''; position: absolute; left: 0; bottom: -12px; width: 12px; height: 12px; background: transparent; box-shadow: -5px -5px 0 4px white; border-top-left-radius: 12px; }
+
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 100; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); }
         .modal-content { background: white; border-radius: 2rem; padding: 1.5rem; width: 100%; max-width: 550px; position: relative; animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
         @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .today-active-tab { animation: glow-pulse 2.5s infinite; z-index: 10; }
-        @keyframes glow-pulse { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.2); } 70% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
+
+        .active-date-tab { border-color: var(--brand-primary) !important; background-color: #f5f3ff !important; color: var(--brand-primary) !important; font-weight: 800 !important; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1) !important; }
+        .wa-team-choice-btn { border: 2px solid #f1f5f9; transition: all 0.2s; border-radius: 1rem; cursor: pointer; }
+        .wa-team-choice-btn.selected { border-color: var(--brand-primary); background-color: #f5f3ff; }
     </style>
 </head>
 <body class="antialiased">
 
-<!-- YÜKLENİYOR EKRANI -->
 <div id="loading-overlay" class="fixed inset-0 bg-slate-50 z-[100] flex flex-col items-center justify-center gap-6 transition-opacity duration-300">
     <div class="relative w-20 h-20">
         <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
@@ -50,25 +61,20 @@
     </div>
     <div class="text-center">
         <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Voleybol Day Pro</h2>
-        <p class="text-xs text-slate-500 font-medium">Veriler Hazırlanıyor...</p>
+        <p class="text-xs text-slate-500 font-medium">Sistem Yükleniyor...</p>
     </div>
 </div>
 
-<div id="app" class="max-w-[1600px] mx-auto min-h-screen pb-20">
-    <!-- MODERN HEADER (Görsel Referanslı) -->
+<div id="app" class="max-w-[1600px] mx-auto min-h-screen">
+    <!-- MASTER KURAL: HEADER -->
     <header class="bg-[#191538] text-white pt-8 pb-36 px-4 md:px-8 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-600 rounded-full opacity-20 blur-[150px] -mr-48 -mt-48 pointer-events-none"></div>
-        <div class="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-6 container mx-auto text-white">
-            
-            <!-- Logo ve Slogan -->
+        <div class="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-6 container mx-auto">
             <div class="text-center xl:text-left flex flex-col gap-1">
-                <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-white">Voleybol <span class="text-indigo-400">Day</span> Pro</h1>
+                <h1 class="text-4xl md:text-5xl font-black tracking-tighter">Voleybol <span class="text-indigo-400">Day</span> Pro</h1>
                 <p class="text-indigo-200/80 font-medium text-xs md:text-sm tracking-wide">Takım odaklı canlı veri ve paylaşım portalı.</p>
             </div>
-            
-            <!-- Sağ Taraf Widget'ları -->
             <div class="flex flex-wrap items-center justify-center gap-3 lg:gap-4">
-                <!-- Saat Widget'ı -->
                 <div class="bg-white/[0.03] backdrop-blur-md h-14 px-5 rounded-2xl border border-white/10 flex items-center gap-4 shadow-xl">
                     <i class="far fa-clock text-indigo-300 text-lg opacity-80"></i>
                     <div class="flex flex-col justify-center leading-tight">
@@ -76,710 +82,491 @@
                         <span id="live-time" class="text-xl font-black tracking-tight text-white leading-none">--:--</span>
                     </div>
                 </div>
-                
-                <!-- Maç Sayısı Widget'ı -->
                 <div class="bg-white/[0.03] backdrop-blur-md h-14 px-5 rounded-2xl border border-white/10 flex flex-col items-center justify-center shadow-xl min-w-[80px]">
                     <span class="text-[9px] uppercase font-extrabold text-indigo-300 tracking-widest opacity-80 mb-0.5 leading-none">MAÇLAR</span>
                     <span id="match-count-badge" class="text-xl font-black leading-none text-white">0</span>
                 </div>
-                
-                <!-- Kahve Butonu (Özel Tasarım - Diğer butonlarla aynı renkte) -->
-                <a href="https://www.buymeacoffee.com/bedenegitimi" target="_blank" class="bg-white/[0.03] backdrop-blur-md h-14 px-5 rounded-2xl border border-white/10 flex items-center justify-center shadow-xl hover:bg-white/[0.08] transition-all gap-2.5 cursor-pointer group">
+                <a href="https://www.buymeacoffee.com/bedenegitimi" target="_blank" class="bg-white/[0.03] backdrop-blur-md h-14 px-5 rounded-2xl border border-white/10 flex items-center justify-center shadow-xl hover:bg-white/[0.08] transition-all gap-2.5 group cursor-pointer">
                     <span class="text-lg group-hover:scale-110 transition-transform">☕</span>
-                    <span class="text-sm font-bold text-indigo-50 group-hover:text-white transition-colors">Bana bir kahve ısmarla</span>
+                    <span class="text-sm font-bold text-indigo-50 group-hover:text-white transition-colors text-center leading-none">Bana bir kahve ısmarla</span>
                 </a>
-
-                <!-- Yenileme Butonu (En Sona Taşındı) -->
-                <button onclick="fetchData()" class="bg-white text-[#191538] w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-indigo-50 active:scale-95 shadow-xl transition-all border border-transparent hover:border-indigo-100">
-                    <i class="fas fa-sync-alt text-lg"></i>
-                </button>
+                <button onclick="fetchData()" class="bg-white text-[#191538] w-14 h-14 rounded-2xl flex items-center justify-center hover:bg-indigo-50 active:scale-95 shadow-xl transition-all border border-transparent"><i class="fas fa-sync-alt text-lg"></i></button>
             </div>
         </div>
     </header>
 
     <div class="-mt-24 px-3 sm:px-6 container mx-auto relative z-20">
         <div class="relative max-w-6xl mx-auto flex flex-col">
-            <!-- SEÇİLİ TAKIM PANELİ -->
-            <div id="selected-team-display" class="hidden mx-auto flex-col items-center w-full max-w-[98%] sm:max-w-2xl px-2 mb-4 sm:mb-6">
-                <div onclick="clearSelectedTeam()" class="bg-indigo-950/95 backdrop-blur-xl border border-indigo-500/30 p-2 sm:p-2.5 rounded-2xl shadow-2xl flex items-center w-full cursor-pointer hover:scale-[1.02] transition-all overflow-hidden text-white">
-                    <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-xl p-0.5 shadow-inner shrink-0 ml-1"></div>
-                    <div id="selected-team-stats" class="flex-1 flex items-center justify-around px-2 sm:px-4 font-black text-center text-xs sm:text-sm"></div>
+            <!-- MASTER KURAL: ISTATISTIK PANELİ -->
+            <div id="selected-team-display" class="hidden mx-auto flex-col items-center w-full max-w-[98%] sm:max-w-5xl px-2 mb-6">
+                <div onclick="clearSelectedTeam()" class="bg-[#191538]/95 backdrop-blur-xl border border-indigo-500/30 p-4 rounded-3xl shadow-2xl flex items-center w-full cursor-pointer hover:scale-[1.01] transition-all text-white overflow-hidden text-center">
+                    <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-2xl p-1 shrink-0 w-16 h-16 mr-2 sm:mr-6"></div>
+                    <div id="selected-team-stats" class="flex-1 flex items-center justify-around font-black text-[10px] sm:text-xs tracking-tighter uppercase text-white"></div>
                 </div>
             </div>
 
-            <!-- ANA KONTROL PANELİ -->
-            <div class="sticky-header bg-white/95 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] rounded-[2rem] p-4 sm:p-6 md:p-8 border border-slate-100 flex flex-col gap-6">
-                
-                <!-- Üst Logolar Şeridi (Modern Halka Tasarım) -->
-                <div id="top-logos-wrapper" class="w-full transition-all duration-300">
-                    <div id="top-logos-container" class="drag-scroll flex gap-4 overflow-x-auto no-scrollbar pb-3 select-none items-center px-1"></div>
+            <!-- FİLTRELER -->
+            <div class="sticky-header bg-white/95 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] rounded-[2.5rem] p-4 sm:p-6 md:p-8 border border-slate-100 flex flex-col gap-6">
+                <div id="top-logos-wrapper" class="w-full">
+                    <div id="top-logos-container" class="drag-scroll flex gap-4 overflow-x-auto no-scrollbar pb-3 items-center"></div>
                 </div>
-
-                <div class="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent opacity-50"></div>
-                
-                <div id="region-tabs" class="drag-scroll flex gap-2.5 overflow-x-auto no-scrollbar pb-1 select-none">
-                    <button id="btn-reg-istanbul" onclick="setRegion('istanbul')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase border transition-all shrink-0 shadow-sm">TVF İSTANBUL</button>
-                    <button id="btn-reg-kocaeli" onclick="setRegion('kocaeli')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase border transition-all shrink-0 shadow-sm">TVF KOCAELİ</button>
-                    <button id="btn-reg-ankara" onclick="setRegion('ankara')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase border transition-all shrink-0 shadow-sm">TVF ANKARA</button>
-                    <button id="btn-reg-izmir" onclick="setRegion('izmir')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase border transition-all shrink-0 shadow-sm">TVF İZMİR</button>
+                <div id="region-tabs" class="drag-scroll flex gap-2.5 overflow-x-auto no-scrollbar">
+                    <button onclick="setRegion('istanbul')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold border border-slate-200 shrink-0">TVF İSTANBUL</button>
+                    <button onclick="setRegion('kocaeli')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold border shrink-0">TVF KOCAELİ</button>
+                    <button onclick="setRegion('ankara')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold border shrink-0">TVF ANKARA</button>
+                    <button onclick="setRegion('izmir')" class="region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold border shrink-0">TVF İZMİR</button>
                 </div>
-
                 <div class="flex flex-col lg:flex-row items-stretch gap-4">
-                    <div id="status-tabs" class="flex items-center bg-slate-50 p-1.5 rounded-2xl border border-slate-100 no-scrollbar overflow-x-auto shrink-0 select-none">
-                        <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase whitespace-nowrap transition-all">Hepsi</button>
-                        <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase text-slate-400 hover:text-slate-600 whitespace-nowrap transition-all">Bitenler</button>
-                        <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase text-slate-400 hover:text-slate-600 whitespace-nowrap transition-all">Gelecek</button>
-                        <button onclick="setStatusFilter('delayed')" id="filter-delayed" class="status-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase text-slate-400 hover:text-slate-600 whitespace-nowrap transition-all">Ertelenen</button>
+                    <div id="status-tabs" class="flex items-center bg-slate-50 p-1.5 rounded-2xl border no-scrollbar overflow-x-auto shrink-0">
+                        <button onclick="setStatusFilter('all')" id="filter-all" class="status-btn active px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase transition-all">Hepsi</button>
+                        <button onclick="setStatusFilter('played')" id="filter-played" class="status-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase text-slate-400">Bitenler</button>
+                        <button onclick="setStatusFilter('pending')" id="filter-pending" class="status-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase text-slate-400">Gelecek</button>
+                        <button onclick="setStatusFilter('delayed')" id="filter-delayed" class="status-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase text-slate-400">Ertelenen</button>
                     </div>
-                    <div id="daily-quote-container" class="flex-1 flex items-center justify-center bg-indigo-50/40 border border-indigo-100/50 rounded-2xl py-3 px-6 select-none">
-                        <p class="text-[12px] font-semibold text-indigo-900/80 text-center italic leading-snug"><i class="fas fa-quote-left text-indigo-300/50 mr-2"></i><span id="daily-quote-text"></span><i class="fas fa-quote-right text-indigo-300/50 ml-2"></i></p>
-                    </div>
+                    <div class="flex-1 flex items-center justify-center bg-indigo-50/40 border border-indigo-100 rounded-2xl py-3 px-6 text-indigo-900/80 italic font-semibold text-xs text-center" id="daily-quote-text"></div>
                 </div>
-
-                <div class="relative w-full text-slate-900 group">
-                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                    <input type="text" id="team-search" oninput="handleSearch(this.value)" placeholder="Takım, lig veya salon ara..." class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-50 rounded-2xl py-3.5 pl-12 pr-6 text-sm font-semibold outline-none transition-all text-slate-800 shadow-sm placeholder:text-slate-400">
+                <div class="relative w-full group">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="team-search" oninput="handleSearch(this.value)" placeholder="Takım, lig veya salon ara..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-6 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-50 transition-all text-slate-900 shadow-sm">
                 </div>
-
-                <!-- Tarih Sekmeleri (Modern Kapsül Tasarım) -->
-                <div id="date-tabs-wrapper" class="pt-2">
-                    <div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto no-scrollbar pb-2 select-none px-1 items-center"></div>
-                </div>
-
-                <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 hidden text-slate-900 font-bold">
-                    <div class="flex items-center justify-between mb-3 px-1"><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center"><i class="fas fa-users mr-2 opacity-50"></i> Sistemdeki Takımlar <span id="total-team-count" class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md ml-2">0</span></h3></div>
-                    <div id="alphabet-index" class="drag-scroll flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-50 px-1 select-none"></div>
-                    <!-- YENİ 6'LI GRID ALANI BURADA YER ALIR (Scroll kaldırıldı, tam boy gösterilir) -->
-                    <div id="playing-teams" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 px-1 select-none text-slate-900 pt-1 pb-2 w-full"></div>
+                <!-- MASTER KURAL: TARİH SEKMELERİ -->
+                <div id="date-tabs-wrapper"><div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto no-scrollbar pb-2 px-1 text-slate-900"></div></div>
+                
+                <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 hidden">
+                    <div id="alphabet-index" class="drag-scroll flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-50"></div>
+                    <div id="playing-teams" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAÇ LİSTESİ -->
-    <main id="match-container" class="mt-12 px-3 sm:px-6 container mx-auto flex flex-col gap-5 max-w-6xl mx-auto"></main>
+    <!-- ANA MAÇ İÇERİĞİ -->
+    <main id="match-container" class="mt-12 px-3 sm:px-6 container mx-auto flex flex-col gap-6 max-w-6xl mx-auto"></main>
     
     <div id="empty-state" class="hidden flex-col items-center justify-center py-32 text-slate-300 text-center">
-        <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
-            <i class="fas fa-volleyball-ball text-4xl text-slate-300"></i>
-        </div>
-        <p class="font-bold text-lg tracking-tight text-slate-400">Bu kritere uygun maç bulunamadı.</p>
+        <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6"><i class="fas fa-volleyball-ball text-4xl text-slate-300"></i></div>
+        <p class="font-bold text-lg text-slate-400">Veri bulunamadı.</p>
     </div>
 
-    <!-- MOBİL UYUMLU İŞLEM BUTONLARI -->
-    <div class="max-w-4xl mx-auto px-4 mt-16 mb-8 flex flex-col sm:flex-row gap-5 justify-center">
-        <!-- Telefona Ekle Butonu -->
-        <button id="install-app-btn" class="w-full sm:w-auto flex-1 flex bg-[#191538] text-white py-4 px-6 rounded-2xl shadow-lg active:scale-95 transition-all items-center justify-center gap-4 border border-indigo-900/50 hover:bg-[#231d4d]">
-            <div class="w-12 h-12 rounded-full bg-indigo-600/30 flex items-center justify-center shrink-0">
-                <i class="fas fa-mobile-alt text-indigo-300 text-xl"></i>
-            </div>
-            <div class="text-left">
-                <span class="block text-[10px] text-indigo-300 font-bold tracking-widest uppercase mb-1">Uygulamayı İndir</span>
-                <span class="block text-[15px] font-black uppercase tracking-wide leading-none">Telefona Ekle</span>
-            </div>
+    <!-- MASTER KURAL: ALT AKSİYONLAR VE FOOTER -->
+    <div class="max-w-4xl mx-auto px-4 mt-16 mb-20 flex flex-col sm:flex-row gap-5 justify-center relative">
+        <button id="install-app-btn" class="w-full sm:w-auto flex-1 flex bg-[#191538] text-white py-4 px-6 rounded-2xl shadow-lg active:scale-95 transition-all items-center justify-center gap-4 border border-indigo-900/50">
+            <div class="w-12 h-12 rounded-full bg-indigo-600/30 flex items-center justify-center shrink-0"><i class="fas fa-mobile-alt text-indigo-300 text-xl"></i></div>
+            <div class="text-left leading-none"><span class="block text-[10px] text-indigo-300 font-bold tracking-widest uppercase mb-1.5">UYGULAMAYI İNDİR</span><span class="block text-[15px] font-black uppercase tracking-wide">TELEFONA EKLE</span></div>
         </button>
-
-        <!-- WhatsApp İletişim Butonu -->
         <a href="https://wa.me/905557924758" target="_blank" class="w-full sm:w-auto flex-1 bg-[#25D366] text-white py-4 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-4 hover:bg-[#20bd5a]">
-            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                <i class="fab fa-whatsapp text-white text-2xl"></i>
-            </div>
-            <div class="text-left">
-                <span class="block text-[10px] text-white/80 font-bold tracking-widest uppercase mb-1">Canlı Destek</span>
-                <span class="block text-[15px] font-black uppercase tracking-wide leading-none">0555 792 47 58</span>
-            </div>
+            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0"><i class="fab fa-whatsapp text-white text-2xl"></i></div>
+            <div class="text-left leading-none"><span class="block text-[10px] text-white/80 font-bold tracking-widest uppercase mb-1.5">CANLI DESTEK</span><span class="block text-[15px] font-black uppercase tracking-wide">0555 792 47 58</span></div>
         </a>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- KİLİTLİ ALAN BAŞLANGICI: FOOTER (BU ALAN HİÇBİR GÜNCELLEMEDE DEĞİŞTİRİLMEYECEKTİR) -->
-    <!-- ========================================================================= -->
-    <footer class="mt-16 bg-white border-t border-slate-200 pt-14 pb-12 px-6 relative">
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="absolute -top-7 left-1/2 -translate-x-1/2 bg-indigo-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_16px_rgba(79,70,229,0.3)] hover:-translate-y-1 transition-all active:scale-95 border-4 border-white">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-indigo-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:-translate-y-1 transition-all border-4 border-white z-30">
             <i class="fas fa-arrow-up"></i>
         </button>
+    </div>
 
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+    <footer class="bg-white border-t border-slate-100 pt-16 pb-12 px-6 text-slate-900">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
             <div class="flex flex-col items-center md:items-start gap-2">
-                <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shadow-inner">
-                        <i class="fas fa-volleyball-ball text-xl"></i>
-                    </div>
-                    <h3 class="text-slate-800 font-black tracking-tighter uppercase text-xl">Voleybol <span class="text-indigo-600">Day</span> Pro</h3>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 shadow-inner"><i class="fas fa-volleyball-ball text-lg"></i></div>
+                    <h3 class="text-slate-800 font-black tracking-tighter uppercase text-lg">VOLEYBOL <span class="text-indigo-600">DAY</span> PRO</h3>
                 </div>
-                <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">© 2026 Tüm Hakları Saklıdır.</p>
+                <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1">© 2026 TÜM HAKLARI SAKLIDIR.</p>
             </div>
-
-            <div class="flex gap-4">
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all text-lg shadow-sm hover:shadow-md hover:-translate-y-0.5"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all text-lg shadow-sm hover:shadow-md hover:-translate-y-0.5"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all text-lg shadow-sm hover:shadow-md hover:-translate-y-0.5"><i class="fab fa-youtube"></i></a>
+            <div class="flex gap-5">
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all text-lg"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all text-lg"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-all text-lg"><i class="fab fa-youtube"></i></a>
             </div>
-
-            <div class="flex flex-col items-center md:items-end gap-3 text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                <div class="flex gap-6">
-                    <a href="#" class="hover:text-indigo-600 transition-colors">İletişim</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors">S.S.S.</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors">Gizlilik</a>
-                </div>
-                <span class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-[9px] tracking-widest font-black">v2.5.0</span>
+            <div class="flex flex-col items-center md:items-end gap-3 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                <div class="flex gap-8"><a href="#" class="hover:text-indigo-600">İLETİŞİM</a><a href="#" class="hover:text-indigo-600">S.S.S.</a><a href="#" class="hover:text-indigo-600">GİZLİLİK</a></div>
+                <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-md text-[9px] font-black">v3.2.0</span>
             </div>
         </div>
     </footer>
-    <!-- ========================================================================= -->
-    <!-- KİLİTLİ ALAN BİTİŞİ: FOOTER -->
-    <!-- ========================================================================= -->
 </div>
 
-<!-- DETAYLI WHATSAPP MODAL -->
+<!-- ŞİFRELİ WHATSAPP PAYLAŞIM MODALI -->
 <div id="whatsapp-modal" class="modal-overlay text-slate-900">
-    <div class="modal-content shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"><i class="fas fa-times"></i></button>
-        <div class="mb-4 text-center border-b border-slate-100 pb-4">
-            <h3 class="text-lg font-black text-indigo-950 uppercase tracking-tighter">Whatsapp'ta Paylaş</h3>
-            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Maç Bilgilerini Gönder</p>
-        </div>
-        <div id="whatsapp-modal-match-info" class="flex items-center justify-between gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 mb-6 text-slate-900 text-center font-bold"></div>
-        <textarea id="whatsapp-note" rows="2" placeholder="Velilere veya takıma not ekleyin..." class="w-full bg-white border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 rounded-xl p-3.5 text-sm font-semibold outline-none resize-none mb-3 transition-all text-slate-800 placeholder:text-slate-400"></textarea>
+    <div class="modal-content shadow-2xl max-h-[95vh] overflow-y-auto custom-scrollbar flex flex-col">
+        <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors z-20"><i class="fas fa-times text-xl"></i></button>
         
-        <div id="whatsapp-roster-section" class="hidden flex-col gap-3 border-t border-slate-100 pt-5 font-bold text-slate-900">
-            <h4 class="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2 mb-1"><i class="fas fa-clipboard-list"></i> MAÇ KADROSU VE DETAYLAR</h4>
-            <input type="text" id="coach-name" placeholder="Antrenör Adı" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold outline-none transition-all text-slate-800">
-            <div class="flex gap-2">
-                <input type="time" id="meeting-time" class="w-1/3 bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold text-slate-600 outline-none transition-all">
-                <input type="text" id="meeting-location" placeholder="Toplanma Yeri" class="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold text-slate-800 outline-none transition-all">
-            </div>
-            <select id="team-serve-status" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-300 rounded-xl p-3 text-sm font-semibold text-slate-600 cursor-pointer outline-none transition-all appearance-none">
-                <option value="">Servis Durumu Belirle</option>
-                <option value="Var ✅">Servis: Var ✅</option>
-                <option value="Yok ❌">Servis: Yok ❌</option>
-            </select>
-            <div id="players-list" class="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-2 mt-2 text-slate-900 custom-scrollbar"></div>
+        <div class="mb-4 text-center border-b pb-4 shrink-0">
+            <h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter text-slate-900">WHATSAPP'TA PAYLAŞ</h3>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">GÜVENLİ GÖNDERİM PANELİ</p>
         </div>
-        <button id="whatsapp-send-btn" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-xl font-black uppercase tracking-widest flex items-center justify-center gap-3 mt-5 shadow-lg shadow-green-500/30 active:scale-95 transition-all">
-            <i class="fab fa-whatsapp text-2xl"></i> Gönder
-        </button>
+
+        <div class="mb-4 flex flex-col gap-3">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 text-slate-900">Paylaşım Yapacak Takımı Seçin:</label>
+            <div class="flex gap-2 w-full" id="wa-team-selection-row">
+                <button onclick="switchWaTargetTeam(1)" id="wa-target-t1" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="wa-logo-t1-slot"></div><span id="wa-name-t1-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1 text-slate-900">---</span></button>
+                <button onclick="switchWaTargetTeam(2)" id="wa-target-t2" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="wa-logo-t2-slot"></div><span id="wa-name-t2-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1 text-slate-900">---</span></button>
+            </div>
+        </div>
+
+        <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 mb-6 flex flex-col gap-3">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 overflow-hidden"><i class="fas fa-shield-alt text-indigo-600 text-sm shrink-0"></i><span id="wa-selected-team-label" class="text-[11px] font-black text-indigo-950 uppercase truncate">Seçim Bekleniyor...</span></div>
+                <div id="wa-auth-error" class="hidden text-[9px] font-bold text-rose-500 animate-pulse">Hatalı Şifre!</div>
+            </div>
+            <div class="relative">
+                <input type="password" id="wa-team-password" placeholder="Takım Şifresini Giriniz" class="w-full bg-white border border-slate-200 rounded-xl p-3 pr-12 text-sm font-black outline-none focus:ring-4 focus:ring-indigo-50 text-slate-900 tracking-widest">
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"><i id="wa-pass-toggle-icon" class="fas fa-eye-slash"></i></button>
+            </div>
+        </div>
+
+        <div id="whatsapp-modal-match-info" class="flex items-center justify-between gap-4 p-6 bg-slate-50 rounded-3xl border mb-6 text-center font-black shrink-0 text-slate-900"></div>
+
+        <div class="flex flex-col gap-5">
+            <textarea id="whatsapp-note" rows="2" placeholder="Velilere veya takıma not ekleyin..." class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm font-semibold outline-none resize-none text-slate-900 transition-all"></textarea>
+            
+            <div id="whatsapp-roster-section" class="flex flex-col gap-4 border-t pt-5">
+                <div class="flex items-center gap-2 mb-1 px-1"><i class="fas fa-clipboard-list text-indigo-600"></i><h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest">MAÇ KADROSU VE DETAYLAR</h4></div>
+                <div class="grid grid-cols-1 gap-3">
+                    <input type="text" id="coach-name-input" placeholder="Antrenör Adı" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none text-slate-900 focus:bg-white">
+                    <div class="flex gap-3">
+                        <input type="time" id="meeting-time-input" class="w-1/3 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-600 outline-none focus:bg-white">
+                        <input type="text" id="meeting-location-input" placeholder="Toplanma Yeri" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold outline-none text-slate-900 focus:bg-white">
+                    </div>
+                    <select id="team-serve-status-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-slate-600 outline-none cursor-pointer focus:bg-white">
+                        <option value="Servis: Var ✅">Servis: Var ✅</option>
+                        <option value="Servis: Yok ❌">Servis: Yok ❌</option>
+                    </select>
+                </div>
+                <div id="players-input-list" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar text-slate-900"></div>
+            </div>
+        </div>
+
+        <div class="pt-6 mt-2 border-t shrink-0">
+            <button id="whatsapp-send-btn" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-2xl font-black uppercase flex items-center justify-center gap-3 active:scale-95 transition-all text-lg shadow-lg">
+                <i class="fab fa-whatsapp text-2xl"></i> Gönder
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- PWA MANIFEST ENJEKSİYONU ---
-    const manifest = {
-        "name": "Voleybol Day Pro",
-        "short_name": "Voleybol Day",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#f4f7f9",
-        "theme_color": "#191538",
-        "icons": [{
-            "src": "https://blogger.googleusercontent.com/img/a/AVvXsEj2fnVtzyOrjYwlRGmx4NRF2fjvzrdScSAByydAmNFbjG_JgBRIfk8PRwsGvQmlO6KGga8nAm6--pnqEGj5l-qjl9UJ8TB4u9xtk3zy3P4XMmWUALANY6aXEFrYpx8Cs4-xaxBcnjPg-dV_22036QzPkmv_cBPNlc3LW6VpF9Ne77AY7zCzE3jzimLqvA",
-            "sizes": "192x192",
-            "type": "image/png"
-        }]
-    };
-    const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-    document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
-
-    // 1. KONFİGÜRASYON
+    // --- MASTER DATA SOURCES ---
     const REGIONS = {
-        istanbul: { name: "TVF İSTANBUL", matches: 'https://docs.google.com/spreadsheets/d/1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic/export?format=csv&gid=0', adText: "İSTANBUL REKLAM 1" },
-        kocaeli: { name: "TVF KOCAELİ", matches: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQL7iZm3gPNyfRhAqJgbETM9o90dnZL5dhRRiw8nwi7iRFSRerVJQS6_1DvtJfjnvd9sUjf4qTpzQNf/pub?gid=0&single=true&output=csv', adText: "KOCAELİ REKLAM 1" },
-        ankara: { name: "TVF ANKARA", matches: 'https://docs.google.com/spreadsheets/d/1VkQ0KW4gRmc21O7R9CHb-nj5Cedajr1-ZosP09Y0CVY/export?format=csv&gid=0', adText: "ANKARA REKLAM 1" },
-        izmir: { name: "TVF İZMİR", matches: 'https://docs.google.com/spreadsheets/d/15ZMyMFlsoWZm-LaDUv-5gLoPQEKElGk4T8levp9oThI/export?format=csv&gid=0', adText: "İZMİR REKLAM 1" }
+        istanbul: { name: "TVF İSTANBUL", matches: 'https://docs.google.com/spreadsheets/d/1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic/export?format=csv&gid=0' },
+        kocaeli: { name: "TVF KOCAELİ", matches: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQL7iZm3gPNyfRhAqJgbETM9o90dnZL5dhRRiw8nwi7iRFSRerVJQS6_1DvtJfjnvd9sUjf4qTpzQNf/pub?gid=0&single=true&output=csv' },
+        ankara: { name: "TVF ANKARA", matches: 'https://docs.google.com/spreadsheets/d/1VkQ0KW4gRmc21O7R9CHb-nj5Cedajr1-ZosP09Y0CVY/export?format=csv&gid=0' },
+        izmir: { name: "TVF İZMİR", matches: 'https://docs.google.com/spreadsheets/d/15ZMyMFlsoWZm-LaDUv-5gLoPQEKElGk4T8levp9oThI/export?format=csv&gid=0' }
     };
-
     const LOGO_DATA_SOURCE = 'https://docs.google.com/spreadsheets/d/1tze95HAdE5QzRbag--RnpzDQPlLBqHZlARJ8TuBp5Fw/export?format=csv&gid=0';
+    const ROSTER_DATA_SOURCE = 'https://docs.google.com/spreadsheets/d/1mxNG1uveIfoxFE3G0hXgJpB31XRya3anaO96cBFKZY0/export?format=csv&gid=0';
+    const AUTH_DIRECT_LINK = 'https://docs.google.com/spreadsheets/d/1SoKK3FBHZDUcjYomIG53hDgsIqA8kExOKq4vhuEeXKQ/export?format=csv&gid=0';
 
-    const MOTIVATION_QUOTES = [
-        "Başarı, hazırlık ve fırsatın buluştuğu yerdir.",
-        "Sahadaki en büyük yetenek, asla pes etmeme yeteneğidir.",
-        "Ter dökmeden dökülen gözyaşı, zafer getirmez.",
-        "Şampiyonlar salonlarda yapılmaz. Şampiyonlar içlerindeki tutkuyla oluşur.",
-        "Bir takımın gücü, her bir üyesidir. Her bir üyenin gücü ise takımdır.",
-        "Maç sahada kazanılmadan önce zihinde kazanılır."
-    ];
+    const MOTIVATION_QUOTES = ["Başarı, hazırlık ve fırsatın buluştuğu yerdir.", "Sahadaki en büyük yetenek, asla pes etmeme yeteneğidir.", "Maç sahada kazanılmadan önce zihinde kazanılır.", "Vazgeçmeyen bir takımı asla yenemezsiniz.", "Sporun gücü kalptedir."];
+    const TURKISH_DAYS = ["PAZAR", "PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ"];
 
-    let state = { 
-        allMatches: [], 
-        logos: {}, 
-        currentDate: "", 
-        selectedStatus: "all", 
-        searchQuery: "", 
-        selectedAlphabet: null, 
-        selectedTeam: null, 
-        selectedTeamGroup: "all", 
-        selectedRegion: "istanbul", 
-        currentSharingMatch: null 
-    };
+    let state = { allMatches: [], logos: {}, rosters: {}, auth: {}, currentDate: "", selectedStatus: "all", searchQuery: "", selectedAlphabet: null, selectedTeam: null, selectedTeamGroup: "all", selectedRegion: "istanbul", currentSharingMatch: null, modalCurrentTeam: null };
 
-    // --- LOGO & İSİM KONTROLLER ---
-    function normalizeForLogo(s) { 
-        if (!s) return ""; 
-        let n = s.toString().trim().toLocaleLowerCase('tr-TR');
-        n = n.replace(/^\(h\)\s*[-–—]?\s*/i, '');
-        n = n.replace(/\s+[a-z]$/i, ''); 
-        return n.replace(/[\.\,\-\(\)\s]/g, '')
-            .replace(/(sk|s\.k|spor|kulübü|derneği|voleybol|belediye|bld|belediyespor|akademi|okulları|voleybolakademi|aslan|kartal|aslanları)$/gi, ''); 
+    // --- MASTER FUNCTIONS ---
+    function setDailyQuote() {
+        const day = Math.floor((new Date().getTime() + 10800000 - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        const qEl = document.getElementById('daily-quote-text');
+        if (qEl) qEl.innerText = MOTIVATION_QUOTES[day % MOTIVATION_QUOTES.length];
     }
 
-    function cleanTeamName(s) { return s ? s.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').trim() : ""; }
-    function getCoreName(s) { return cleanTeamName(s).replace(/\s+[a-zA-Z]$/, '').trim(); }
+    function superNormalize(s) { if (!s) return ""; return s.toString().replace(/I/g, 'i').replace(/İ/g, 'i').replace(/ı/g, 'i').toLowerCase().replace(/[ğ]/g,'g').replace(/[ü]/g,'u').replace(/[ş]/g,'s').replace(/[ö]/g,'o').replace(/[ç]/g,'c').replace(/[^a-z0-9]/g, ''); }
+    function normalizeForLogo(s) { if (!s) return ""; let n = s.toString().replace(/I/g, 'ı').replace(/İ/g, 'i').toLowerCase().trim(); return n.replace(/[\.\,\-\(\)\s]/g, '').replace(/(sk|s\.k|spor|kulübü|derneği|voleybol|belediye|bld|belediyespor|akademi|okulları|voleybolakademi)$/gi, ''); }
+    function getCoreName(s) { return s ? s.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').replace(/\s+[a-zA-Z]$/, '').trim() : ""; }
+    function getGroupCode(m) { return [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim() || "Genel"; }
+    function getTodayString() { const t = new Date(new Date().getTime() + 10800000); return `${String(t.getUTCDate()).padStart(2, '0')}.${String(t.getUTCMonth() + 1).padStart(2, '0')}.${t.getUTCFullYear()}`; }
+    function getDayName(dateStr) { const pts = dateStr.split('.'); return TURKISH_DAYS[new Date(pts[2], pts[1]-1, pts[0]).getDay()]; }
 
     function getLogoHtml(teamName, classes = "w-10 h-10") {
         if (!teamName) return "";
-        const coreName = getCoreName(teamName);
-        const normTeam = normalizeForLogo(coreName); 
-        let rawUrl = null, finalUrl = null;
-        
-        const keys = Object.keys(state.logos);
-        for (const k of keys) { if (normTeam === normalizeForLogo(k)) { rawUrl = state.logos[k]; break; } }
-
-        if (rawUrl) {
-            if (rawUrl.includes('drive.google.com')) finalUrl = rawUrl; 
-            else if (rawUrl.includes('instagram') || rawUrl.includes('fbcdn') || rawUrl.includes('fbcdn.net') || rawUrl.includes('scontent')) {
-                finalUrl = `https://wsrv.nl/?url=${encodeURIComponent(rawUrl)}&w=150&h=150&fit=contain&output=webp`;
-            } else finalUrl = rawUrl;
-        }
-        
-        const initial = coreName.substring(0, 2).toUpperCase() || "VO";
-        return `<div class="team-logo-circle ${classes} bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-100 relative shrink-0 overflow-hidden">
-            <span class="fallback-text">${initial}</span>
-            ${finalUrl ? `<img src="${finalUrl}" loading="lazy" class="relative z-10" referrerpolicy="no-referrer" onerror="this.parentElement.querySelector('.fallback-text').style.display='flex'; this.style.display='none'">` : ''}
-        </div>`;
+        const core = getCoreName(teamName); const norm = normalizeForLogo(core); 
+        let finalUrl = null;
+        for (const k in state.logos) { if (norm === normalizeForLogo(k)) { finalUrl = state.logos[k]; break; } }
+        const initial = core.substring(0, 2).toUpperCase() || "VO";
+        return `<div class="team-logo-circle ${classes} bg-white shadow-sm border border-slate-100 relative shrink-0 overflow-hidden"><span class="fallback-text text-slate-900">${initial}</span>${finalUrl ? `<img src="${finalUrl}" loading="lazy" class="relative z-10" onerror="this.style.display='none'">` : ''}</div>`;
     }
 
-    // --- CSV & VERİ ---
-    function parseCSVLine(str) {
-        const result = []; let current = '', inQuotes = false;
-        for (let i = 0; i < str.length; i++) {
-            const char = str[i];
-            if (char === '"') { if (inQuotes && str[i+1] === '"') { current += '"'; i++; } else inQuotes = !inQuotes; } 
-            else if (char === ',' && !inQuotes) { result.push(current); current = ''; } 
-            else current += char;
-        }
-        result.push(current); return result;
-    }
-
-    async function fetchLogos() {
+    async function fetchAuth() { try { const r = await fetch(`${AUTH_DIRECT_LINK}&cb=${Date.now()}`); const csv = await r.text(); csv.split(/\r?\n/).slice(1).forEach(line => { const p = parseCSVLine(line); if (p.length >= 2 && p[0] && p[1]) state.auth[superNormalize(normalizeForLogo(p[0].trim()))] = p[1].toString().trim(); }); } catch (e) {} }
+    
+    async function fetchRosters() {
         try {
-            const r = await fetch(`${LOGO_DATA_SOURCE}&cb=${Date.now()}`, { cache: 'no-store' });
-            const csvText = await r.text();
-            if(csvText.toLowerCase().includes('<!doctype html>')) return;
-
-            csvText.split(/\r?\n/).slice(1).forEach(line => {
-                const parts = parseCSVLine(line);
-                if (parts.length >= 2 && parts[0] && parts[1]) {
-                    const teamName = parts[0].trim();
-                    let logoUrl = parts[1].trim().replace(/^"|"$/g, '');
-
-                    // YENİ KURAL: HTTP ise HTTPS yap
-                    logoUrl = logoUrl.replace(/^http:\/\//i, 'https://');
-
-                    let fileId = null;
-                    if (logoUrl.includes('drive.google.com/file/d/')) { const match = logoUrl.match(/\/d\/([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } 
-                    else if (logoUrl.includes('drive.google.com/open?id=')) { const match = logoUrl.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } 
-                    else if (logoUrl.includes('drive.google.com/uc?id=')) { const match = logoUrl.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; }
-
-                    if (fileId) logoUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
-                    if(logoUrl.startsWith('https')) state.logos[teamName] = logoUrl;
-                }
-            });
+            const r = await fetch(`${ROSTER_DATA_SOURCE}&cb=${Date.now()}`); const csvText = await r.text(); if(csvText.toLowerCase().includes('<!doctype html>')) return;
+            state.rosters = {}; const rows = csvText.split(/\r?\n/).map(line => parseCSVLine(line)); let lastTeam = "", lastGroup = "", lastCoach = "";
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i]; if (row.length < 2) continue;
+                const tr = (row[0]||'').replace(/^\uFEFF/, '').trim(), gr = (row[1]||'').trim(), co = (row[2]||'').trim(), no = (row[3]||'').trim(), nm = (row[4]||'').trim(), ps = (row[5]||'').trim(), img = (row[6]||'').trim();
+                if (superNormalize(tr).includes('takimadi') || superNormalize(nm).includes('oyuncuadi')) continue;
+                if (tr) lastTeam = tr; if (gr) lastGroup = gr; if (co) lastCoach = co; if (!nm || !lastTeam || !lastGroup) continue;
+                const tKey = superNormalize(normalizeForLogo(lastTeam)), gKey = superNormalize(lastGroup);
+                if (!state.rosters[tKey]) state.rosters[tKey] = {}; if (!state.rosters[tKey][gKey]) state.rosters[tKey][gKey] = { coach: lastCoach, players: [] };
+                let fImg = null; if (img && img.length > 5) { const idMatch = img.match(/\/d\/([a-zA-Z0-9_-]+)/) || img.match(/id=([a-zA-Z0-9_-]+)/); fImg = idMatch ? `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w400` : img; }
+                state.rosters[tKey][gKey].players.push({ no: no || '-', name: nm, pos: ps || 'Oyuncu', img: fImg });
+            }
         } catch (e) {}
-    }
-
-    function getTurkeyTime() { const now = new Date(); return new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (10800000)); }
-    function getTodayString() { const tr = getTurkeyTime(); return `${String(tr.getDate()).padStart(2, '0')}.${String(tr.getMonth() + 1).padStart(2, '0')}.${tr.getFullYear()}`; }
-    function isMatchPlayed(m) { return (m.s1 !== '-' && m.s1 !== '') || (m.s2 !== '-' && m.s2 !== ''); }
-    function timeToMins(t) { const p = (t || "00:00").split(':'); return (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0); }
-    function dateToValue(d) { if(!d) return 0; const p = d.split('.').map(Number); return new Date(p[2], p[1]-1, p[0]).getTime(); }
-
-    function isMatchDelayedOrMissing(m) {
-        if (isMatchPlayed(m)) return false;
-        const todayVal = dateToValue(getTodayString()), mVal = dateToValue(m.date);
-        if (mVal < todayVal) return true;
-        if (mVal === todayVal) { if (getTurkeyTime().getHours() * 60 + getTurkeyTime().getMinutes() >= timeToMins(m.time) + 120) return true; }
-        return false;
-    }
-
-    function checkLiveStatus(m) {
-        if (isMatchPlayed(m) || isMatchDelayedOrMissing(m)) return false;
-        if (m.date === getTodayString()) { if (getTurkeyTime().getHours() * 60 + getTurkeyTime().getMinutes() >= timeToMins(m.time)) return true; }
-        return false;
-    }
-
-    // --- GÜNCELLEMELER ---
-    function startLiveClock() {
-        const tEl = document.getElementById('live-time'), dEl = document.getElementById('live-date');
-        function update() {
-            const tr = getTurkeyTime();
-            if(tEl) tEl.innerText = `${String(tr.getHours()).padStart(2, '0')}:${String(tr.getMinutes()).padStart(2, '0')}`;
-            const ds = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'], ms = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-            if(dEl) dEl.innerText = `${tr.getDate()} ${ms[tr.getMonth()]} ${ds[tr.getDay()]}`;
-        }
-        update(); setInterval(update, 30000);
-    }
-
-    function setDailyQuote() {
-        const day = Math.floor((getTurkeyTime() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-        document.getElementById('daily-quote-text').innerText = MOTIVATION_QUOTES[day % MOTIVATION_QUOTES.length];
-    }
-
-    function setRegion(regionKey) {
-        if (!REGIONS[regionKey]) return;
-        state.selectedRegion = regionKey; state.selectedTeam = null; state.currentDate = ""; state.searchQuery = ""; state.selectedTeamGroup = "all";
-        document.querySelectorAll('.region-btn').forEach(b => b.className = "region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase border border-slate-200 bg-white text-slate-500 hover:border-indigo-300 transition-all shrink-0 shadow-sm");
-        document.getElementById(`btn-reg-${regionKey}`).className = "region-btn px-6 py-3 rounded-xl text-[11px] font-extrabold uppercase border border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition-all shrink-0";
-        fetchData();
     }
 
     async function fetchData() {
         try {
             document.getElementById('loading-overlay').classList.remove('hidden');
-            if (Object.keys(state.logos).length === 0) await fetchLogos();
-            const r = await fetch(`${REGIONS[state.selectedRegion].matches}${REGIONS[state.selectedRegion].matches.includes('?') ? '&' : '?'}cb=${Date.now()}`, { cache: 'no-store' });
-            state.allMatches = parseMatches(await r.text());
-            const ds = getSortedDates(), td = getTodayString();
-            if (ds.length > 0) state.currentDate = ds.includes(td) ? td : ds[0];
+            await Promise.all([
+                fetch(`${LOGO_DATA_SOURCE}&cb=${Date.now()}`).then(r => r.text()).then(txt => { txt.split(/\r?\n/).slice(1).forEach(line => { const p = parseCSVLine(line); if (p.length >= 2 && p[0] && p[1]) { let url = p[1].trim(); if (url.includes('drive.google.com')) { const id = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/); if (id) url = `https://drive.google.com/thumbnail?id=${id[1]}&sz=w400`; } state.logos[p[0].trim()] = url; } }); }),
+                fetchRosters(), fetchAuth()
+            ]);
+            const r = await fetch(`${REGIONS[state.selectedRegion].matches}&cb=${Date.now()}`), csv = await r.text();
+            state.allMatches = csv.split(/\r?\n/).slice(1).map(line => { const p = parseCSVLine(line); return { date: (p[0]||"").trim(), venue: (p[1]||"").trim(), time: (p[2]||"").trim(), t1: (p[3]||"").trim(), s1: (p[4]||"").trim()||"-", s2: (p[5]||"").trim()||"-", t2: (p[6]||"").trim(), sets: (p[7]||"").trim(), league: (p[10]||"LİG").trim(), kume: (p[10]||""), tur: (p[12]||""), gr: (p[13]||""), c: (p[9]||""), ktg: (p[11]||"") }; }).filter(m => !(m.time + m.sets + m.t1 + m.t2).toLocaleLowerCase('tr-TR').includes('iptal'));
+            const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); return new Date(p1[2], p1[1]-1, p1[0]) - new Date(p2[2], p2[1]-1, p2[0]); });
+            const today = getTodayString(); state.currentDate = ds.includes(today) ? today : (ds[0] || "");
             document.getElementById('loading-overlay').classList.add('hidden');
-            updateUI();
+            updateUI(true);
         } catch (error) { document.getElementById('loading-overlay').classList.add('hidden'); }
     }
 
-    function parseMatches(csv) {
-        return csv.split(/\r?\n/).slice(1).map(line => {
-            const p = parseCSVLine(line);
-            return { date: (p[0]||"").trim(), venue: (p[1]||"").trim(), time: (p[2]||"").trim(), t1: (p[3]||"").trim(), s1: (p[4]||"").trim()||"-", s2: (p[5]||"").trim()||"-", t2: (p[6]||"").trim(), sets: (p[7]||"").trim(), league: (p[10]||"LİG").trim(), kume: (p[10]||""), tur: (p[12]||""), gr: (p[13]||""), c: (p[9]||""), ktg: (p[11]||"") };
-        }).filter(m => !(m.time + m.sets + m.t1 + m.t2).toLocaleLowerCase('tr-TR').includes('iptal'));
-    }
+    function parseCSVLine(str) { const res = []; let cur = '', inQ = false; for (let i = 0; i < str.length; i++) { if (str[i] === '"') { if (inQ && str[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; } else if (str[i] === ',' && !inQ) { res.push(cur); cur = ''; } else cur += str[i]; } res.push(cur); return res; }
+    function isMatchPlayed(m) { return (m.s1 !== '-' && m.s1 !== '') || (m.s2 !== '-' && m.s2 !== ''); }
+    function isMatchDelayed(m) { if (isMatchPlayed(m)) return false; const t = getTodayString().split('.').reverse().join(''), md = m.date.split('.').reverse().join(''); if (md < t) return true; if (md === t) { const now = new Date(new Date().getTime() + 10800000), hm = m.time.split(':'); if (hm.length < 2) return false; const lim = parseInt(hm[0]) * 60 + parseInt(hm[1]) + 120, cur = now.getUTCHours() * 60 + now.getUTCMinutes(); return cur > lim; } return false; }
+    function checkLiveStatus(m) { if (isMatchPlayed(m)) return false; if (m.date === getTodayString()) { const now = new Date(new Date().getTime() + 10800000), hm = m.time.split(':'); if (hm.length < 2) return false; const mt = parseInt(hm[0]) * 60 + parseInt(hm[1]), ct = now.getUTCHours() * 60 + now.getUTCMinutes(); return ct >= mt && ct <= mt + 120; } return false; }
 
-    function updateUI() {
+    function updateUI(shCenter = false) {
         const sD = document.getElementById('selected-team-display'), pW = document.getElementById('playing-teams-wrapper'), dW = document.getElementById('date-tabs-wrapper');
         if (state.selectedTeam) {
-            sD.classList.remove('hidden'); sD.classList.add('flex'); dW.classList.add('hidden'); pW.classList.add('hidden');
-            document.getElementById('selected-team-logo').innerHTML = getLogoHtml(state.selectedTeam, "w-14 h-14 text-slate-900");
-            const s = calculateTeamStats(state.selectedTeam);
-            document.getElementById('selected-team-stats').innerHTML = `<div class="flex flex-col items-center flex-1 px-1 border-r border-indigo-700/50"><span class="text-[8px] uppercase font-black opacity-60 mb-0.5">Oynanan</span><span class="text-base sm:text-xl text-white">${s.played}</span></div><div class="flex flex-col items-center flex-1 px-1 border-r border-indigo-700/50 text-emerald-400"><span class="text-[8px] uppercase font-black opacity-60 mb-0.5">GALİBİYET</span><span class="text-base sm:text-xl">${s.wins}</span></div><div class="flex flex-col items-center flex-1 px-1 border-r border-indigo-700/50 text-rose-400"><span class="text-[8px] uppercase font-black opacity-60 mb-0.5">MAĞLUBİYET</span><span class="text-base sm:text-xl">${s.losses}</span></div><div class="hidden sm:flex flex-col items-center flex-1 px-1 border-r border-indigo-700/50 text-amber-400"><span class="text-[8px] uppercase font-black opacity-60 mb-0.5">ERTELENEN</span><span class="text-base sm:text-xl">${s.delayed}</span></div><div class="flex flex-col items-center flex-1 px-0.5 sm:px-1"><span class="text-[8px] uppercase font-black opacity-60 mb-0.5 text-indigo-300">OYNANACAK</span><span class="text-base sm:text-xl text-white">${s.pending}</span></div>`;
-        } else { sD.classList.add('hidden'); dW.classList.remove('hidden'); pW.classList.remove('hidden'); }
-        renderTopLogos(); renderDateTabs(); renderAlphabetTeams(); renderMatches();
+            sD.classList.replace('hidden', 'flex'); dW.classList.add('hidden'); pW.classList.add('hidden');
+            document.getElementById('selected-team-logo').innerHTML = getLogoHtml(state.selectedTeam, "w-14 h-14 border-none shadow-none text-slate-900");
+            const s = calculateFullStats(state.selectedTeam);
+            document.getElementById('selected-team-stats').innerHTML = `<div class="flex-1 border-r border-white/10 px-1 text-white">OYNANAN<br><span class="text-lg sm:text-2xl text-white">${s.p}</span></div><div class="flex-1 border-r border-white/10 px-1 text-emerald-400">GALİBİYET<br><span class="text-lg sm:text-2xl">${s.w}</span></div><div class="flex-1 border-r border-white/10 px-1 text-rose-400">MAĞLUBİYET<br><span class="text-lg sm:text-2xl">${s.l}</span></div><div class="flex-1 border-r border-white/10 px-1 text-amber-400">ERTELENEN<br><span class="text-lg sm:text-2xl">${s.d}</span></div><div class="flex-1 px-1 text-indigo-300">OYNANACAK<br><span class="text-lg sm:text-2xl">${s.n}</span></div>`;
+        } else { sD.classList.replace('flex', 'hidden'); dW.classList.remove('hidden'); pW.classList.remove('hidden'); }
+        renderTopLogos(); renderDateTabs(shCenter); renderAlphabetTeams(); renderMatches();
+    }
+
+    function calculateFullStats(tName) {
+        let p=0, w=0, l=0, d=0, n=0; const key = superNormalize(getCoreName(tName));
+        state.allMatches.forEach(m => {
+            const t1 = superNormalize(getCoreName(m.t1)), t2 = superNormalize(getCoreName(m.t2));
+            if (t1 === key || t2 === key) { if (isMatchPlayed(m)) { p++; const s1 = parseInt(m.s1), s2 = parseInt(m.s2); if (t1 === key) s1 > s2 ? w++ : l++; else s2 > s1 ? w++ : l++; } else { if (isMatchDelayed(m)) d++; else n++; } }
+        });
+        return { p, w, l, d, n };
     }
 
     function renderTopLogos() {
         const c = document.getElementById('top-logos-container'); if (!state.currentDate) return;
-        const p = new Map(); 
-        state.allMatches.filter(m => m.date === state.currentDate).forEach(m => { 
-            if(m.t1 && !isPlaceholderTeam(m.t1)) { const core = getCoreName(m.t1); p.set(core, core); }
-            if(m.t2 && !isPlaceholderTeam(m.t2)) { const core = getCoreName(m.t2); p.set(core, core); }
-        });
-        c.innerHTML = ''; Array.from(p.values()).sort((a,b) => a.localeCompare(b, 'tr')).forEach(t => {
-            const isActive = state.selectedTeam === t;
-            const chip = document.createElement('div');
-            chip.className = `flex items-center justify-center p-1.5 rounded-full bg-white transition-all cursor-pointer shrink-0 ${isActive ? 'scale-110 shadow-md ring-4 ring-indigo-100' : 'shadow-sm border border-slate-100 hover:scale-105 hover:shadow-md'}`;
-            chip.innerHTML = getLogoHtml(t, "w-11 h-11 border-none shadow-none"); 
-            chip.onclick = () => isActive ? clearSelectedTeam() : selectTeam(t);
-            c.appendChild(chip);
+        const seen = new Set(); c.innerHTML = '';
+        state.allMatches.filter(m => m.date === state.currentDate).forEach(m => {
+            [m.t1, m.t2].forEach(t => { const core = getCoreName(t); if (core && !seen.has(core) && !t.includes('.si')) { seen.add(core); const chip = document.createElement('div'); chip.className = `p-1 rounded-full bg-white transition-all cursor-pointer shrink-0 border ${state.selectedTeam === core ? 'ring-4 ring-indigo-200 border-indigo-500 scale-110' : 'border-slate-100 shadow-sm'}`; chip.innerHTML = getLogoHtml(core, "w-11 h-11 border-none"); chip.onclick = () => state.selectedTeam === core ? clearSelectedTeam() : selectTeam(core); c.appendChild(chip); } });
         });
     }
 
-    function renderDateTabs() {
-        const c = document.getElementById('date-tabs'), ds = getSortedDates(), td = getTodayString(); c.innerHTML = '';
-        let activeBtn = null;
-        ds.forEach(d => {
-            const isA = d === state.currentDate, isT = d === td;
-            const b = document.createElement('button');
-            b.className = `px-6 py-3.5 rounded-[1.2rem] text-[12px] font-bold border shrink-0 transition-all ${isA ? 'bg-indigo-50 text-indigo-700 border-indigo-500 shadow-md font-black' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50 shadow-sm'} ${isT && isA ? 'today-active-tab' : ''}`;
-            b.innerHTML = isT ? `<span class="inline-block w-2.5 h-2.5 bg-rose-500 rounded-full mr-2.5 shadow-[0_0_10px_rgba(244,63,94,0.6)]"></span>${d}` : d;
-            b.onclick = () => { state.currentDate = d; updateUI(); }; 
-            c.appendChild(b);
-            if (isA) activeBtn = b;
+    function renderDateTabs(shCenter) {
+        const c = document.getElementById('date-tabs'); c.innerHTML = '';
+        const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); return new Date(p1[2], p1[1]-1, p1[0]) - new Date(p2[2], p2[1]-1, p2[0]); });
+        let act = null; ds.forEach(d => {
+            const isA = d === state.currentDate, b = document.createElement('button');
+            b.className = `px-6 py-2.5 rounded-[1.2rem] border shrink-0 transition-all flex flex-col items-center justify-center min-w-[120px] ${isA ? 'active-date-tab' : 'bg-white text-slate-600 border-slate-200 shadow-sm'}`;
+            b.innerHTML = `<span class="text-[12px] font-bold leading-tight text-slate-900">${d}</span><span class="text-[9px] font-black opacity-60 tracking-wider mt-0.5 text-slate-500">${getDayName(d)}</span>`;
+            b.onclick = () => { state.currentDate = d; updateUI(true); }; c.appendChild(b); if (isA) act = b;
         });
-
-        if (activeBtn) {
-            setTimeout(() => {
-                const scrollPos = activeBtn.offsetLeft - (c.clientWidth / 2) + (activeBtn.clientWidth / 2);
-                c.scrollTo({ left: scrollPos, behavior: 'smooth' });
-            }, 50);
-        }
+        if (shCenter && act) { setTimeout(() => { const x = act.offsetLeft - (c.clientWidth / 2) + (act.clientWidth / 2); c.scrollTo({ left: x, behavior: 'smooth' }); }, 100); }
     }
 
     function renderAlphabetTeams() {
-        const c = document.getElementById('playing-teams'), aC = document.getElementById('alphabet-index'), m = new Map();
-        const teamGroups = {}; 
-        
-        // Hangi takımın kaç grubu olduğunu hesaplayıp kaydediyoruz
-        state.allMatches.forEach(x => { 
-            const g = [x.kume, x.ktg, x.tur, x.gr].filter(Boolean).join(' ').trim() || "Diğer";
-            if(x.t1 && !isPlaceholderTeam(x.t1)) { 
-                const core = getCoreName(x.t1); m.set(core, core); 
-                if(!teamGroups[core]) teamGroups[core] = new Set();
-                teamGroups[core].add(g);
-            }
-            if(x.t2 && !isPlaceholderTeam(x.t2)) { 
-                const core = getCoreName(x.t2); m.set(core, core); 
-                if(!teamGroups[core]) teamGroups[core] = new Set();
-                teamGroups[core].add(g);
-            }
-        });
-        
-        const teams = Array.from(m.values()).sort((a,b) => a.localeCompare(b, 'tr'));
-        document.getElementById('total-team-count').innerText = teams.length;
-        
-        const alph = ['Hepsi','0-9','A','B','C','Ç','D','E','F','G','H','I','İ','J','K','L','M','N','O','Ö','P','R','S','Ş','T','U','Ü','V','Y','Z']; aC.innerHTML = '';
-        alph.forEach(l => {
-            const b = document.createElement('button');
-            b.className = `shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-[10px] font-black ${state.selectedAlphabet === l ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
-            b.innerText = l; b.onclick = () => { state.selectedAlphabet = (state.selectedAlphabet === l ? null : l); updateUI(); }; aC.appendChild(b);
-        });
-        
-        // Yeni tasarımda boş durumu ve grid sisteminin yerleşimi
-        c.innerHTML = !state.selectedAlphabet ? '<div class="col-span-full text-[11px] text-slate-400 py-6 text-center w-full">Filtrelemek için harf seçin.</div>' : '';
-        
-        if (state.selectedAlphabet) {
-            teams.filter(t => state.selectedAlphabet === 'Hepsi' || (state.selectedAlphabet === '0-9' ? /[0-9]/.test(t.charAt(0)) : t.charAt(0).toLocaleUpperCase('tr-TR') === state.selectedAlphabet)).forEach(t => {
-                const groupCount = teamGroups[t] ? teamGroups[t].size : 0;
-                const chip = document.createElement('div');
-                
-                // YENİ: Dikey hizalanmış, ortalanmış, 6'lı grid sistemine uygun takım kartı
-                chip.className = `flex flex-col items-center justify-center text-center p-3 rounded-[1.2rem] border cursor-pointer transition-all overflow-hidden ${state.selectedTeam === t ? 'bg-indigo-50 border-indigo-500 shadow-md ring-2 ring-indigo-200' : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm hover:-translate-y-0.5'}`;
-                
-                chip.innerHTML = `
-                    ${getLogoHtml(t, "w-12 h-12 shadow-sm border border-slate-100 mb-2")} 
-                    <span class="text-[11px] font-black ${state.selectedTeam === t ? 'text-indigo-800' : 'text-slate-700'} uppercase truncate w-full" title="${t}">${t}</span>
-                    <span class="text-[9px] font-bold text-slate-400 mt-1 bg-slate-50 px-2 py-0.5 rounded-md">${groupCount} Grup</span>
-                `;
-                
-                chip.onclick = () => state.selectedTeam === t ? clearSelectedTeam() : selectTeam(t); c.appendChild(chip);
-            });
-        }
-    }
-
-    function createMatchCard(m, index) {
-        const isLive = checkLiveStatus(m), sets = parseSetScoresHtml(m.sets);
-        // Yeni Kategori Adı Birleştirici (Küme + Ktg + Tür + Gr)
-        const lgn = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || m.league;
-        
-        const displayS1 = (m.s1 === '-' || m.s1 === '') ? '0' : m.s1;
-        const displayS2 = (m.s2 === '-' || m.s2 === '') ? '0' : m.s2;
-        
-        // YENİ: Reklamın mobilde flex-1 ile genişlemesi sağlandı (sm:flex-none yerine lg:flex-none)
-        const adHtml = (index % 3 === 0) ? `<div class="flex-1 lg:flex-none w-full lg:w-[140px] h-12 bg-slate-50 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-center px-3 text-slate-400"><span class="text-[9px] font-black uppercase leading-tight">${REGIONS[state.selectedRegion].adText}</span></div>` : `<a href="https://vesportscamps.com/" target="_blank" class="flex-1 lg:flex-none w-full lg:w-[140px] h-12 bg-indigo-950 rounded-xl flex items-center justify-center text-center px-3 hover:bg-[#1e1b4b] transition-all shadow-md hover:-translate-y-0.5"><span class="text-[9px] font-black text-white uppercase leading-tight text-center">VESPORTSCAMP KAYITLARI DEVAM EDİYOR</span></a>`;
-
-        return `<div class="match-card bg-white p-5 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch lg:items-center gap-5 lg:gap-6 w-full relative overflow-hidden">
-            <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2.5">
-                <div class="bg-indigo-50/70 rounded-xl py-2.5 px-3.5 text-[10px] text-indigo-800 font-bold border border-indigo-100 flex items-center gap-2.5 uppercase truncate"><i class="fas fa-trophy text-amber-500 text-sm"></i> ${lgn}</div>
-                <div class="bg-slate-50/70 rounded-xl p-3 text-[11px] text-slate-600 font-semibold flex flex-col gap-2 relative border border-slate-100">
-                    <div class="flex items-center gap-2.5"><i class="far fa-calendar-alt text-slate-400"></i> ${m.date} - ${m.time}</div>
-                    <div class="truncate flex items-center gap-2.5"><i class="fas fa-map-marker-alt text-slate-400"></i> ${m.venue}</div>
-                    ${isLive ? '<div class="absolute top-2.5 right-2.5 flex items-center gap-1 bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded text-[8px] font-black animate-pulse"><div class="w-1.5 h-1.5 bg-rose-500 rounded-full"></div>CANLI</div>' : ''}
-                </div>
-            </div>
-            <div class="flex-1 flex flex-row items-center justify-between w-full border-t border-slate-100 lg:border-t-0 pt-5 lg:pt-0 gap-3 h-full">
-                <div class="flex flex-col gap-3.5 flex-1 min-w-0 pr-3 py-1 h-full justify-center">
-                    <div class="flex items-center gap-3.5 sm:gap-4 h-10 sm:h-11 text-slate-800">${getLogoHtml(m.t1, "w-9 h-9 sm:w-11 sm:h-11 shadow-sm")}<span class="text-xs sm:text-[15px] font-black uppercase truncate">${m.t1}</span></div>
-                    <div class="flex items-center gap-3.5 sm:gap-4 h-10 sm:h-11 text-slate-800">${getLogoHtml(m.t2, "w-9 h-9 sm:w-11 sm:h-11 shadow-sm")}<span class="text-xs sm:text-[15px] font-black uppercase truncate">${m.t2}</span></div>
-                </div>
-                <div class="flex items-center shrink-0 h-full">
-                    <div class="flex items-center gap-3 sm:gap-6">
-                        <div class="bg-[#191538] rounded-xl flex flex-col w-10 sm:w-12 text-white font-black text-sm sm:text-lg overflow-hidden shadow-lg shrink-0 h-[80px] sm:h-[96px] justify-center">
-                            <div class="flex-1 flex items-center justify-center border-b border-white/10 leading-none">${displayS1}</div>
-                            <div class="flex-1 flex items-center justify-center leading-none">${displayS2}</div>
-                        </div>
-                        <div class="flex flex-col gap-4 sm:gap-6 font-bold text-xs sm:text-sm h-[80px] sm:h-[96px] justify-center">${sets.row1}${sets.row2}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="w-full lg:w-[140px] flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0 mt-1 lg:mt-0">
-                ${adHtml}
-                <!-- YENİ: WhatsApp kutusu kaldırıldı. Sadece Text ve İkon hizalandı -->
-                <button onclick="openWhatsappModal('${encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27")}')" class="text-[#25D366] hover:text-[#20bd5a] font-black text-[13px] sm:text-[15px] flex items-center justify-center gap-1.5 shrink-0 transition-colors pr-1">WhatsApp <i class="fab fa-whatsapp text-xl sm:text-2xl"></i></button>
-            </div>
-        </div>`;
-    }
-
-    function parseSetScoresHtml(sets) {
-        let r1 = '', r2 = '', ms = sets ? [...sets.matchAll(/\((\d+)-(\d+)\)/g)] : [];
-        for (let i = 0; i < 5; i++) {
-            if (i < ms.length) {
-                const v1 = parseInt(ms[i][1]), v2 = parseInt(ms[i][2]);
-                r1 += `<span class="w-5 sm:w-7 text-center h-8 sm:h-10 flex items-center justify-center rounded-md ${v1 > v2 ? 'bg-rose-50 text-rose-600 font-black' : 'bg-slate-50 text-slate-500'}">${v1}</span>`;
-                r2 += `<span class="w-5 sm:w-7 text-center h-8 sm:h-10 flex items-center justify-center rounded-md ${v2 > v1 ? 'bg-rose-50 text-rose-600 font-black' : 'bg-slate-50 text-slate-500'}">${v2}</span>`;
-            } else { r1 += `<span class="w-5 sm:w-7 text-center h-8 sm:h-10 flex items-center justify-center text-slate-200">-</span>`; r2 += `<span class="w-5 sm:w-7 text-center h-8 sm:h-10 flex items-center justify-center text-slate-200">-</span>`; }
-        }
-        return { row1: `<div class="flex gap-1.5 sm:gap-2 items-center leading-none">${r1}</div>`, row2: `<div class="flex gap-1.5 sm:gap-2 items-center leading-none">${r2}</div>` };
-    }
-
-    function setTeamGroupFilter(g) {
-        state.selectedTeamGroup = g;
-        updateUI(); 
+        const c = document.getElementById('playing-teams'), aC = document.getElementById('alphabet-index'), seen = new Set();
+        state.allMatches.forEach(m => { [m.t1, m.t2].forEach(t => { const cr = getCoreName(t); if(cr && !t.includes('.si')) seen.add(cr); }); });
+        const teams = Array.from(seen).sort((a,b) => a.localeCompare(b, 'tr')), alph = ['Hepsi','A','B','C','Ç','D','E','F','G','H','I','İ','J','K','L','M','N','O','Ö','P','R','S','Ş','T','U','Ü','V','Y','Z']; aC.innerHTML = '';
+        alph.forEach(l => { const b = document.createElement('button'); b.className = `shrink-0 w-8 h-8 rounded-xl text-[10px] font-black ${state.selectedAlphabet === l ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`; b.innerText = l; b.onclick = () => { state.selectedAlphabet = (state.selectedAlphabet === l ? null : l); updateUI(); }; aC.appendChild(b); });
+        c.innerHTML = !state.selectedAlphabet ? '<div class="col-span-full text-slate-400 py-6 text-center text-xs">Takım seçerek listeleyin.</div>' : '';
+        if (state.selectedAlphabet) { teams.filter(t => state.selectedAlphabet === 'Hepsi' || t.charAt(0).toLocaleUpperCase('tr-TR') === state.selectedAlphabet).forEach(t => { const chip = document.createElement('div'); chip.className = `flex flex-col items-center p-3 rounded-[1.2rem] border cursor-pointer bg-white border-slate-200 hover:border-indigo-300 transition-all shadow-sm text-slate-900`; chip.innerHTML = `${getLogoHtml(t, "w-12 h-12 shadow-sm mb-2")} <span class="text-[11px] font-black text-slate-700 uppercase truncate w-full text-center text-slate-900">${t}</span>`; chip.onclick = () => selectTeam(t); c.appendChild(chip); }); }
     }
 
     function renderMatches() {
         const container = document.getElementById('match-container'); container.innerHTML = '';
-        let matches = [];
+        let matchPool = [];
         
         if (state.selectedTeam) {
-            const selCore = getCoreName(state.selectedTeam).toLocaleLowerCase('tr-TR');
-            let teamMatches = state.allMatches.filter(m => getCoreName(m.t1).toLocaleLowerCase('tr-TR') === selCore || getCoreName(m.t2).toLocaleLowerCase('tr-TR') === selCore);
+            const key = superNormalize(getCoreName(state.selectedTeam));
+            let teamMatches = state.allMatches.filter(m => superNormalize(getCoreName(m.t1)) === key || superNormalize(getCoreName(m.t2)) === key);
+            const groups = [...new Set(teamMatches.map(m => getGroupCode(m)))].sort();
             
-            const groups = [...new Set(teamMatches.map(m => [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer"))].sort();
-            
-            if (groups.length > 1) { 
-                // YENİ: Seçili takımın mini logosunu alıyoruz
-                const miniLogo = getLogoHtml(state.selectedTeam, "w-8 h-8 sm:w-9 sm:h-9 shadow-none border-none bg-transparent");
-                
-                // YENİ: Hangi grupta kaç maç olduğunu hesaplıyoruz
-                const groupCounts = {};
-                teamMatches.forEach(m => {
-                    const g = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer";
-                    groupCounts[g] = (groupCounts[g] || 0) + 1;
-                });
-
-                // YENİ: Modern ufak kart tasarımı, logo ve maç sayısı eklendi (GRID SİSTEMİ 5'Lİ)
-                let tabsHtml = `<div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pb-5 select-none">
-                    <button onclick="setTeamGroupFilter('all')" class="flex items-center justify-start gap-2.5 px-3 py-2 rounded-[1.2rem] transition-all border w-full overflow-hidden ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">
-                        ${miniLogo}
-                        <div class="flex flex-col items-start leading-none gap-1.5 overflow-hidden w-full">
-                            <span class="text-[11px] font-black uppercase truncate w-full text-left">Tüm Maçlar</span>
-                            <span class="text-[9px] font-bold ${state.selectedTeamGroup === 'all' ? 'text-indigo-200' : 'text-slate-400'}">${teamMatches.length} Maç</span>
-                        </div>
-                    </button>`;
-                
-                groups.forEach(g => {
-                    const isActive = state.selectedTeamGroup === g;
-                    tabsHtml += `<button onclick="setTeamGroupFilter('${g.replace(/'/g, "\\'")}')" class="flex items-center justify-start gap-2.5 px-3 py-2 rounded-[1.2rem] transition-all border w-full overflow-hidden ${isActive ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}">
-                        ${miniLogo}
-                        <div class="flex flex-col items-start leading-none gap-1.5 overflow-hidden w-full">
-                            <span class="text-[11px] font-black uppercase truncate w-full text-left" title="${g}">${g}</span>
-                            <span class="text-[9px] font-bold ${isActive ? 'text-indigo-200' : 'text-slate-400'}">${groupCounts[g]} Maç</span>
-                        </div>
-                    </button>`;
-                });
-                tabsHtml += `</div>`;
-                container.insertAdjacentHTML('beforeend', tabsHtml);
+            if (groups.length > 0) {
+                let tabsHtml = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-6"><button onclick="setTeamGroupFilter('all')" class="flex items-center gap-2.5 p-3 rounded-2xl border transition-all ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}">${getLogoHtml(state.selectedTeam, "w-6 h-6 border-none")} <div class="text-[10px] font-black uppercase ${state.selectedTeamGroup === 'all' ? 'text-white' : 'text-slate-900'}">Tüm Maçlar</div></button>`;
+                groups.forEach(g => { tabsHtml += `<button onclick="setTeamGroupFilter('${g.replace(/'/g, "\\'")}')" class="flex items-center gap-2.5 p-3 rounded-2xl border transition-all ${state.selectedTeamGroup === g ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}">${getLogoHtml(state.selectedTeam, "w-6 h-6 border-none")} <div class="text-[10px] font-black uppercase ${state.selectedTeamGroup === g ? 'text-white' : 'text-slate-900'}">${g}</div></button>`; });
+                tabsHtml += `</div>`; container.insertAdjacentHTML('beforeend', tabsHtml);
             }
-
-            matches = state.selectedTeamGroup === 'all' ? teamMatches : teamMatches.filter(m => {
-                const g = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer";
-                return g === state.selectedTeamGroup;
-            });
-
+            
+            if (state.selectedTeamGroup !== 'all') {
+                const tKey = superNormalize(normalizeForLogo(state.selectedTeam)), gKey = superNormalize(state.selectedTeamGroup);
+                let rData = (state.rosters[tKey] && state.rosters[tKey][gKey]) ? state.rosters[tKey][gKey] : null;
+                if (rData && rData.players.length > 0) {
+                    let rHtml = `<div class="bg-indigo-50/40 p-4 sm:p-6 rounded-[2.5rem] border border-indigo-100 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] mb-4"><div class="flex items-center justify-between mb-6 border-b border-indigo-200/50 pb-4"><h3 class="text-base font-black text-indigo-950 uppercase tracking-tighter flex items-center gap-2"><div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><i class="fas fa-users text-sm"></i></div> TAKIM KADROSU</h3>${rData.coach ? `<span class="bg-white text-indigo-700 px-4 py-2 rounded-xl text-[11px] font-black border border-indigo-200 shadow-sm uppercase font-mono text-slate-900"><i class="fas fa-whistle mr-2 text-slate-900"></i> ${rData.coach}</span>` : ''}</div><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">`;
+                    rData.players.forEach(p => { 
+                        rHtml += `<div class="bg-white border border-slate-100 rounded-[20px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col relative group"><div class="relative h-[95px] bg-gradient-to-tr from-indigo-700 to-indigo-500 w-full flex items-end justify-center overflow-hidden"><div class="concave-corner shadow-md"><span class="text-indigo-700 font-black text-[14px] leading-none">${p.no}</span><span class="text-indigo-700/50 font-bold text-[6px] uppercase tracking-widest">FORMA</span></div><div class="absolute top-2.5 right-2.5 text-right z-10"><span class="block text-white font-black text-[12px] leading-none drop-shadow-sm uppercase font-mono text-white">${(p.pos||'OYU').slice(0,3)}</span></div><div class="relative z-0 flex items-end justify-center w-full h-full pt-2">
+                        ${p.img ? `<img src="${p.img}" class="h-[95%] w-auto object-contain object-bottom transition-transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
+                        <div class="h-full w-full flex items-center justify-center" style="${p.img ? 'display:none' : ''}"><i class="fa-regular fa-user text-white/40 text-5xl drop-shadow-lg"></i></div>
+                        </div></div><div class="bg-white p-3 flex flex-col items-center justify-center flex-1"><h4 class="text-indigo-950 font-bold text-[11px] text-center leading-tight mb-2 line-clamp-2 px-1 uppercase text-slate-900">${p.name}</h4><div class="text-[9px] font-black uppercase bg-slate-50 text-slate-500 px-2 py-1 rounded border border-slate-100">${p.pos}</div></div></div>`; 
+                    }); 
+                    rHtml += `</div></div>`; container.insertAdjacentHTML('beforeend', rHtml);
+                }
+            }
+            matchPool = state.selectedTeamGroup === 'all' ? teamMatches : teamMatches.filter(m => getGroupCode(m) === state.selectedTeamGroup);
         } else {
-            matches = state.allMatches.filter(m => m.date === state.currentDate);
-            if (state.selectedStatus === 'played') matches = matches.filter(isMatchPlayed);
-            else if (state.selectedStatus === 'pending') matches = matches.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m) && !isMatchDelayedOrMissing(m));
-            else if (state.selectedStatus === 'delayed') matches = matches.filter(isMatchDelayedOrMissing);
+            matchPool = state.allMatches.filter(m => m.date === state.currentDate);
+            if (state.selectedStatus === 'played') matchPool = matchPool.filter(isMatchPlayed);
+            else if (state.selectedStatus === 'pending') matchPool = matchPool.filter(m => !isMatchPlayed(m) && !isMatchDelayed(m));
+            else if (state.selectedStatus === 'delayed') matchPool = matchPool.filter(isMatchDelayed);
             if (state.searchQuery) { 
                 const q = state.searchQuery.toLocaleLowerCase('tr-TR').trim(); 
-                matches = matches.filter(m => m.t1.toLocaleLowerCase('tr-TR').includes(q) || m.t2.toLocaleLowerCase('tr-TR').includes(q) || m.venue.toLocaleLowerCase('tr-TR').includes(q)); 
+                matchPool = matchPool.filter(m => m.t1.toLocaleLowerCase('tr-TR').includes(q) || m.t2.toLocaleLowerCase('tr-TR').includes(q) || m.venue.toLocaleLowerCase('tr-TR').includes(q)); 
             }
         }
-        
-        document.getElementById('match-count-badge').innerText = matches.length;
-        if (!matches.length) document.getElementById('empty-state').classList.replace('hidden', 'flex');
-        else {
+
+        if (!matchPool.length) { 
+            document.getElementById('empty-state').classList.replace('hidden', 'flex'); 
+        } else {
             document.getElementById('empty-state').classList.replace('flex', 'hidden');
-            const live = matches.filter(checkLiveStatus), pending = matches.filter(m => !isMatchPlayed(m) && !checkLiveStatus(m) && !isMatchDelayedOrMissing(m)), played = matches.filter(isMatchPlayed), delayed = matches.filter(isMatchDelayedOrMissing);
-            const h2Class = "text-slate-800 font-black text-2xl sm:text-3xl tracking-tighter uppercase border-b-2 border-slate-200 pb-3 mb-5";
-            if (live.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-rose-600 font-black text-2xl sm:text-3xl tracking-tighter uppercase border-b-2 border-rose-200 pb-3 mb-5 flex items-center gap-3"><div class="w-3 h-3 bg-rose-500 rounded-full animate-pulse"></div>CANLI MAÇLAR</h2>`); live.forEach((m,i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-            if (pending.length) { container.insertAdjacentHTML('beforeend', `<h2 class="${h2Class} ${live.length?'mt-12':''}">GELECEK MAÇLAR</h2>`); pending.forEach((m,i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-            if (played.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-slate-500 font-black text-2xl sm:text-3xl tracking-tighter uppercase border-b-2 border-slate-200 pb-3 mb-5 mt-12">BİTEN MAÇLAR</h2>`); played.forEach((m,i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-            if (delayed.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-amber-500 font-black text-2xl sm:text-3xl tracking-tighter uppercase border-b-2 border-amber-200 pb-3 mb-5 mt-12">ERTELENEN / SKOR BEKLENEN</h2>`); delayed.forEach((m,i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
+            const can = matchPool.filter(checkLiveStatus), bit = matchPool.filter(isMatchPlayed), ert = matchPool.filter(m => isMatchDelayed(m) && !isMatchPlayed(m)), gel = matchPool.filter(m => !isMatchPlayed(m) && !isMatchDelayed(m) && !checkLiveStatus(m));
+            
+            if (can.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-rose-600 font-black text-2xl uppercase tracking-tighter flex items-center gap-2 mb-4 mt-2"><span class="w-3 h-3 bg-rose-500 rounded-full animate-pulse"></span> CANLI MAÇLAR</h2>`); can.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
+            if (gel.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-slate-800 font-black text-2xl uppercase tracking-tighter border-b-2 pb-2 mb-4 mt-4 text-slate-900">GELECEK MAÇLAR</h2>`); gel.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
+            if (bit.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-emerald-600 font-black text-2xl uppercase tracking-tighter border-b-2 border-emerald-100 pb-2 mt-6 mb-4">BİTEN MAÇLAR</h2>`); bit.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
+            if (ert.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-amber-600 font-black text-2xl uppercase tracking-tighter border-b-2 border-amber-100 pb-2 mt-6 mb-4">ERTELENEN / SKOR BEKLENEN</h2>`); ert.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
         }
+        document.getElementById('match-count-badge').innerText = matchPool.length;
+    }
+
+    function createMatchCard(m, i) {
+        const live = checkLiveStatus(m), sA = m.sets ? [...m.sets.matchAll(/\((\d+)-(\d+)\)/g)] : [];
+        let r1 = '', r2 = ''; for(let j=0; j<5; j++){ if(j < sA.length){ const v1 = parseInt(sA[j][1]), v2 = parseInt(sA[j][2]); r1 += `<span class="w-6 h-9 flex items-center justify-center rounded-md ${v1>v2?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v1}</span>`; r2 += `<span class="w-6 h-9 flex items-center justify-center rounded-md ${v2>v1?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v2}</span>`; } else { r1 += '<span class="w-6 text-center text-slate-200">-</span>'; r2 += '<span class="w-6 text-center text-slate-200">-</span>'; } }
+        return `<div class="match-card bg-white p-5 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch lg:items-center gap-5 w-full overflow-hidden relative mb-4 shadow-sm hover:shadow-md transition-all">
+            <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2.5">
+                <div class="bg-indigo-50/70 rounded-xl py-2 px-3 text-[10px] text-indigo-800 font-black border border-indigo-100 flex items-center gap-2 uppercase truncate text-slate-900"><i class="fas fa-trophy text-amber-500"></i> ${getGroupCode(m)}</div>
+                <div class="bg-slate-50 p-3 rounded-xl text-[11px] text-slate-500 font-bold border border-slate-100 shadow-inner"><div><i class="far fa-calendar-alt mr-2 text-indigo-300"></i> ${m.date} - ${m.time}</div><div class="truncate mt-1 text-slate-900"><i class="fas fa-map-marker-alt mr-2 text-indigo-300"></i> ${m.venue}</div>${live ? '<div class="absolute top-2.5 right-2.5 bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded text-[8px] font-black animate-pulse">CANLI</div>' : ''}</div>
+            </div>
+            <div class="flex-1 flex row items-center justify-between border-t lg:border-t-0 pt-5 lg:pt-0 gap-3">
+                <div class="flex flex-col gap-3.5 flex-1 pr-3 text-slate-900 font-black uppercase text-[13px] sm:text-[15px]"><div class="flex items-center gap-3 h-10">${getLogoHtml(m.t1, "w-9 h-9")} <span class="truncate">${m.t1}</span></div><div class="flex items-center gap-3 h-10">${getLogoHtml(m.t2, "w-9 h-9")} <span class="truncate">${m.t2}</span></div></div>
+                <div class="flex items-center gap-3 sm:gap-6">
+                    <div class="bg-indigo-950 rounded-xl flex flex-col w-11 text-white font-black text-lg h-24 overflow-hidden shadow-lg shrink-0"><div class="flex-1 flex items-center justify-center border-b border-white/10 text-white">${m.s1==='-'?'0':m.s1}</div><div class="flex-1 flex items-center justify-center text-white">${m.s2==='-'?'0':m.s2}</div></div>
+                    <div class="flex flex-col gap-4 h-24 justify-center"><div class="flex gap-1 items-center text-slate-900">${r1}</div><div class="flex gap-1 items-center text-slate-900">${r2}</div></div>
+                </div>
+            </div>
+            <div class="w-full lg:w-[140px] flex row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0">
+                <a href="https://vesportscamps.com/" target="_blank" class="flex-1 lg:flex-none w-full lg:w-[120px] h-10 bg-indigo-950 rounded-xl flex items-center justify-center text-[9px] font-black text-white uppercase text-center px-2 shadow-md">VESPORTSCAMP</a>
+                <button onclick="openWhatsappModal('${encodeURIComponent(JSON.stringify(m))}')" class="text-[#25D366] font-black text-[14px] flex items-center gap-1 hover:text-[#20bd5a] transition-all">WhatsApp <i class="fab fa-whatsapp text-2xl"></i></button>
+            </div>
+        </div>`;
     }
 
     function selectTeam(t) { state.selectedTeam = t; state.searchQuery = t; state.selectedTeamGroup = "all"; updateUI(); }
-    function clearSelectedTeam() { state.selectedTeam = null; state.searchQuery = ""; state.selectedTeamGroup = "all"; updateUI(); }
-    function handleSearch(v) { state.searchQuery = v; if (v && state.selectedTeam && getCoreName(v).toLocaleLowerCase('tr-TR') !== getCoreName(state.selectedTeam).toLocaleLowerCase('tr-TR')) state.selectedTeam = null; updateUI(); }
-    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active')); document.getElementById(`filter-${s}`).classList.add('active'); updateUI(); }
-    function isPlaceholderTeam(s) { return !s || s.toLowerCase().includes(".si") || s.toLowerCase().includes("galibi"); }
-    function getSortedDates() { return [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => dateToValue(a) - dateToValue(b)); }
-    
-    function calculateTeamStats(n) {
-        const selCore = getCoreName(n).toLocaleLowerCase('tr-TR');
-        let p=0, w=0, l=0, d=0, pen=0;
-        state.allMatches.forEach(m => {
-            const t1Core = getCoreName(m.t1).toLocaleLowerCase('tr-TR'), t2Core = getCoreName(m.t2).toLocaleLowerCase('tr-TR');
-            const match1 = (t1Core === selCore), match2 = (t2Core === selCore);
-            if (match1 || match2) { 
-                const g = [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').trim() || "Diğer";
-                if (state.selectedTeamGroup !== 'all' && g !== state.selectedTeamGroup) return;
-
-                if (isMatchPlayed(m)) { const s1=parseInt(m.s1), s2=parseInt(m.s2); if (match1) { p++; if(s1>s2) w++; else l++; } if (match2) { p++; if(s2>s1) w++; else l++; } } 
-                else { if (isMatchDelayedOrMissing(m)) { if(match1) d++; if(match2) d++; } else { if(match1) pen++; if(match2) pen++; } } 
-            }
-        });
-        return { played: p, wins: w, losses: l, delayed: d, pending: pen };
-    }
-    
-    function showError(m) { const t = document.createElement('div'); t.className = "fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[200] font-bold text-sm text-center w-[90%] max-w-sm"; t.innerText = m; document.body.appendChild(t); setTimeout(() => t.remove(), 4000); }
+    function clearSelectedTeam() { state.selectedTeam = null; state.searchQuery = ""; updateUI(); }
+    function handleSearch(v) { state.searchQuery = v; updateUI(); }
+    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active')); document.getElementById(`filter-${s}`).classList.add('active'); renderMatches(); }
+    function setRegion(r) { state.selectedRegion = r; state.selectedTeam = null; fetchData(); }
+    function setTeamGroupFilter(g) { state.selectedTeamGroup = g; renderMatches(); }
+    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; document.getElementById('wa-team-password').value = ''; document.getElementById('wa-auth-error').classList.add('hidden'); }
+    function togglePasswordVisibility() { const pi = document.getElementById('wa-team-password'), ti = document.getElementById('wa-pass-toggle-icon'); if (pi.type === 'password') { pi.type = 'text'; ti.className = 'fas fa-eye'; } else { pi.type = 'password'; ti.className = 'fas fa-eye-slash'; } }
 
     function openWhatsappModal(mStr) {
         const m = JSON.parse(decodeURIComponent(mStr)); state.currentSharingMatch = m;
-        document.getElementById('whatsapp-modal').style.display = 'flex';
-        document.getElementById('whatsapp-modal-match-info').innerHTML = `<div class="flex flex-col items-center gap-2.5 w-1/3">${getLogoHtml(m.t1, "w-12 h-12 sm:w-14 sm:h-14 shadow-none border")} <span class="text-[10px] font-black text-center uppercase text-slate-700">${m.t1}</span></div><div class="flex flex-col items-center justify-center w-1/3"><span class="text-2xl font-black text-indigo-950 uppercase leading-none text-center">${isMatchPlayed(m) ? m.s1+"-"+m.s2 : "VS"}</span></div><div class="flex flex-col items-center gap-2.5 w-1/3">${getLogoHtml(m.t2, "w-12 h-12 sm:w-14 sm:h-14 shadow-none border")} <span class="text-[10px] font-black text-center uppercase text-slate-700">${m.t2}</span></div>`;
-        if (!isMatchPlayed(m)) { document.getElementById('whatsapp-roster-section').classList.replace('hidden', 'flex'); initRosterForm(); } else document.getElementById('whatsapp-roster-section').classList.replace('flex', 'hidden');
-    }
-    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
-    function initRosterForm() {
-        const l = document.getElementById('players-list'); if (l.children.length > 0) return;
-        let ns = '<option value="">No</option>'; for(let n=1; n<=99; n++) { let s = n<10 ? '0'+n : n.toString(); ns += `<option value="${s}">${s}</option>`; }
-        let h = ''; for(let i=1; i<=18; i++) {
-            h += `<div class="flex flex-row items-center gap-2 w-full mb-1.5"><span class="text-[12px] font-black text-slate-400 w-5 text-right shrink-0">${i}.</span><select id="p-num-${i}" class="bg-white border border-slate-200 rounded-lg p-2.5 text-[11px] font-bold text-slate-700 outline-none w-[55px] shrink-0 text-center">${ns}</select><input type="text" id="p-name-${i}" placeholder="Sporcu Adı" class="flex-1 min-w-0 bg-white border border-slate-200 rounded-lg p-2.5 text-[11px] font-bold text-slate-800 outline-none"><select id="p-pos-${i}" class="bg-white border border-slate-200 rounded-lg p-2.5 text-[11px] font-bold text-slate-700 outline-none w-[90px] shrink-0"><option value="">Mevki</option><option value="Pasör">Pasör</option><option value="Orta">Orta</option><option value="Smaçör">Smaçör</option><option value="Libero">Libero</option></select></div>`;
+        const modal = document.getElementById('whatsapp-modal'); modal.style.display = 'flex';
+        document.getElementById('wa-auth-error').classList.add('hidden');
+        document.getElementById('wa-team-password').value = '';
+        document.getElementById('wa-team-password').type = 'password';
+        document.getElementById('wa-pass-toggle-icon').className = 'fas fa-eye-slash';
+        
+        document.getElementById('wa-logo-t1-slot').innerHTML = getLogoHtml(m.t1, "w-8 h-8");
+        document.getElementById('wa-logo-t2-slot').innerHTML = getLogoHtml(m.t2, "w-8 h-8");
+        document.getElementById('wa-name-t1-slot').innerText = m.t1;
+        document.getElementById('wa-name-t2-slot').innerText = m.t2;
+        
+        let tid = 1; 
+        if (state.selectedTeam) { 
+            const sn = superNormalize(normalizeForLogo(state.selectedTeam)); 
+            if (sn === superNormalize(normalizeForLogo(m.t2))) tid = 2; 
         }
-        l.innerHTML = h;
+        switchWaTargetTeam(tid);
+        
+        document.getElementById('whatsapp-modal-match-info').innerHTML = `<div class="w-1/3 flex flex-col items-center gap-2 shrink-0">${getLogoHtml(m.t1, "w-14 h-14")} <span class="text-[9px] uppercase font-black line-clamp-2 text-slate-900">${m.t1}</span></div><div class="flex-1 flex flex-col items-center justify-center px-1"><span class="text-2xl font-black text-indigo-950">${isMatchPlayed(m) ? m.s1+"-"+m.s2 : "VS"}</span></div><div class="w-1/3 flex flex-col items-center gap-2 shrink-0">${getLogoHtml(m.t2, "w-14 h-14")} <span class="text-[9px] uppercase font-black line-clamp-2 text-slate-900">${m.t2}</span></div>`;
     }
-    
-    document.getElementById('whatsapp-send-btn').onclick = () => {
+
+    function switchWaTargetTeam(id) {
         const m = state.currentSharingMatch; if(!m) return;
-        const note = document.getElementById('whatsapp-note').value.trim();
-        const cat = (m.kume + " " + m.tur + " " + m.gr).trim() || m.league;
-        let msg = `*${isMatchPlayed(m) ? 'MAÇ SONUCU' : 'MAÇ GÜNÜ'}*\n🏆 Kategori: ${cat}\n\n`;
-        if(note) msg += `📝 ${note}\n\n`;
-        if (isMatchPlayed(m)) msg += `🏐 *${m.t1}* : ${m.s1}\n🏐 *${m.t2}* : ${m.s2}\n\n*Setler:*\n${m.sets.replace(/<[^>]*>/g, '')}\n`;
-        else msg += `🏐 *${m.t1}*\n🆚\n🏐 *${m.t2}*\n\n⏰ Saat: ${m.time}\n`;
-        msg += `📍 Salon: ${m.venue}\n📅 Tarih: ${m.date}\n\n`;
+        const sel = (id === 1) ? m.t1 : m.t2; state.modalCurrentTeam = sel;
+        document.querySelectorAll('.wa-team-choice-btn').forEach(b => b.classList.remove('selected'));
+        document.getElementById(`wa-target-t${id}`).classList.add('selected');
+        document.getElementById('wa-selected-team-label').innerText = sel;
+        const rosterSec = document.getElementById('whatsapp-roster-section'), list = document.getElementById('players-input-list');
+        list.innerHTML = '';
+        
         if (!isMatchPlayed(m)) {
-            const coach = document.getElementById('coach-name').value; if(coach) msg += `*Antrenör:* ${coach}\n`;
-            const serve = document.getElementById('team-serve-status').value; if(serve) msg += `*Servis:* ${serve}\n`;
-            const mt = document.getElementById('meeting-time').value, ml = document.getElementById('meeting-location').value;
-            if(mt || ml) msg += `\n*Toplanma:*\n${mt ? '⏰ Saat: '+mt+'\n' : ''}${ml ? '📍 Yer: '+ml+'\n' : ''}`;
-            let pL = ''; for(let i=1; i<=18; i++){ const n = document.getElementById(`p-num-${i}`).value, nm = document.getElementById(`p-name-${i}`).value, ps = document.getElementById(`p-pos-${i}`).value; if(nm) pL += `${i}. #${n} ${nm} - ${ps}\n`; }
-            if(pL) msg += `\n*Kadro:*\n${pL}`;
-        }
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
-        closeWhatsappModal();
-    };
-
-    function makeScrollable(id) {
-        const el = document.getElementById(id); if(!el) return;
-        let isDown = false, startX, scrollLeft;
-        el.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft; });
-        el.addEventListener('mouseleave', () => isDown = false);
-        el.addEventListener('mouseup', () => isDown = false);
-        el.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - el.offsetLeft; const walk = (x - startX) * 2; el.scrollLeft = scrollLeft - walk; });
+            rosterSec.style.display = 'flex';
+            const g = getGroupCode(m), tk = superNormalize(normalizeForLogo(sel)), gk = superNormalize(g);
+            let roster = (state.rosters[tk] && state.rosters[tk][gk]) ? state.rosters[tk][gk] : null;
+            
+            if (roster) { 
+                document.getElementById('coach-name-input').value = roster.coach || ''; 
+                roster.players.forEach((p, idx) => { if (idx < 18) addPlayerRow(idx + 1, p.no, p.name, p.pos); }); 
+            } else { 
+                document.getElementById('coach-name-input').value = ''; 
+            }
+            const cCount = list.children.length; for (let i = cCount + 1; i <= 14; i++) addPlayerRow(i);
+        } else { rosterSec.style.display = 'none'; }
     }
 
-    // --- PWA (TELEFONA EKLE) FONKSİYONLARI ---
-    let deferredPrompt;
-    const installBtn = document.getElementById('install-app-btn');
+    function addPlayerRow(i, no = '', nm = '', ps = '') {
+        const list = document.getElementById('players-input-list'), row = document.createElement('div');
+        const nPs = superNormalize(ps);
+        row.className = "flex items-center gap-2 w-full shrink-0 mb-1";
+        row.innerHTML = `<span class="text-[10px] font-black text-slate-300 w-4 text-center">${i}.</span>
+            <input type="text" id="wa-p-no-${i}" value="${no==='-'?'':no}" placeholder="No" class="w-12 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black outline-none text-slate-900 focus:bg-white shadow-sm">
+            <input type="text" id="wa-p-name-${i}" value="${nm}" placeholder="Sporcu Adı" class="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-900 focus:bg-white shadow-sm">
+            <select id="wa-p-pos-${i}" class="w-24 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold outline-none text-slate-900 focus:bg-white shadow-sm">
+                <option value="">Mevki</option>
+                <option value="Pasör" ${nPs.includes('pasor')?'selected':''}>Pasör</option>
+                <option value="Smaçör" ${nPs.includes('smacor')?'selected':''}>Smaçör</option>
+                <option value="Libero" ${nPs.includes('libero')?'selected':''}>Libero</option>
+                <option value="Orta" ${nPs.includes('orta')?'selected':''}>Orta</option>
+            </select>`;
+        list.appendChild(row);
+    }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
-
-    installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-        } else {
-            showError("Tarayıcınızın alt menüsündeki 'Paylaş' veya 'Seçenekler' ikonuna basıp 'Ana Ekrana Ekle' seçeneğini kullanarak uygulamayı indirebilirsiniz.");
+    function setupAppHandlers() {
+        const sBtn = document.getElementById('whatsapp-send-btn');
+        if (sBtn) {
+            sBtn.onclick = () => {
+                const m = state.currentSharingMatch; if(!m) return;
+                const tN = state.modalCurrentTeam, iPass = document.getElementById('wa-team-password').value.trim(), cPass = state.auth[superNormalize(normalizeForLogo(tN))];
+                if (!cPass || iPass !== cPass) { document.getElementById('wa-auth-error').classList.remove('hidden'); return; }
+                
+                const note = document.getElementById('whatsapp-note').value.trim(), cat = getGroupCode(m);
+                let msg = `${isMatchPlayed(m) ? '🏐 MAÇ SONUCU' : '🏐 MAÇ GÜNÜ'}\n🏆 Kategori: ${cat}\n\n`;
+                
+                if (isMatchPlayed(m)) { 
+                    msg += `${m.t1} ${m.s1} - ${m.s2} ${m.t2}\nMaç Tamamlandı\n`; 
+                    if(m.sets) { const cs = m.sets.replace(/<[^>]*>/g, '').replace(/[\(\)]/g, ' ').trim().split(/\s+/).join(', '); msg += `Set Skorları: ${cs}\n`; } 
+                } else {
+                    msg += `${m.t1} vs ${m.t2}\n⏰ Saat: ${m.time}\n📍 Salon: ${m.venue}\n📅 Tarih: ${m.date}\n`;
+                    const co = document.getElementById('coach-name-input').value.trim(), mt = document.getElementById('meeting-time-input').value, ml = document.getElementById('meeting-location-input').value.trim(), serve = document.getElementById('team-serve-status-input').value;
+                    if(co) msg += `👤 Antrenör: ${co}\n`; if(mt || ml) msg += `📍 Toplanma: ${mt ? mt : ''} ${ml ? '- ' + ml : ''}\n`; msg += `🚌 ${serve}\n`;
+                    let ros = ''; 
+                    for(let i=1; i<=14; i++){ 
+                        const n = document.getElementById(`wa-p-no-${i}`).value, nm = document.getElementById(`wa-p-name-${i}`).value.trim(), ps = document.getElementById(`wa-p-pos-${i}`).value; 
+                        if(nm) ros += `${i}. ${n ? n : '?'} ${nm} (${ps || 'OYU'})\n`; 
+                    }
+                    if(ros) msg += `\nMAÇ KADROSU:\n${ros}`;
+                }
+                if(note) msg += `📝 Not: ${note}\n`; 
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank'); 
+                closeWhatsappModal();
+            };
         }
-    });
+        const ib = document.getElementById('install-app-btn'); if(ib) ib.onclick = () => alert("Telefona eklemek için tarayıcı menüsünden 'Ana Ekrana Ekle' seçeneğini kullanın.");
+    }
 
     window.onload = () => { 
-        startLiveClock(); setDailyQuote(); setRegion('istanbul');
-        ['status-tabs', 'date-tabs', 'alphabet-index', 'region-tabs', 'top-logos-container'].forEach(makeScrollable);
+        setInterval(() => { const now = new Date(new Date().getTime() + 10800000); const tEl = document.getElementById('live-time'), dEl = document.getElementById('live-date'); if (tEl) tEl.innerText = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}`; if (dEl) dEl.innerText = `${now.getUTCDate()} ${TURKISH_DAYS[now.getUTCDay()]}`; }, 1000); 
+        setDailyQuote(); fetchData(); setupAppHandlers();
+        ['status-tabs', 'date-tabs', 'alphabet-index', 'region-tabs', 'top-logos-container'].forEach(id => { 
+            const el = document.getElementById(id); 
+            if(el) { 
+                el.addEventListener('mousedown', (e) => { el.isDown = true; el.startX = e.pageX - el.offsetLeft; el.scrollLeftStart = el.scrollLeft; }); 
+                window.addEventListener('mouseup', () => el.isDown = false); 
+                el.addEventListener('mousemove', (e) => { if(!el.isDown) return; e.preventDefault(); const x = e.pageX - el.offsetLeft; const walk = (x - el.startX) * 2; el.scrollLeft = el.scrollLeftStart - walk; }); 
+            } 
+        });
     };
 </script>
 </body>
