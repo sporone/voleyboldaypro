@@ -31,7 +31,7 @@
         .status-btn.active { background-color: white; color: var(--brand-primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12); }
         
         .team-logo-circle { border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex-shrink: 0; background: white; }
-        .team-logo-circle img { width: 100%; height: 100%; object-fit: contain; padding: 2px; z-index: 2; }
+        .team-logo-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; transform: scale(1.02); z-index: 2; }
         .fallback-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 9px; color: #94a3b8; text-transform: uppercase; background: #f8fafc; border-radius: 50%; }
 
         .concave-corner { 
@@ -430,20 +430,23 @@
 
     function createMatchCard(m, i) {
         const live = checkLiveStatus(m), sA = m.sets ? [...m.sets.matchAll(/\((\d+)-(\d+)\)/g)] : [];
-        let r1 = '', r2 = ''; for(let j=0; j<5; j++){ if(j < sA.length){ const v1 = parseInt(sA[j][1]), v2 = parseInt(sA[j][2]); r1 += `<span class="w-6 h-9 flex items-center justify-center rounded-md ${v1>v2?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v1}</span>`; r2 += `<span class="w-6 h-9 flex items-center justify-center rounded-md ${v2>v1?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v2}</span>`; } else { r1 += '<span class="w-6 text-center text-slate-200">-</span>'; r2 += '<span class="w-6 text-center text-slate-200">-</span>'; } }
-        return `<div class="match-card bg-white p-5 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch lg:items-center gap-5 w-full overflow-hidden relative mb-4 shadow-sm hover:shadow-md transition-all">
+        let r1 = '', r2 = ''; for(let j=0; j<5; j++){ if(j < sA.length){ const v1 = parseInt(sA[j][1]), v2 = parseInt(sA[j][2]); r1 += `<span class="w-5 sm:w-6 h-8 sm:h-9 text-[11px] sm:text-xs flex items-center justify-center rounded-md shrink-0 ${v1>v2?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v1}</span>`; r2 += `<span class="w-5 sm:w-6 h-8 sm:h-9 text-[11px] sm:text-xs flex items-center justify-center rounded-md shrink-0 ${v2>v1?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v2}</span>`; } else { r1 += '<span class="w-5 sm:w-6 text-center text-slate-200 shrink-0">-</span>'; r2 += '<span class="w-5 sm:w-6 text-center text-slate-200 shrink-0">-</span>'; } }
+        return `<div class="match-card bg-white p-4 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch lg:items-center gap-5 w-full overflow-hidden relative mb-4 shadow-sm hover:shadow-md transition-all">
             <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2.5">
                 <div class="bg-indigo-50/70 rounded-xl py-2 px-3 text-[10px] text-indigo-800 font-black border border-indigo-100 flex items-center gap-2 uppercase truncate text-slate-900"><i class="fas fa-trophy text-amber-500"></i> ${getGroupCode(m)}</div>
                 <div class="bg-slate-50 p-3 rounded-xl text-[11px] text-slate-500 font-bold border border-slate-100 shadow-inner"><div><i class="far fa-calendar-alt mr-2 text-indigo-300"></i> ${m.date} - ${m.time}</div><div class="truncate mt-1 text-slate-900"><i class="fas fa-map-marker-alt mr-2 text-indigo-300"></i> ${m.venue}</div>${live ? '<div class="absolute top-2.5 right-2.5 bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded text-[8px] font-black animate-pulse">CANLI</div>' : ''}</div>
             </div>
-            <div class="flex-1 flex row items-center justify-between border-t lg:border-t-0 pt-5 lg:pt-0 gap-3">
-                <div class="flex flex-col gap-3.5 flex-1 pr-3 text-slate-900 font-black uppercase text-[13px] sm:text-[15px]"><div class="flex items-center gap-3 h-10">${getLogoHtml(m.t1, "w-9 h-9")} <span class="truncate">${m.t1}</span></div><div class="flex items-center gap-3 h-10">${getLogoHtml(m.t2, "w-9 h-9")} <span class="truncate">${m.t2}</span></div></div>
-                <div class="flex items-center gap-3 sm:gap-6">
-                    <div class="bg-indigo-950 rounded-xl flex flex-col w-11 text-white font-black text-lg h-24 overflow-hidden shadow-lg shrink-0"><div class="flex-1 flex items-center justify-center border-b border-white/10 text-white">${m.s1==='-'?'0':m.s1}</div><div class="flex-1 flex items-center justify-center text-white">${m.s2==='-'?'0':m.s2}</div></div>
-                    <div class="flex flex-col gap-4 h-24 justify-center"><div class="flex gap-1 items-center text-slate-900">${r1}</div><div class="flex gap-1 items-center text-slate-900">${r2}</div></div>
+            <div class="flex-1 flex flex-row items-center justify-between border-t lg:border-t-0 pt-5 lg:pt-0 gap-2 sm:gap-3 min-w-0">
+                <div class="flex flex-col gap-3.5 flex-1 min-w-0 pr-1 sm:pr-3 text-slate-900 font-black uppercase text-[12px] sm:text-[14px]">
+                    <div class="flex items-center gap-2 sm:gap-3 min-h-[2.5rem]">${getLogoHtml(m.t1, "w-8 h-8 sm:w-9 sm:h-9")} <span class="line-clamp-2 leading-tight">${m.t1}</span></div>
+                    <div class="flex items-center gap-2 sm:gap-3 min-h-[2.5rem]">${getLogoHtml(m.t2, "w-8 h-8 sm:w-9 sm:h-9")} <span class="line-clamp-2 leading-tight">${m.t2}</span></div>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-5 shrink-0">
+                    <div class="bg-indigo-950 rounded-xl flex flex-col w-9 sm:w-11 text-white font-black text-sm sm:text-lg h-20 sm:h-24 overflow-hidden shadow-lg shrink-0"><div class="flex-1 flex items-center justify-center border-b border-white/10 text-white">${m.s1==='-'?'0':m.s1}</div><div class="flex-1 flex items-center justify-center text-white">${m.s2==='-'?'0':m.s2}</div></div>
+                    <div class="flex flex-col gap-2 sm:gap-4 h-20 sm:h-24 justify-center"><div class="flex gap-1 items-center text-slate-900">${r1}</div><div class="flex gap-1 items-center text-slate-900">${r2}</div></div>
                 </div>
             </div>
-            <div class="w-full lg:w-[140px] flex row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0">
+            <div class="w-full lg:w-[140px] flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0">
                 <a href="https://vesportscamps.com/" target="_blank" class="flex-1 lg:flex-none w-full lg:w-[120px] h-10 bg-indigo-950 rounded-xl flex items-center justify-center text-[9px] font-black text-white uppercase text-center px-2 shadow-md">VESPORTSCAMP</a>
                 <button onclick="openWhatsappModal('${encodeURIComponent(JSON.stringify(m))}')" class="text-[#25D366] font-black text-[14px] flex items-center gap-1 hover:text-[#20bd5a] transition-all">WhatsApp <i class="fab fa-whatsapp text-2xl"></i></button>
             </div>
