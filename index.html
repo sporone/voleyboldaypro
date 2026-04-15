@@ -261,6 +261,40 @@
 
     let state = { allMatches: [], logos: {}, rosters: {}, auth: {}, currentDate: "", selectedStatus: "all", searchQuery: "", selectedAlphabet: null, selectedTeam: null, selectedTeamGroup: "all", selectedRegion: "istanbul", currentSharingMatch: null, modalCurrentTeam: null };
 
+    // --- URL ROUTING FONKSİYONLARI ---
+    function syncStateToURL() {
+        const url = new URL(window.location);
+        if (state.selectedRegion !== 'istanbul') url.searchParams.set('bolge', state.selectedRegion);
+        else url.searchParams.delete('bolge');
+        
+        if (state.selectedTeam) {
+            url.searchParams.set('takim', state.selectedTeam);
+            document.title = `${state.selectedTeam} - Voleybol Day Pro`;
+        } else {
+            url.searchParams.delete('takim');
+            document.title = 'Voleybol Day Pro | Master Base v3.2.5';
+        }
+        window.history.pushState({ region: state.selectedRegion, team: state.selectedTeam }, '', url);
+    }
+
+    function syncURLToState() {
+        const params = new URLSearchParams(window.location.search);
+        const b = params.get('bolge');
+        const t = params.get('takim');
+        
+        state.selectedRegion = (b && REGIONS[b]) ? b : 'istanbul';
+        
+        if (t) {
+            state.selectedTeam = t;
+            state.searchQuery = t;
+            document.title = `${t} - Voleybol Day Pro`;
+        } else {
+            state.selectedTeam = null;
+            state.searchQuery = "";
+            document.title = 'Voleybol Day Pro | Master Base v3.2.5';
+        }
+    }
+
     // --- MASTER FUNCTIONS ---
     function setDailyQuote() {
         const day = Math.floor((new Date().getTime() + 10800000 - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
@@ -453,11 +487,11 @@
         </div>`;
     }
 
-    function selectTeam(t) { state.selectedTeam = t; state.searchQuery = t; state.selectedTeamGroup = "all"; updateUI(); }
-    function clearSelectedTeam() { state.selectedTeam = null; state.searchQuery = ""; updateUI(); }
+    function selectTeam(t) { state.selectedTeam = t; state.searchQuery = t; state.selectedTeamGroup = "all"; syncStateToURL(); updateUI(); }
+    function clearSelectedTeam() { state.selectedTeam = null; state.searchQuery = ""; syncStateToURL(); updateUI(); }
     function handleSearch(v) { state.searchQuery = v; updateUI(); }
     function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active')); document.getElementById(`filter-${s}`).classList.add('active'); renderMatches(); }
-    function setRegion(r) { state.selectedRegion = r; state.selectedTeam = null; fetchData(); }
+    function setRegion(r) { state.selectedRegion = r; state.selectedTeam = null; syncStateToURL(); fetchData(); }
     function setTeamGroupFilter(g) { state.selectedTeamGroup = g; renderMatches(); }
     function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; document.getElementById('wa-team-password').value = ''; document.getElementById('wa-auth-error').classList.add('hidden'); }
     function togglePasswordVisibility() { const pi = document.getElementById('wa-team-password'), ti = document.getElementById('wa-pass-toggle-icon'); if (pi.type === 'password') { pi.type = 'text'; ti.className = 'fas fa-eye'; } else { pi.type = 'password'; ti.className = 'fas fa-eye-slash'; } }
@@ -559,7 +593,18 @@
         const ib = document.getElementById('install-app-btn'); if(ib) ib.onclick = () => alert("Telefona eklemek için tarayıcı menüsünden 'Ana Ekrana Ekle' seçeneğini kullanın.");
     }
 
+    window.addEventListener('popstate', (e) => {
+        const oldRegion = state.selectedRegion;
+        syncURLToState();
+        if (oldRegion !== state.selectedRegion) {
+            fetchData();
+        } else {
+            updateUI();
+        }
+    });
+
     window.onload = () => { 
+        syncURLToState();
         setInterval(() => { const now = new Date(new Date().getTime() + 10800000); const tEl = document.getElementById('live-time'), dEl = document.getElementById('live-date'); if (tEl) tEl.innerText = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}`; if (dEl) dEl.innerText = `${now.getUTCDate()} ${TURKISH_DAYS[now.getUTCDay()]}`; }, 1000); 
         setDailyQuote(); fetchData(); setupAppHandlers();
         ['status-tabs', 'date-tabs', 'alphabet-index', 'region-tabs', 'top-logos-container'].forEach(id => { 
