@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- HTML FORM'DAN PDF'E DÖNÜŞTÜRME KÜTÜPHANESİ (Endüstri Standardı) -->
+    <!-- PDF İndirme Kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- Google AdSense -->
@@ -23,8 +23,9 @@
         :root { --brand-primary: #6366f1; --brand-secondary: #f43f5e; --brand-dark: #1e1b4b; color-scheme: light; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f7f9; scroll-behavior: smooth; color: #0f172a; -webkit-tap-highlight-color: transparent; }
         
-        .match-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #f1f5f9; border-radius: 1.5rem; }
-        .match-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08); border-color: #e2e8f0; }
+        .match-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #f1f5f9; border-radius: 1.5rem; background: white; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .match-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); border-color: #e2e8f0; }
+        
         .sticky-header { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .drag-scroll { cursor: grab; }
@@ -32,16 +33,15 @@
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
         .status-btn.active { background-color: white; color: var(--brand-primary); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12); }
         
         .team-logo-circle { border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex-shrink: 0; background: white; }
-        .team-logo-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; transform: scale(1.02); z-index: 2; }
-        .fallback-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 9px; color: #94a3b8; text-transform: uppercase; background: #f8fafc; border-radius: 50%; }
+        .team-logo-circle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; z-index: 2; }
+        .fallback-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px; color: #94a3b8; text-transform: uppercase; background: #f8fafc; border-radius: 50%; }
 
-        .concave-corner { position: absolute; top: 0; left: 0; background: white; width: 42px; height: 42px; border-bottom-right-radius: 20px; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .concave-corner::after { content: ''; position: absolute; right: -12px; top: 0; width: 12px; height: 12px; background: transparent; box-shadow: -5px -5px 0 4px white; border-top-left-radius: 12px; }
-        .concave-corner::before { content: ''; position: absolute; left: 0; bottom: -12px; width: 12px; height: 12px; background: transparent; box-shadow: -5px -5px 0 4px white; border-top-left-radius: 12px; }
-
+        .score-box { background: #1e1b4b; color: white; min-width: 52px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.8rem; box-shadow: 0 4px 12px rgba(30, 27, 75, 0.25); }
+        
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 100; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(8px); }
         .modal-content { background: white; border-radius: 2rem; padding: 1.5rem; width: 100%; max-width: 550px; position: relative; animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); max-height: 95vh; overflow-y: auto; }
         @keyframes modalPop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -49,6 +49,17 @@
         .active-date-tab { border-color: var(--brand-primary) !important; background-color: #f5f3ff !important; color: var(--brand-primary) !important; font-weight: 800 !important; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1) !important; }
         .wa-team-choice-btn { border: 2px solid #f1f5f9; transition: all 0.2s; border-radius: 1rem; cursor: pointer; }
         .wa-team-choice-btn.selected { border-color: var(--brand-primary); background-color: #f5f3ff; }
+        
+        #match-container { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        @media (min-width: 1024px) { #match-container { grid-template-columns: 1fr 1fr; } }
+        
+        .category-badge { background: #f8fafc; border: 1px solid #f1f5f9; color: #475569; font-size: 9px; font-weight: 900; padding: 4px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-flex; align-items: center; gap: 5px; }
+        .live-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        .set-pill { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 45px; }
+        .set-label { font-size: 8px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+        .set-value { font-size: 13px; font-weight: 900; padding: 3px 2px; border-radius: 8px; background: #f8fafc; color: #1e1b4b; border: 1px solid #f1f5f9; width: 100%; text-align: center; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
         
         .pdf-gizle { display: block; }
     </style>
@@ -99,7 +110,7 @@
     <div class="-mt-24 px-3 sm:px-6 container mx-auto relative z-20">
         <div class="relative max-w-6xl mx-auto flex flex-col">
             <div id="selected-team-display" class="hidden mx-auto flex-col items-center w-full max-w-[98%] sm:max-w-5xl px-2 mb-6">
-                <div onclick="clearSelectedTeam()" class="bg-[#191538]/95 backdrop-blur-xl border border-indigo-500/30 p-4 rounded-3xl shadow-2xl flex items-center w-full cursor-pointer hover:scale-[1.01] transition-all text-white overflow-hidden text-center">
+                <div onclick="clearSelectedTeam()" class="bg-[#191538]/95 backdrop-blur-xl border border-indigo-500/30 p-4 rounded-3xl shadow-2xl flex items-center w-full cursor-pointer hover:scale-[1.01] transition-all text-white overflow-hidden text-center text-slate-900">
                     <div id="selected-team-logo" class="flex items-center justify-center bg-white rounded-2xl p-1 shrink-0 w-16 h-16 mr-2 sm:mr-6"></div>
                     <div id="selected-team-stats" class="flex-1 flex items-center justify-around font-black text-[10px] sm:text-xs tracking-tighter uppercase text-white"></div>
                 </div>
@@ -128,19 +139,25 @@
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="text" id="team-search" oninput="handleSearch(this.value)" placeholder="Takım, lig veya salon ara..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 pl-12 pr-6 text-sm font-semibold outline-none focus:ring-4 focus:ring-indigo-50 transition-all text-slate-900 shadow-sm">
                 </div>
+                
                 <div id="date-tabs-wrapper"><div id="date-tabs" class="drag-scroll flex gap-3 overflow-x-auto no-scrollbar pb-2 px-1 text-slate-900"></div></div>
-                <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5 hidden">
+                
+                <div id="playing-teams-wrapper" class="border-t border-slate-100 pt-5">
                     <div id="alphabet-index" class="drag-scroll flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-50"></div>
+                    <div id="alphabet-instruction" class="text-slate-400 py-6 text-center text-xs font-semibold">Takım seçerek listeleyin.</div>
                     <div id="playing-teams" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <main id="match-container" class="mt-12 px-3 sm:px-6 container mx-auto flex flex-col gap-6 max-w-6xl mx-auto"></main>
+    <main class="mt-8 px-3 sm:px-6 container mx-auto max-w-6xl">
+        <div id="match-container"></div>
+    </main>
+
     <div id="empty-state" class="hidden flex-col items-center justify-center py-32 text-slate-300 text-center"><div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6"><i class="fas fa-volleyball-ball text-4xl text-slate-300"></i></div><p class="font-bold text-lg text-slate-400">Veri bulunamadı.</p></div>
 
-    <div class="max-w-4xl mx-auto px-4 mt-16 mb-20 flex flex-col sm:flex-row gap-5 justify-center relative">
+    <div class="max-w-4xl mx-auto px-4 mt-16 mb-20 flex flex-col sm:flex-row gap-5 justify-center relative text-slate-900">
         <button id="install-app-btn" class="w-full sm:w-auto flex-1 flex bg-[#191538] text-white py-4 px-6 rounded-2xl shadow-lg active:scale-95 transition-all items-center justify-center gap-4 border border-indigo-900/50">
             <div class="w-12 h-12 rounded-full bg-indigo-600/30 flex items-center justify-center shrink-0"><i class="fas fa-mobile-alt text-indigo-300 text-xl"></i></div>
             <div class="text-left leading-none"><span class="block text-[10px] text-indigo-300 font-bold tracking-widest uppercase mb-1.5">UYGULAMAYI İNDİR</span><span class="block text-[15px] font-black uppercase tracking-wide">TELEFONA EKLE</span></div>
@@ -174,12 +191,12 @@
 <div id="whatsapp-modal" class="modal-overlay text-slate-900">
     <div class="modal-content shadow-2xl custom-scrollbar max-w-[550px]">
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors z-20"><i class="fas fa-times text-xl"></i></button>
-        <div class="mb-4 text-center border-b pb-4 shrink-0"><h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter text-slate-900">WHATSAPP'TA PAYLAŞ</h3><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">GÜVENLİ GÖNDERİM PANELİ</p></div>
+        <div class="mb-4 text-center border-b pb-4 shrink-0"><h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter text-slate-900 text-center">WHATSAPP'TA PAYLAŞ</h3><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">GÜVENLİ GÖNDERİM PANELİ</p></div>
         <div class="mb-4 flex flex-col gap-3">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 text-slate-900">Paylaşım Yapacak Takımı Seçin:</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Paylaşım Yapacak Takımı Seçin:</label>
             <div class="flex gap-2 w-full" id="wa-team-selection-row">
-                <button onclick="switchWaTargetTeam(1)" id="wa-target-t1" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="wa-logo-t1-slot"></div><span id="wa-name-t1-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1 text-slate-900">---</span></button>
-                <button onclick="switchWaTargetTeam(2)" id="wa-target-t2" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="wa-logo-t2-slot"></div><span id="wa-name-t2-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1 text-slate-900">---</span></button>
+                <button onclick="switchWaTargetTeam(1)" id="wa-target-t1" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="wa-logo-t1-slot"></div><span id="wa-name-t1-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1">---</span></button>
+                <button onclick="switchWaTargetTeam(2)" id="wa-target-t2" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="wa-logo-t2-slot"></div><span id="wa-name-t2-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1">---</span></button>
             </div>
         </div>
         <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 mb-6 flex flex-col gap-3">
@@ -192,7 +209,7 @@
                 <button type="button" onclick="togglePasswordVisibility('wa-team-password', 'wa-pass-toggle-icon')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors"><i id="wa-pass-toggle-icon" class="fas fa-eye-slash"></i></button>
             </div>
         </div>
-        <div id="whatsapp-modal-match-info" class="flex items-center justify-between gap-4 p-6 bg-slate-50 rounded-3xl border mb-6 text-center font-black shrink-0 text-slate-900"></div>
+        <div id="whatsapp-modal-match-info" class="flex items-center justify-between gap-4 p-6 bg-slate-50 rounded-3xl border mb-6 text-center font-black shrink-0"></div>
         <div class="flex flex-col gap-5">
             <textarea id="whatsapp-note" rows="2" placeholder="Velilere veya takıma not ekleyin..." class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm font-semibold outline-none resize-none text-slate-900 transition-all"></textarea>
             <div id="whatsapp-roster-section" class="flex flex-col gap-4 border-t pt-5">
@@ -209,33 +226,32 @@
             </div>
         </div>
         <div class="pt-6 mt-2 border-t shrink-0">
-            <button id="whatsapp-send-btn" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-2xl font-black uppercase flex items-center justify-center gap-3 active:scale-95 transition-all text-lg shadow-lg"><i class="fab fa-whatsapp text-2xl"></i> Gönder</button>
+            <button id="whatsapp-send-btn" onclick="sendWhatsappMessage()" class="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-2xl font-black uppercase flex items-center justify-center gap-3 active:scale-95 transition-all text-lg shadow-lg"><i class="fab fa-whatsapp text-2xl"></i> Gönder</button>
         </div>
     </div>
 </div>
 
-<!-- MAÇ RAPORU MODALI -->
 <div id="report-modal" class="modal-overlay text-slate-900">
     <div class="modal-content shadow-2xl max-w-[850px] custom-scrollbar">
         <button onclick="closeReportModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors z-20"><i class="fas fa-times text-xl"></i></button>
         
-        <div class="mb-4 text-center border-b pb-4 shrink-0">
-            <h3 class="text-xl font-black text-indigo-950 uppercase tracking-tighter text-slate-900">RESMİ MAÇ RAPORU</h3>
+        <div class="mb-4 text-center border-b pb-4 shrink-0 text-slate-900">
+            <h3 class="text-xl font-black uppercase tracking-tighter">RESMİ MAÇ RAPORU</h3>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">ANTRENÖRLER İÇİN ANALİZ EKRANI</p>
         </div>
 
-        <div id="report-auth-section" class="max-w-[550px] mx-auto">
+        <div id="report-auth-section" class="max-w-[550px] mx-auto text-slate-900">
             <div class="mb-4 flex flex-col gap-3">
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 text-slate-900">Raporu Oluşturacak Takımı Seçin:</label>
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Raporu Oluşturacak Takımı Seçin:</label>
                 <div class="flex gap-2 w-full" id="rep-team-selection-row">
-                    <button onclick="switchReportTargetTeam(1)" id="rep-target-t1" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="rep-logo-t1-slot"></div><span id="rep-name-t1-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1 text-slate-900">---</span></button>
-                    <button onclick="switchReportTargetTeam(2)" id="rep-target-t2" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="rep-logo-t2-slot"></div><span id="rep-name-t2-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1 text-slate-900">---</span></button>
+                    <button onclick="switchReportTargetTeam(1)" id="rep-target-t1" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="rep-logo-t1-slot"></div><span id="rep-name-t1-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1">---</span></button>
+                    <button onclick="switchReportTargetTeam(2)" id="rep-target-t2" class="wa-team-choice-btn flex-1 p-3 rounded-xl flex flex-col items-center bg-white shadow-sm hover:bg-indigo-50/50"><div id="rep-logo-t2-slot"></div><span id="rep-name-t2-slot" class="text-[9px] font-black uppercase text-center truncate w-full mt-1">---</span></button>
                 </div>
             </div>
 
             <div class="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 mb-6 flex flex-col gap-3">
                 <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2 overflow-hidden"><i class="fas fa-shield-alt text-indigo-600 text-sm shrink-0"></i><span id="rep-selected-team-label" class="text-[11px] font-black text-indigo-950 uppercase truncate">Seçim Bekleniyor...</span></div>
+                    <div class="flex items-center gap-2 overflow-hidden text-slate-900"><i class="fas fa-shield-alt text-indigo-600 text-sm shrink-0"></i><span id="rep-selected-team-label" class="text-[11px] font-black uppercase truncate">Seçim Bekleniyor...</span></div>
                     <div id="rep-auth-error" class="hidden text-[9px] font-bold text-rose-500 animate-pulse">Hatalı Şifre!</div>
                 </div>
                 <div class="relative">
@@ -246,15 +262,13 @@
             </div>
         </div>
 
-        <!-- DOĞRUDAN FORM VE PDF İNDİRME EKRANI -->
         <div id="report-form-section" class="hidden flex-col gap-5">
-            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3">
+            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3 text-slate-900">
                 <h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest border-b pb-2">1. Maçın Genel Özeti</h4>
-                <textarea id="rep-match-summary" rows="2" placeholder="Örn: İlk setteki servis karşılama hataları düzeltildikten sonra oyun kontrolümüz altına girdi." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-semibold outline-none resize-none text-slate-900"></textarea>
+                <textarea id="rep-match-summary" rows="2" placeholder="Örn: İlk setteki servis karşılama hataları düzeltildikten sonra oyun kontrolümüz altına girdi." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-semibold outline-none resize-none"></textarea>
             </div>
 
-            <!-- ARAYÜZ İÇİN İSTEDİĞİNİZ TEK SATIR DİZİLİM -->
-            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3">
+            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3 text-slate-900">
                 <h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest border-b pb-2">2. Takım Genel Değerlendirmesi (1-5 Puan)</h4>
                 <div class="flex flex-col lg:flex-row gap-2 w-full">
                     <div class="flex-1 flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm min-w-0">
@@ -280,15 +294,15 @@
                 </div>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3">
+            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3 text-slate-900">
                 <h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest border-b pb-2">3. Bireysel Oyuncu Performansı</h4>
                 <div id="rep-players-list" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar text-slate-900"></div>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3">
-                <h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest border-b pb-2">4. Sonuç ve Eylem Planı (Antrenman Çıktısı)</h4>
-                <input type="text" id="rep-focus-tech" placeholder="Teknik Odak: (Örn: 1 ve 5 numaradan gelen servislere manşet çalışması)" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none text-slate-900">
-                <input type="text" id="rep-focus-mental" placeholder="Taktik/Mental Odak: (Örn: Geriye düşülen setlerdeki paniği kırmak için baskı antrenmanı)" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none text-slate-900">
+            <div class="bg-slate-50 p-4 rounded-2xl border flex flex-col gap-3 text-slate-900">
+                <h4 class="text-[11px] font-black text-indigo-600 uppercase tracking-widest border-b pb-2">4. Sonuç ve Eylem Planı</h4>
+                <input type="text" id="rep-focus-tech" placeholder="Teknik Odak..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none text-slate-900 shadow-sm">
+                <input type="text" id="rep-focus-mental" placeholder="Taktik/Mental Odak..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-bold outline-none text-slate-900 shadow-sm">
             </div>
 
             <div class="flex flex-col gap-3 mt-2 max-w-[550px] mx-auto w-full">
@@ -304,57 +318,15 @@
 </div>
 
 <script>
-    // --- HELPERS ---
-    function parseCSVLine(str) { 
-        if (!str) return [];
-        const res = []; let cur = '', inQ = false; 
-        for (let i = 0; i < str.length; i++) { 
-            if (str[i] === '"') { 
-                if (inQ && str[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; 
-            } else if (str[i] === ',' && !inQ) { res.push(cur); cur = ''; } else cur += str[i]; 
-        } 
-        res.push(cur); return res; 
-    }
-
-    function superNormalize(s) { if (!s) return ""; return s.toString().replace(/I/g, 'i').replace(/İ/g, 'i').replace(/ı/g, 'i').toLowerCase().replace(/[ğ]/g,'g').replace(/[ü]/g,'u').replace(/[ş]/g,'s').replace(/[ö]/g,'o').replace(/[ç]/g,'c').replace(/[^a-z0-9]/g, ''); }
-    function normalizeForLogo(s) { if (!s) return ""; let n = s.toString().replace(/I/g, 'ı').replace(/İ/g, 'i').toLowerCase().trim(); return n.replace(/[\.\,\-\(\)\s]/g, '').replace(/(sk|s\.k|spor|kulübü|derneği|voleybol|belediye|bld|belediyespor|akademi|okulları|voleybolakademi)$/gi, ''); }
-    function getCoreName(s) { return s ? s.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').replace(/\s+[a-zA-Z]$/, '').trim() : ""; }
-    function getGroupCode(m) { return [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim() || "Genel"; }
-    function getTodayString() { const t = new Date(); const tr = new Date(t.getTime() + (t.getTimezoneOffset() * 60000) + (3600000 * 3)); return `${String(tr.getDate()).padStart(2, '0')}.${String(tr.getMonth() + 1).padStart(2, '0')}.${tr.getFullYear()}`; }
-    function getDayName(dateStr) { if(!dateStr) return ""; const pts = dateStr.split('.'); const d = new Date(pts[2], pts[1]-1, pts[0]); return TURKISH_DAYS[d.getDay()]; }
-    
-    function isMatchPlayed(m) { return (m.s1 !== '-' && m.s1 !== '') || (m.s2 !== '-' && m.s2 !== ''); }
-    function isMatchDelayed(m) { 
-        if (isMatchPlayed(m)) return false; 
-        const today = getTodayString().split('.').reverse().join(''); 
-        const matchDate = (m.date || "").split('.').reverse().join(''); 
-        if (matchDate < today) return true; 
-        if (matchDate === today) { 
-            const now = new Date(); 
-            const trNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 3));
-            const hm = (m.time || "00:00").split(':'); 
-            if (hm.length < 2) return false; 
-            const limitMins = parseInt(hm[0]) * 60 + parseInt(hm[1]) + 120; 
-            const currentMins = trNow.getHours() * 60 + trNow.getMinutes(); 
-            return currentMins > limitMins; 
-        } 
-        return false; 
-    }
-    function checkLiveStatus(m) { 
-        if (isMatchPlayed(m)) return false; 
-        if (m.date === getTodayString()) { 
-            const now = new Date(); 
-            const trNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 3));
-            const hm = (m.time || "00:00").split(':'); 
-            if (hm.length < 2) return false; 
-            const matchMins = parseInt(hm[0]) * 60 + parseInt(hm[1]); 
-            const currentMins = trNow.getHours() * 60 + trNow.getMinutes(); 
-            return currentMins >= matchMins && currentMins <= matchMins + 120; 
-        } 
-        return false; 
-    }
-
-    // --- MASTER CONSTANTS & DATA SOURCES ---
+    // --- SABİTLER ---
+    const TURKISH_DAYS = ["PAZAR", "PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ"];
+    const MOTIVATION_QUOTES = [
+        "Başarı, hazırlık ve fırsatın buluştuğu yerdir.",
+        "Sahadaki en büyük yetenek, asla pes etmeme yeteneğidir.",
+        "Maç sahada kazanılmadan önce zihinde kazanılır.",
+        "Vazgeçmeyen bir takımı asla yenemezsiniz.",
+        "Sporun gücü kalptedir."
+    ];
     const REGIONS = {
         istanbul: { name: "TVF İSTANBUL", matches: 'https://docs.google.com/spreadsheets/d/1czqD3fVZD-P8zuefoikXfIisTmqSbSxN-4YXiibxkic/export?format=csv&gid=0' },
         kocaeli: { name: "TVF KOCAELİ", matches: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQL7iZm3gPNyfRhAqJgbETM9o90dnZL5dhRRiw8nwi7iRFSRerVJQS6_1DvtJfjnvd9sUjf4qTpzQNf/pub?gid=0&single=true&output=csv' },
@@ -364,9 +336,6 @@
     const LOGO_DATA_SOURCE = 'https://docs.google.com/spreadsheets/d/1tze95HAdE5QzRbag--RnpzDQPlLBqHZlARJ8TuBp5Fw/export?format=csv&gid=0';
     const ROSTER_DATA_SOURCE = 'https://docs.google.com/spreadsheets/d/1mxNG1uveIfoxFE3G0hXgJpB31XRya3anaO96cBFKZY0/export?format=csv&gid=0';
     const AUTH_DIRECT_LINK = 'https://docs.google.com/spreadsheets/d/1SoKK3FBHZDUcjYomIG53hDgsIqA8kExOKq4vhuEeXKQ/export?format=csv&gid=0';
-
-    const MOTIVATION_QUOTES = ["Başarı, hazırlık ve fırsatın buluştuğu yerdir.", "Sahadaki en büyük yetenek, asla pes etmeme yeteneğidir.", "Maç sahada kazanılmadan önce zihinde kazanılır.", "Vazgeçmeyen bir takımı asla yenemezsiniz.", "Sporun gücü kalptedir."];
-    const TURKISH_DAYS = ["PAZAR", "PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ"];
 
     const REPORT_PROS_OPTIONS = `
         <option value="-">Seçiniz</option>
@@ -398,7 +367,6 @@
             <option value="Mental: Taktik Disipline Uyum">Taktik Disipline Uyum</option>
         </optgroup>
     `;
-
     const REPORT_CONS_OPTIONS = `
         <option value="-">Seçiniz</option>
         <optgroup label="SERVİS">
@@ -430,25 +398,76 @@
         </optgroup>
     `;
 
-    let state = { allMatches: [], logos: {}, rosters: {}, auth: {}, currentDate: "", selectedStatus: "all", searchQuery: "", selectedAlphabet: null, selectedTeam: null, selectedTeamGroup: "all", selectedRegion: "istanbul", currentSharingMatch: null, modalCurrentTeam: null, modalCurrentReportTeam: null, reportPlayersCache: [] };
+    let state = { 
+        allMatches: [], logos: {}, rosters: {}, auth: {}, 
+        currentDate: "", selectedStatus: "all", searchQuery: "", selectedAlphabet: null, 
+        selectedTeam: null, selectedTeamGroup: "all", selectedRegion: "istanbul", 
+        currentSharingMatch: null, modalCurrentTeam: null, modalCurrentReportTeam: null, reportPlayersCache: [] 
+    };
 
-    // --- UI INTERACTION LOGIC ---
-    function selectTeam(t) { state.selectedTeam = t; state.searchQuery = t; state.selectedTeamGroup = "all"; syncStateToURL(); updateUI(); }
-    function clearSelectedTeam() { state.selectedTeam = null; state.searchQuery = ""; syncStateToURL(); updateUI(); }
-    function setRegion(r) { state.selectedRegion = r; state.selectedTeam = null; syncStateToURL(); fetchData(); }
-    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); renderMatches(); }
-    function setTeamGroupFilter(g) { state.selectedTeamGroup = g; renderMatches(); }
-    function handleSearch(v) { state.searchQuery = v; updateUI(); }
-
-    // --- URL ROUTING ---
-    function syncStateToURL() {
-        try {
-            const url = new URL(window.location);
-            if (state.selectedRegion !== 'istanbul') url.searchParams.set('bolge', state.selectedRegion); else url.searchParams.delete('bolge');
-            if (state.selectedTeam) { url.searchParams.set('takim', state.selectedTeam); document.title = `${state.selectedTeam} - Voleybol Day Pro`; } 
-            else { url.searchParams.delete('takim'); document.title = 'Voleybol Day Pro | Master Base v3.2.5'; }
-            window.history.pushState({ region: state.selectedRegion, team: state.selectedTeam }, '', url);
-        } catch (e) {}
+    // --- HELPER FONKSİYONLAR ---
+    function parseCSVLine(str) { 
+        if (!str) return [];
+        const res = []; let cur = '', inQ = false; 
+        for (let i = 0; i < str.length; i++) { 
+            if (str[i] === '"') { if (inQ && str[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; } 
+            else if (str[i] === ',' && !inQ) { res.push(cur); cur = ''; } else cur += str[i]; 
+        } 
+        res.push(cur); return res; 
+    }
+    
+    function superNormalize(s) { 
+        if (!s) return ""; 
+        return s.toString().trim()
+            .replace(/İ/g, 'i').replace(/I/g, 'ı')
+            .toLocaleLowerCase('tr-TR')
+            .replace(/[ğ]/g,'g').replace(/[ü]/g,'u').replace(/[ş]/g,'s').replace(/[ö]/g,'o').replace(/[ç]/g,'c')
+            .replace(/[^a-z0-9]/g, ''); 
+    }
+    
+    function normalizeForLogo(s) { 
+        if (!s) return ""; 
+        let n = s.toString().trim()
+            .replace(/İ/g, 'i').replace(/I/g, 'ı')
+            .toLocaleLowerCase('tr-TR'); 
+        return n.replace(/[\.\,\-\(\)\s]/g, '')
+            .replace(/(sk|s\.k|spor|kulübü|derneği|voleybol|belediye|bld|belediyespor|akademi|okulları|voleybolakademi)$/gi, ''); 
+    }
+    
+    function getCoreName(s) { 
+        return s ? s.toString().replace(/^\(H\)\s*[-–—]?\s*/i, '').replace(/\s+[a-zA-Z]$/, '').trim() : ""; 
+    }
+    
+    function getGroupCode(m) { return [m.kume, m.ktg, m.tur, m.gr].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim() || "Genel"; }
+    function getTodayString() { const t = new Date(); const tr = new Date(t.getTime() + (t.getTimezoneOffset() * 60000) + (3600000 * 3)); return `${String(tr.getDate()).padStart(2, '0')}.${String(tr.getMonth() + 1).padStart(2, '0')}.${tr.getFullYear()}`; }
+    function getDayName(dateStr) { if(!dateStr) return ""; const pts = dateStr.split('.'); const d = new Date(pts[2]||0, (pts[1]||1)-1, pts[0]||0); return TURKISH_DAYS[d.getDay()] || ""; }
+    function isMatchPlayed(m) { return (m.s1 && m.s1 !== '-' && m.s1 !== '') || (m.s2 && m.s2 !== '-' && m.s2 !== ''); }
+    
+    function checkLiveStatus(m) { 
+        if (isMatchPlayed(m)) return false; 
+        if (m.date === getTodayString()) { 
+            const now = new Date(); const trNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 3)); 
+            const hm = (m.time || "00:00").split(':'); if (hm.length < 2) return false; 
+            const matchMins = parseInt(hm[0]||0) * 60 + parseInt(hm[1]||0); 
+            const currentMins = trNow.getHours() * 60 + trNow.getMinutes(); 
+            return currentMins >= matchMins && currentMins <= matchMins + 120; 
+        } 
+        return false; 
+    }
+    
+    function isMatchDelayed(m) { 
+        if (isMatchPlayed(m)) return false; 
+        const today = getTodayString().split('.').map(n => n.padStart(2, '0')).reverse().join(''); 
+        const matchDate = (m.date || "").split('.').map(n => n.padStart(2, '0')).reverse().join(''); 
+        if (matchDate < today) return true; 
+        if (matchDate === today) { 
+            const now = new Date(); const trNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 3)); 
+            const hm = (m.time || "00:00").split(':'); if (hm.length < 2) return false; 
+            const limitMins = parseInt(hm[0]||0) * 60 + parseInt(hm[1]||0) + 120; 
+            const currentMins = trNow.getHours() * 60 + trNow.getMinutes(); 
+            return currentMins > limitMins; 
+        } 
+        return false; 
     }
 
     function syncURLToState() {
@@ -456,332 +475,444 @@
             const params = new URLSearchParams(window.location.search);
             const b = params.get('bolge'), t = params.get('takim');
             state.selectedRegion = (b && REGIONS[b]) ? b : 'istanbul';
-            if (t) { state.selectedTeam = t; state.searchQuery = t; document.title = `${t} - Voleybol Day Pro`; } 
-            else { state.selectedTeam = null; state.searchQuery = ""; document.title = 'Voleybol Day Pro | Master Base v3.2.5'; }
+            if (t) { state.selectedTeam = t; state.searchQuery = t; document.title = `${t} - Voleybol Day Pro`; }
         } catch (e) {}
     }
 
-    // --- LOGIC ---
-    function setDailyQuote() {
-        const day = Math.floor((new Date().getTime() + 10800000 - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-        const qEl = document.getElementById('daily-quote-text');
-        if (qEl) qEl.innerText = MOTIVATION_QUOTES[day % MOTIVATION_QUOTES.length];
-    }
-
-    function getLogoHtml(teamName, classes = "w-10 h-10") {
-        if (!teamName) return "";
-        const core = getCoreName(teamName); const norm = normalizeForLogo(core); 
-        let finalUrl = null;
-        for (const k in state.logos) { if (norm === normalizeForLogo(k)) { finalUrl = state.logos[k]; break; } }
-        const initial = core.substring(0, 2).toUpperCase() || "VO";
-        return `<div class="team-logo-circle ${classes} bg-white shadow-sm border border-slate-100 relative shrink-0 overflow-hidden"><span class="fallback-text text-slate-900">${initial}</span>${finalUrl ? `<img src="${finalUrl}" loading="lazy" class="relative z-10" onerror="this.style.display='none'">` : ''}</div>`;
-    }
-    
-    function getLogoUrlStr(teamName) {
-        if (!teamName) return null;
-        const core = getCoreName(teamName); const norm = normalizeForLogo(core); 
-        for (const k in state.logos) { if (norm === normalizeForLogo(k)) { return state.logos[k]; } }
-        return null;
-    }
-
-    async function fetchAuth() { 
-        try { 
-            const r = await fetch(`${AUTH_DIRECT_LINK}&cb=${Date.now()}`); 
-            const csv = await r.text(); 
-            csv.split(/\r?\n/).slice(1).forEach(line => { 
-                const p = parseCSVLine(line); 
-                if (p.length >= 2 && p[0] && p[1]) state.auth[superNormalize(normalizeForLogo(p[0].trim()))] = p[1].toString().trim(); 
-            }); 
-        } catch (e) { console.error("Auth Fetch Error:", e); } 
-    }
-    
-    async function fetchRosters() {
+    function syncStateToURL() {
         try {
-            const r = await fetch(`${ROSTER_DATA_SOURCE}&cb=${Date.now()}`); const csvText = await r.text(); if(csvText.toLowerCase().includes('<!doctype html>')) return;
-            state.rosters = {}; const rows = csvText.split(/\r?\n/).map(line => parseCSVLine(line)); let lastTeam = "", lastGroup = "", lastCoach = "";
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i]; if (row.length < 2) continue;
-                const tr = (row[0]||'').replace(/^\uFEFF/, '').trim(), gr = (row[1]||'').trim(), co = (row[2]||'').trim(), no = (row[3]||'').trim(), nm = (row[4]||'').trim(), ps = (row[5]||'').trim(), img = (row[6]||'').trim();
-                if (superNormalize(tr).includes('takimadi') || superNormalize(nm).includes('oyuncuadi')) continue;
-                if (tr) lastTeam = tr; if (gr) lastGroup = gr; if (co) lastCoach = co; if (!nm || !lastTeam || !lastGroup) continue;
-                const tKey = superNormalize(normalizeForLogo(lastTeam)), gKey = superNormalize(lastGroup);
-                if (!state.rosters[tKey]) state.rosters[tKey] = {}; if (!state.rosters[tKey][gKey]) state.rosters[tKey][gKey] = { coach: lastCoach, players: [] };
-                let fImg = null; if (img && img.length > 5) { const idMatch = img.match(/\/d\/([a-zA-Z0-9_-]+)/) || img.match(/id=([a-zA-Z0-9_-]+)/); fImg = idMatch ? `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w400` : img; }
-                state.rosters[tKey][gKey].players.push({ no: no || '-', name: nm, pos: ps || 'Oyuncu', img: fImg });
-            }
-        } catch (e) { console.error("Roster Fetch Error:", e); }
+            const url = new URL(window.location);
+            if (state.selectedRegion !== 'istanbul') url.searchParams.set('bolge', state.selectedRegion); else url.searchParams.delete('bolge');
+            if (state.selectedTeam) url.searchParams.set('takim', state.selectedTeam); else url.searchParams.delete('takim');
+            window.history.pushState({}, '', url);
+        } catch (e) {}
     }
 
+    function setDailyQuote() {
+        try {
+            const now = new Date(); const start = new Date(now.getFullYear(), 0, 0); const day = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+            const qEl = document.getElementById('daily-quote-text'); if (qEl) qEl.innerText = MOTIVATION_QUOTES[day % MOTIVATION_QUOTES.length];
+        } catch(e) {}
+    }
+
+    // --- VERİ ÇEKME ---
     async function fetchData() {
         try {
-            document.getElementById('loading-overlay').classList.remove('hidden');
+            const overlay = document.getElementById('loading-overlay');
+            if(overlay) overlay.classList.remove('hidden');
+            
             await Promise.all([
                 fetch(`${LOGO_DATA_SOURCE}&cb=${Date.now()}`).then(r => r.text()).then(txt => { 
                     txt.split(/\r?\n/).slice(1).forEach(line => { 
                         const p = parseCSVLine(line); 
-                        if (p.length >= 2 && p[0] && p[1]) { 
-                            let url = p[1].trim(); 
-                            if (url.includes('drive.google.com')) { 
-                                const id = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/); 
-                                if (id) url = `https://drive.google.com/thumbnail?id=${id[1]}&sz=w400`; 
-                            } 
-                            state.logos[p[0].trim()] = url; 
-                        } 
+                        if (p.length >= 2 && p[0] && p[1]) {
+                            let url = p[1].trim();
+                            if (url.includes('drive.google.com')) {
+                                const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+                                if (idMatch) url = `https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w400`;
+                            }
+                            state.logos[p[0].trim().replace(/^\uFEFF/, '')] = url; 
+                        }
                     }); 
-                }).catch(e => console.error("Logo fetch error:", e)),
-                fetchRosters(), 
-                fetchAuth()
+                }).catch(e => console.warn("Logos Error")),
+                fetchRosters(), fetchAuth()
             ]);
             
             const r = await fetch(`${REGIONS[state.selectedRegion].matches}&cb=${Date.now()}`);
             const csv = await r.text();
             
-            state.allMatches = csv.split(/\r?\n/).slice(1).map(line => { 
-                const p = parseCSVLine(line); 
-                return { date: (p[0]||"").trim(), venue: (p[1]||"").trim(), time: (p[2]||"").trim(), t1: (p[3]||"").trim(), s1: (p[4]||"").trim()||"-", s2: (p[5]||"").trim()||"-", t2: (p[6]||"").trim(), sets: (p[7]||"").trim(), league: (p[10]||"LİG").trim(), kume: (p[10]||""), tur: (p[12]||""), gr: (p[13]||""), c: (p[9]||""), ktg: (p[11]||"") }; 
-            }).filter(m => !(m.time + m.sets + m.t1 + m.t2).toLocaleLowerCase('tr-TR').includes('iptal'));
+            if(csv.toLowerCase().includes('<!doctype html>')) {
+                console.warn("HTML Data Returned for Matches");
+                if(overlay) overlay.classList.add('hidden');
+                showEmptyState("Veri tabanına bağlanılamadı. Lütfen daha sonra tekrar deneyin.");
+                return;
+            }
+
+            state.allMatches = csv.split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(l => l.length > 0)
+                .slice(1)
+                .map(line => { 
+                    const p = parseCSVLine(line); 
+                    return { date: (p[0]||"").trim(), venue: (p[1]||"").trim(), time: (p[2]||"").trim(), t1: (p[3]||"").trim(), s1: (p[4]||"").trim()||"-", s2: (p[5]||"").trim()||"-", t2: (p[6]||"").trim(), sets: (p[7]||"").trim(), league: (p[10]||"LİG").trim(), kume: (p[10]||"").trim(), tur: (p[12]||"").trim(), gr: (p[13]||"").trim(), c: (p[9]||"").trim(), ktg: (p[11]||"").trim() }; 
+                })
+                .filter(m => m.t1 && m.t2 && !(m.time + m.sets + m.t1 + m.t2).toLocaleLowerCase('tr-TR').includes('iptal'));
             
-            const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); return new Date(p1[2], p1[1]-1, p1[0]) - new Date(p2[2], p2[1]-1, p2[0]); });
-            const today = getTodayString(); state.currentDate = ds.includes(today) ? today : (ds[0] || "");
+            const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { 
+                const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); 
+                return new Date(p1[2]||0, (p1[1]||1)-1, p1[0]||0) - new Date(p2[2]||0, (p2[1]||1)-1, p2[0]||0); 
+            });
+            const today = getTodayString(); 
+            state.currentDate = ds.includes(today) ? today : (ds[0] || "");
             
-            document.getElementById('loading-overlay').classList.add('hidden');
+            if(overlay) overlay.classList.add('hidden');
             updateUI(true);
         } catch (error) { 
-            console.error("Main Data Fetch Error:", error);
-            document.getElementById('loading-overlay').classList.add('hidden'); 
+            const overlay = document.getElementById('loading-overlay');
+            if(overlay) overlay.classList.add('hidden');
+            showEmptyState("Bağlantı hatası oluştu.");
         }
     }
 
-    // --- UI RENDERING ---
-    function renderTopLogos() {
-        const c = document.getElementById('top-logos-container'); if (!state.currentDate) return;
-        const seen = new Set(); c.innerHTML = '';
-        state.allMatches.filter(m => m.date === state.currentDate).forEach(m => {
-            [m.t1, m.t2].forEach(t => { const core = getCoreName(t); if (core && !seen.has(core) && !t.includes('.si')) { seen.add(core); const chip = document.createElement('div'); chip.className = `p-1 rounded-full bg-white transition-all cursor-pointer shrink-0 border ${state.selectedTeam === core ? 'ring-4 ring-indigo-200 border-indigo-500 scale-110' : 'border-slate-100 shadow-sm'}`; chip.innerHTML = getLogoHtml(core, "w-11 h-11 border-none"); chip.onclick = () => state.selectedTeam === core ? clearSelectedTeam() : selectTeam(core); c.appendChild(chip); } });
-        });
+    async function fetchRosters() {
+        try {
+            const r = await fetch(`${ROSTER_DATA_SOURCE}&cb=${Date.now()}`); const csvText = await r.text(); if(csvText.toLowerCase().includes('<!doctype html>')) return;
+            state.rosters = {}; const rows = csvText.split(/\r?\n/).map(line => parseCSVLine(line)); 
+            let lastTeam = "", lastGroup = "", lastCoach = "";
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i]; if (row.length < 2) continue;
+                const tr = (row[0]||'').replace(/^\uFEFF/, '').trim(), gr = (row[1]||'').trim(), co = (row[2]||'').trim(), no = (row[3]||'').trim(), nm = (row[4]||'').trim(), ps = (row[5]||'').trim(), img = (row[6]||'').trim();
+                if (tr) lastTeam = tr; if (gr) lastGroup = gr; if (co) lastCoach = co; if (!nm || !lastTeam || !lastGroup) continue;
+                const tKey = superNormalize(normalizeForLogo(lastTeam)), gKey = superNormalize(lastGroup);
+                if (!state.rosters[tKey]) state.rosters[tKey] = {}; if (!state.rosters[tKey][gKey]) state.rosters[tKey][gKey] = { coach: lastCoach, players: [] };
+                state.rosters[tKey][gKey].players.push({ no: no || '-', name: nm, pos: ps || 'Oyuncu', img: img });
+            }
+        } catch (e) {}
     }
 
-    function renderDateTabs(shCenter) {
-        const c = document.getElementById('date-tabs'); c.innerHTML = '';
-        const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); return new Date(p1[2], p1[1]-1, p1[0]) - new Date(p2[2], p2[1]-1, p2[0]); });
-        let act = null; ds.forEach(d => {
-            const isA = d === state.currentDate, b = document.createElement('button');
-            b.className = `px-6 py-2.5 rounded-[1.2rem] border shrink-0 transition-all flex flex-col items-center justify-center min-w-[120px] ${isA ? 'active-date-tab' : 'bg-white text-slate-600 border-slate-200 shadow-sm'}`;
-            b.innerHTML = `<span class="text-[12px] font-bold leading-tight text-slate-900">${d}</span><span class="text-[9px] font-black opacity-60 tracking-wider mt-0.5 text-slate-500">${getDayName(d)}</span>`;
-            b.onclick = () => { state.currentDate = d; updateUI(true); }; c.appendChild(b); if (isA) act = b;
-        });
-        if (shCenter && act) { setTimeout(() => { const x = act.offsetLeft - (c.clientWidth / 2) + (act.clientWidth / 2); c.scrollTo({ left: x, behavior: 'smooth' }); }, 100); }
+    async function fetchAuth() { 
+        try { 
+            const r = await fetch(`${AUTH_DIRECT_LINK}&cb=${Date.now()}`); const csv = await r.text(); 
+            if(csv.toLowerCase().includes('<!doctype html>')) return;
+            csv.split(/\r?\n/).slice(1).forEach(line => { 
+                const p = parseCSVLine(line); if (p.length >= 2 && p[0] && p[1]) state.auth[superNormalize(normalizeForLogo(p[0].trim()))] = p[1].toString().trim(); 
+            }); 
+        } catch (e) {} 
     }
 
-    function renderAlphabetTeams() {
-        const c = document.getElementById('playing-teams'), aC = document.getElementById('alphabet-index'), seen = new Set();
-        state.allMatches.forEach(m => { [m.t1, m.t2].forEach(t => { const cr = getCoreName(t); if(cr && !t.includes('.si')) seen.add(cr); }); });
-        const teams = Array.from(seen).sort((a,b) => a.localeCompare(b, 'tr')), alph = ['Hepsi','A','B','C','Ç','D','E','F','G','H','I','İ','J','K','L','M','N','O','Ö','P','R','S','Ş','T','U','Ü','V','Y','Z']; aC.innerHTML = '';
-        alph.forEach(l => { const b = document.createElement('button'); b.className = `shrink-0 w-8 h-8 rounded-xl text-[10px] font-black ${state.selectedAlphabet === l ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-600'}`; b.innerText = l; b.onclick = () => { state.selectedAlphabet = (state.selectedAlphabet === l ? null : l); updateUI(); }; aC.appendChild(b); });
-        c.innerHTML = !state.selectedAlphabet ? '<div class="col-span-full text-slate-400 py-6 text-center text-xs">Takım seçerek listeleyin.</div>' : '';
-        if (state.selectedAlphabet) { teams.filter(t => state.selectedAlphabet === 'Hepsi' || t.charAt(0).toLocaleUpperCase('tr-TR') === state.selectedAlphabet).forEach(t => { const chip = document.createElement('div'); chip.className = `flex flex-col items-center p-3 rounded-[1.2rem] border cursor-pointer bg-white border-slate-200 hover:border-indigo-300 transition-all shadow-sm text-slate-900`; chip.innerHTML = `${getLogoHtml(t, "w-12 h-12 shadow-sm mb-2")} <span class="text-[11px] font-black text-slate-700 uppercase truncate w-full text-center text-slate-900">${t}</span>`; chip.onclick = () => selectTeam(t); c.appendChild(chip); }); }
+    // --- GÖRÜNÜM KONTROLLERİ ---
+    function showEmptyState(msg = "Veri bulunamadı.") {
+        const empty = document.getElementById('empty-state');
+        if(empty) {
+            empty.classList.remove('hidden');
+            empty.classList.add('flex');
+            empty.querySelector('p').innerText = msg;
+        }
+    }
+
+    function hideEmptyState() {
+        const empty = document.getElementById('empty-state');
+        if(empty) {
+            empty.classList.remove('flex');
+            empty.classList.add('hidden');
+        }
     }
 
     function updateUI(shCenter = false) {
-        const sD = document.getElementById('selected-team-display'), pW = document.getElementById('playing-teams-wrapper'), dW = document.getElementById('date-tabs-wrapper');
-        if (state.selectedTeam) {
-            sD.classList.replace('hidden', 'flex'); dW.classList.add('hidden'); pW.classList.add('hidden');
-            document.getElementById('selected-team-logo').innerHTML = getLogoHtml(state.selectedTeam, "w-14 h-14 border-none shadow-none text-slate-900");
-            const s = calculateFullStats(state.selectedTeam);
-            document.getElementById('selected-team-stats').innerHTML = `<div class="flex-1 border-r border-white/10 px-1 text-white">OYNANAN<br><span class="text-lg sm:text-2xl text-white">${s.p}</span></div><div class="flex-1 border-r border-white/10 px-1 text-emerald-400">GALİBİYET<br><span class="text-lg sm:text-2xl">${s.w}</span></div><div class="flex-1 border-r border-white/10 px-1 text-rose-400">MAĞLUBİYET<br><span class="text-lg sm:text-2xl">${s.l}</span></div><div class="flex-1 border-r border-white/10 px-1 text-amber-400">ERTELENEN<br><span class="text-lg sm:text-2xl">${s.d}</span></div><div class="flex-1 px-1 text-indigo-300">OYNANACAK<br><span class="text-lg sm:text-2xl">${s.n}</span></div>`;
-        } else { sD.classList.replace('flex', 'hidden'); dW.classList.remove('hidden'); pW.classList.remove('hidden'); }
-        renderTopLogos(); renderDateTabs(shCenter); renderAlphabetTeams(); renderMatches();
+        try {
+            const sD = document.getElementById('selected-team-display'), pW = document.getElementById('playing-teams-wrapper'), dW = document.getElementById('date-tabs-wrapper');
+            if (state.selectedTeam) {
+                if(sD) { sD.classList.remove('hidden'); sD.classList.add('flex'); }
+                if(pW) pW.classList.add('hidden'); 
+                if(dW) dW.classList.add('hidden');
+                
+                const logoEl = document.getElementById('selected-team-logo'); 
+                if(logoEl) logoEl.innerHTML = getLogoHtml(state.selectedTeam, "w-14 h-14 border-none shadow-none");
+                
+                const s = calculateFullStats(state.selectedTeam);
+                const statsEl = document.getElementById('selected-team-stats'); 
+                if(statsEl) statsEl.innerHTML = `<div class="flex-1 border-r border-white/10 px-1 text-white text-[10px]">OYNANAN<br><span class="text-lg sm:text-2xl">${s.p}</span></div><div class="flex-1 border-r border-white/10 px-1 text-emerald-400 text-[10px]">GALİBİYET<br><span class="text-lg sm:text-2xl">${s.w}</span></div><div class="flex-1 border-r border-white/10 px-1 text-rose-400 text-[10px]">MAĞLUBİYET<br><span class="text-lg sm:text-2xl">${s.l}</span></div><div class="flex-1 border-r border-white/10 px-1 text-amber-400 text-[10px]">ERTELENEN<br><span class="text-lg sm:text-2xl">${s.d}</span></div><div class="flex-1 px-1 text-indigo-300 text-[10px]">OYNANACAK<br><span class="text-lg sm:text-2xl">${s.n}</span></div>`;
+            } else { 
+                if(sD) { sD.classList.add('hidden'); sD.classList.remove('flex'); } 
+                if(pW) pW.classList.remove('hidden'); 
+                if(dW) dW.classList.remove('hidden');
+            }
+            
+            renderTopLogos(); 
+            renderDateTabs(shCenter); 
+            renderAlphabetTeams(); 
+            renderMatches();
+        } catch(e) {
+            console.error("UI Update Error:", e);
+        }
+    }
+
+    function renderAlphabetTeams() {
+        try {
+            const c = document.getElementById('playing-teams'), aC = document.getElementById('alphabet-index'), instr = document.getElementById('alphabet-instruction');
+            if(!c || !aC) return;
+            const seen = new Set(); 
+            state.allMatches.forEach(m => { [m.t1, m.t2].forEach(t => { const cr = getCoreName(t); if(cr) seen.add(cr); }); });
+            
+            const teams = Array.from(seen).sort((a,b) => a.localeCompare(b, 'tr'));
+            const alph = ['Hepsi','A','B','C','Ç','D','E','F','G','H','I','İ','J','K','L','M','N','O','Ö','P','R','S','Ş','T','U','Ü','V','Y','Z'];
+            
+            aC.innerHTML = alph.map(l => `<button onclick="state.selectedAlphabet = (state.selectedAlphabet === '${l}' ? null : '${l}'); renderAlphabetTeams();" class="shrink-0 w-8 h-8 rounded-full text-[10px] font-black transition-all ${state.selectedAlphabet === l ? 'bg-indigo-600 text-white shadow-md scale-110' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${l}</button>`).join('');
+            
+            if (!state.selectedAlphabet) { 
+                c.innerHTML = ''; 
+                if(instr) instr.style.display = 'block'; 
+            } else { 
+                if(instr) instr.style.display = 'none'; 
+                c.innerHTML = teams.filter(t => state.selectedAlphabet === 'Hepsi' || t.charAt(0).toLocaleUpperCase('tr-TR') === state.selectedAlphabet).map(t => {
+                    const safeT = t.replace(/'/g, "\\'");
+                    return `<div onclick="selectTeam('${safeT}')" class="flex flex-col items-center p-3 rounded-2xl border cursor-pointer bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all text-slate-900 shadow-sm">${getLogoHtml(t, "w-12 h-12 shadow-sm mb-2")} <span class="text-[10px] font-black uppercase truncate w-full text-center">${t}</span></div>`;
+                }).join(''); 
+            }
+        } catch(e) { console.error("Alphabet Teams Error", e); }
+    }
+
+    function safeCreateMatchCard(m) {
+        try { return createMatchCard(m); } catch(e) { return ""; }
     }
 
     function renderMatches() {
-        const container = document.getElementById('match-container'); container.innerHTML = '';
-        let matchPool = [];
-        
-        if (state.selectedTeam) {
-            const key = superNormalize(getCoreName(state.selectedTeam));
-            let teamMatches = state.allMatches.filter(m => superNormalize(getCoreName(m.t1)) === key || superNormalize(getCoreName(m.t2)) === key);
-            const groups = [...new Set(teamMatches.map(m => getGroupCode(m)))].sort();
-            
-            if (groups.length > 0) {
-                let tabsHtml = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-6"><button onclick="setTeamGroupFilter('all')" class="flex items-center gap-2.5 p-3 rounded-2xl border transition-all ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}">${getLogoHtml(state.selectedTeam, "w-6 h-6 border-none")} <div class="text-[10px] font-black uppercase ${state.selectedTeamGroup === 'all' ? 'text-white' : 'text-slate-900'}">Tüm Maçlar</div></button>`;
-                groups.forEach(g => { tabsHtml += `<button onclick="setTeamGroupFilter('${g.replace(/'/g, "\\'")}')" class="flex items-center gap-2.5 p-3 rounded-2xl border transition-all ${state.selectedTeamGroup === g ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}">${getLogoHtml(state.selectedTeam, "w-6 h-6 border-none")} <div class="text-[10px] font-black uppercase ${state.selectedTeamGroup === g ? 'text-white' : 'text-slate-900'}">${g}</div></button>`; });
-                tabsHtml += `</div>`; container.insertAdjacentHTML('beforeend', tabsHtml);
-            }
-            
-            if (state.selectedTeamGroup !== 'all') {
-                const tKey = superNormalize(normalizeForLogo(state.selectedTeam)), gKey = superNormalize(state.selectedTeamGroup);
-                let rData = (state.rosters[tKey] && state.rosters[tKey][gKey]) ? state.rosters[tKey][gKey] : null;
-                if (rData && rData.players.length > 0) {
-                    let rHtml = `<div class="bg-indigo-50/40 p-4 sm:p-6 rounded-[2.5rem] border border-indigo-100 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] mb-4"><div class="flex items-center justify-between mb-6 border-b border-indigo-200/50 pb-4"><h3 class="text-base font-black text-indigo-950 uppercase tracking-tighter flex items-center gap-2"><div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><i class="fas fa-users text-sm"></i></div> TAKIM KADROSU</h3>${rData.coach ? `<span class="bg-white text-indigo-700 px-4 py-2 rounded-xl text-[11px] font-black border border-indigo-200 shadow-sm uppercase font-mono text-slate-900"><i class="fas fa-whistle mr-2 text-slate-900"></i> ${rData.coach}</span>` : ''}</div><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">`;
-                    rData.players.forEach(p => { 
-                        rHtml += `<div class="bg-white border border-slate-100 rounded-[20px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col relative group"><div class="relative h-[95px] bg-gradient-to-tr from-indigo-700 to-indigo-500 w-full flex items-end justify-center overflow-hidden"><div class="concave-corner shadow-md"><span class="text-indigo-700 font-black text-[14px] leading-none">${p.no}</span><span class="text-indigo-700/50 font-bold text-[6px] uppercase tracking-widest">FORMA</span></div><div class="absolute top-2.5 right-2.5 text-right z-10"><span class="block text-white font-black text-[12px] leading-none drop-shadow-sm uppercase font-mono text-white">${(p.pos||'OYU').slice(0,3)}</span></div><div class="relative z-0 flex items-end justify-center w-full h-full pt-2">
-                        ${p.img ? `<img src="${p.img}" class="h-[95%] w-auto object-contain object-bottom transition-transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
-                        <div class="h-full w-full flex items-center justify-center" style="${p.img ? 'display:none' : ''}"><i class="fa-regular fa-user text-white/40 text-5xl drop-shadow-lg"></i></div>
-                        </div></div><div class="bg-white p-3 flex flex-col items-center justify-center flex-1"><h4 class="text-indigo-950 font-bold text-[11px] text-center leading-tight mb-2 line-clamp-2 px-1 uppercase text-slate-900">${p.name}</h4><div class="text-[9px] font-black uppercase bg-slate-50 text-slate-500 px-2 py-1 rounded border border-slate-100">${p.pos}</div></div></div>`; 
-                    }); 
-                    rHtml += `</div></div>`; container.insertAdjacentHTML('beforeend', rHtml);
-                }
-            }
-            matchPool = state.selectedTeamGroup === 'all' ? teamMatches : teamMatches.filter(m => getGroupCode(m) === state.selectedTeamGroup);
-        } else {
-            matchPool = state.allMatches.filter(m => m.date === state.currentDate);
-            if (state.selectedStatus === 'played') matchPool = matchPool.filter(isMatchPlayed);
-            else if (state.selectedStatus === 'pending') matchPool = matchPool.filter(m => !isMatchPlayed(m) && !isMatchDelayed(m));
-            else if (state.selectedStatus === 'delayed') matchPool = matchPool.filter(isMatchDelayed);
-            if (state.searchQuery) { 
-                const q = state.searchQuery.toLocaleLowerCase('tr-TR').trim(); 
-                matchPool = matchPool.filter(m => m.t1.toLocaleLowerCase('tr-TR').includes(q) || m.t2.toLocaleLowerCase('tr-TR').includes(q) || m.venue.toLocaleLowerCase('tr-TR').includes(q)); 
-            }
-        }
+        try {
+            const container = document.getElementById('match-container'); if(!container) return;
+            container.innerHTML = '';
+            let matchPool = [];
 
-        if (!matchPool.length) { document.getElementById('empty-state').classList.replace('hidden', 'flex'); }
-        else {
-            document.getElementById('empty-state').classList.replace('flex', 'hidden');
-            const can = matchPool.filter(checkLiveStatus), bit = matchPool.filter(isMatchPlayed), ert = matchPool.filter(m => isMatchDelayed(m) && !isMatchPlayed(m)), gel = matchPool.filter(m => !isMatchPlayed(m) && !isMatchDelayed(m) && !checkLiveStatus(m));
-            
-            if (can.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-rose-600 font-black text-2xl uppercase tracking-tighter flex items-center gap-2 mb-4 mt-2"><span class="w-3 h-3 bg-rose-500 rounded-full animate-pulse"></span> CANLI MAÇLAR</h2>`); can.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-            if (gel.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-slate-800 font-black text-2xl uppercase tracking-tighter border-b-2 pb-2 mb-4 mt-4 text-slate-900">GELECEK MAÇLAR</h2>`); gel.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-            if (bit.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-emerald-600 font-black text-2xl uppercase tracking-tighter border-b-2 border-emerald-100 pb-2 mt-6 mb-4">BİTEN MAÇLAR</h2>`); bit.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-            if (ert.length) { container.insertAdjacentHTML('beforeend', `<h2 class="text-amber-600 font-black text-2xl uppercase tracking-tighter border-b-2 border-amber-100 pb-2 mt-6 mb-4">ERTELENEN / SKOR BEKLENEN</h2>`); ert.forEach((m, i) => container.insertAdjacentHTML('beforeend', createMatchCard(m, i))); }
-        }
-        document.getElementById('match-count-badge').innerText = matchPool.length;
+            if (state.selectedTeam) {
+                const key = superNormalize(getCoreName(state.selectedTeam));
+                let teamMatches = state.allMatches.filter(m => superNormalize(getCoreName(m.t1)) === key || superNormalize(getCoreName(m.t2)) === key);
+                
+                // Kategori (Grup) Filtreleri
+                const groups = [...new Set(teamMatches.map(m => getGroupCode(m)))].sort();
+                if (groups.length > 0) {
+                    let tabsHtml = `<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-6 col-span-full"><button onclick="setTeamGroupFilter('all')" class="flex items-center gap-2.5 p-3 rounded-2xl border transition-all ${state.selectedTeamGroup === 'all' ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}">${getLogoHtml(state.selectedTeam, "w-6 h-6 border-none")} <div class="text-[10px] font-black uppercase ${state.selectedTeamGroup === 'all' ? 'text-white' : 'text-slate-900'}">Tüm Maçlar</div></button>`;
+                    groups.forEach(g => { 
+                        const safeG = g.replace(/'/g, "\\'");
+                        tabsHtml += `<button onclick="setTeamGroupFilter('${safeG}')" class="flex items-center gap-2.5 p-3 rounded-2xl border transition-all ${state.selectedTeamGroup === g ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white hover:bg-slate-50 border-slate-200 shadow-sm'}">${getLogoHtml(state.selectedTeam, "w-6 h-6 border-none")} <div class="text-[10px] font-black uppercase ${state.selectedTeamGroup === g ? 'text-white' : 'text-slate-900'}">${g}</div></button>`; 
+                    });
+                    tabsHtml += `</div>`; container.insertAdjacentHTML('beforeend', tabsHtml);
+                }
+
+                // Kadro Görünümü (Roster)
+                if (state.selectedTeamGroup !== 'all') {
+                    const tKey = superNormalize(normalizeForLogo(state.selectedTeam)), gKey = superNormalize(state.selectedTeamGroup);
+                    let rData = (state.rosters[tKey] && state.rosters[tKey][gKey]) ? state.rosters[tKey][gKey] : null;
+                    if (rData && rData.players.length > 0) {
+                        let rHtml = `<div class="col-span-full bg-indigo-50/40 p-4 sm:p-6 rounded-[2.5rem] border border-indigo-100 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] mb-4"><div class="flex items-center justify-between mb-6 border-b border-indigo-200/50 pb-4"><h3 class="text-base font-black text-indigo-950 uppercase tracking-tighter flex items-center gap-2"><div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><i class="fas fa-users text-sm"></i></div> TAKIM KADROSU</h3>${rData.coach ? `<span class="bg-white text-indigo-700 px-4 py-2 rounded-xl text-[11px] font-black border border-indigo-200 shadow-sm uppercase font-mono text-slate-900"><i class="fas fa-whistle mr-2"></i> ${rData.coach}</span>` : ''}</div><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">`;
+                        rData.players.forEach(p => { 
+                            rHtml += `<div class="bg-white border border-slate-100 rounded-[20px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col relative group"><div class="relative h-[95px] bg-gradient-to-tr from-indigo-700 to-indigo-500 w-full flex items-end justify-center overflow-hidden"><div class="absolute top-0 left-0 bg-white/20 backdrop-blur-md px-2 py-1 rounded-br-lg shadow-md"><span class="text-white font-black text-[14px] leading-none">${p.no}</span></div><div class="absolute top-2.5 right-2.5 text-right z-10"><span class="block text-white font-black text-[12px] leading-none drop-shadow-sm uppercase font-mono text-white">${(p.pos||'OYU').slice(0,3)}</span></div><div class="relative z-0 flex items-end justify-center w-full h-full pt-2">
+                            ${p.img ? `<img src="${p.img}" class="h-[95%] w-auto object-contain object-bottom transition-transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
+                            <div class="h-full w-full flex items-center justify-center" style="${p.img ? 'display:none' : ''}"><i class="fa-regular fa-user text-white/40 text-5xl drop-shadow-lg"></i></div>
+                            </div></div><div class="bg-white p-3 flex flex-col items-center justify-center flex-1"><h4 class="text-indigo-950 font-bold text-[11px] text-center leading-tight mb-2 line-clamp-2 px-1 uppercase text-slate-900">${p.name}</h4><div class="text-[9px] font-black uppercase bg-slate-50 text-slate-500 px-2 py-1 rounded border border-slate-100">${p.pos}</div></div></div>`; 
+                        }); 
+                        rHtml += `</div></div>`; container.insertAdjacentHTML('beforeend', rHtml);
+                    }
+                }
+                matchPool = state.selectedTeamGroup === 'all' ? teamMatches : teamMatches.filter(m => getGroupCode(m) === state.selectedTeamGroup);
+            } else {
+                matchPool = state.allMatches.filter(m => m.date === state.currentDate);
+                if (state.selectedStatus === 'played') matchPool = matchPool.filter(isMatchPlayed);
+                else if (state.selectedStatus === 'pending') matchPool = matchPool.filter(m => !isMatchPlayed(m) && !isMatchDelayed(m));
+                else if (state.selectedStatus === 'delayed') matchPool = matchPool.filter(isMatchDelayed);
+                if (state.searchQuery) { const q = state.searchQuery.toLocaleLowerCase('tr-TR').trim(); matchPool = matchPool.filter(m => m.t1.toLocaleLowerCase('tr-TR').includes(q) || m.t2.toLocaleLowerCase('tr-TR').includes(q) || m.venue.toLocaleLowerCase('tr-TR').includes(q)); }
+            }
+
+            if (!matchPool.length) { 
+                showEmptyState();
+            } else {
+                hideEmptyState();
+                const can = matchPool.filter(checkLiveStatus), gel = matchPool.filter(m => !isMatchPlayed(m) && !isMatchDelayed(m) && !checkLiveStatus(m)), bit = matchPool.filter(isMatchPlayed), ert = matchPool.filter(m => isMatchDelayed(m) && !isMatchPlayed(m));
+                
+                if (can.length) { container.insertAdjacentHTML('beforeend', `<h2 class="col-span-full text-rose-600 font-black text-2xl uppercase flex items-center gap-2 mb-2 mt-2"><span class="live-dot"></span> CANLI MAÇLAR</h2>` + can.map(safeCreateMatchCard).join('')); }
+                if (gel.length) { container.insertAdjacentHTML('beforeend', `<h2 class="col-span-full text-slate-800 font-black text-2xl border-b-2 pb-2 mb-2 mt-4 uppercase text-slate-900">GELECEK MAÇLAR</h2>` + gel.map(safeCreateMatchCard).join('')); }
+                if (bit.length) { container.insertAdjacentHTML('beforeend', `<h2 class="col-span-full text-emerald-600 font-black text-2xl border-b-2 border-emerald-100 pb-2 mb-2 mt-6 uppercase">BİTEN MAÇLAR</h2>` + bit.map(safeCreateMatchCard).join('')); }
+                if (ert.length) { container.insertAdjacentHTML('beforeend', `<h2 class="col-span-full text-amber-600 font-black text-2xl border-b-2 border-amber-100 pb-2 mb-2 mt-6 uppercase">ERTELENEN / SKOR BEKLENEN</h2>` + ert.map(safeCreateMatchCard).join('')); }
+            }
+            if(document.getElementById('match-count-badge')) document.getElementById('match-count-badge').innerText = matchPool.length;
+        } catch(e) { console.error("Render Matches Error", e); }
     }
 
-    function createMatchCard(m, i) {
+    function createMatchCard(m) {
         const live = checkLiveStatus(m), played = isMatchPlayed(m), sA = m.sets ? [...m.sets.matchAll(/\((\d+)-(\d+)\)/g)] : [];
-        let r1 = '', r2 = ''; 
-        for(let j=0; j<5; j++){ 
-            if(j < sA.length){ 
-                const v1 = parseInt(sA[j][1]), v2 = parseInt(sA[j][2]); 
-                r1 += `<span class="w-5 sm:w-6 h-8 sm:h-9 text-[11px] sm:text-xs flex items-center justify-center rounded-md shrink-0 ${v1>v2?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v1}</span>`; 
-                r2 += `<span class="w-5 sm:w-6 h-8 sm:h-9 text-[11px] sm:text-xs flex items-center justify-center rounded-md shrink-0 ${v2>v1?'bg-rose-50 text-rose-600 font-black':'bg-slate-50 text-slate-400'}">${v2}</span>`; 
-            } else { r1 += '<span class="w-5 sm:w-6 text-center text-slate-200 shrink-0">-</span>'; r2 += '<span class="w-5 sm:w-6 text-center text-slate-200 shrink-0">-</span>'; } 
-        }
-        return `<div class="match-card bg-white p-4 sm:p-6 lg:p-7 flex flex-col lg:flex-row items-stretch lg:items-center gap-5 w-full overflow-hidden relative mb-4 shadow-sm hover:shadow-md transition-all">
-            <div class="w-full lg:w-[190px] shrink-0 flex flex-col gap-2.5">
-                <div class="bg-indigo-50/70 rounded-xl py-2 px-3 text-[10px] text-indigo-800 font-black border border-indigo-100 flex items-center gap-2 uppercase truncate text-slate-900"><i class="fas fa-trophy text-amber-500"></i> ${getGroupCode(m)}</div>
-                <div class="bg-slate-50 p-3 rounded-xl text-[11px] text-slate-500 font-bold border border-slate-100 shadow-inner"><div><i class="far fa-calendar-alt mr-2 text-indigo-300"></i> ${m.date} - ${m.time}</div><div class="truncate mt-1 text-slate-900"><i class="fas fa-map-marker-alt mr-2 text-indigo-300"></i> ${m.venue}</div>${live ? `<div class="absolute top-2.5 right-2.5 bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded text-[8px] font-black animate-pulse">CANLI</div>` : ''}</div>
-            </div>
-            <div class="flex-1 flex flex-row items-center justify-between border-t lg:border-t-0 pt-5 lg:pt-0 gap-2 sm:gap-3 min-w-0">
-                <div class="flex flex-col gap-3.5 flex-1 min-w-0 pr-1 sm:pr-3 text-slate-900 font-black uppercase text-[12px] sm:text-[14px]">
-                    <div class="flex items-center gap-2 sm:gap-3 min-h-[2.5rem]">${getLogoHtml(m.t1, "w-8 h-8 sm:w-9 sm:h-9")} <span class="line-clamp-2 leading-tight">${m.t1}</span></div>
-                    <div class="flex items-center gap-2 sm:gap-3 min-h-[2.5rem]">${getLogoHtml(m.t2, "w-8 h-8 sm:w-9 sm:h-9")} <span class="line-clamp-2 leading-tight">${m.t2}</span></div>
-                </div>
-                <div class="flex items-center gap-2 sm:gap-5 shrink-0">
-                    <div class="bg-indigo-950 rounded-xl flex flex-col w-9 sm:w-11 text-white font-black text-sm sm:text-lg h-20 sm:h-24 overflow-hidden shadow-lg shrink-0"><div class="flex-1 flex items-center justify-center border-b border-white/10 text-white">${m.s1==='-'?'0':m.s1}</div><div class="flex-1 flex items-center justify-center text-white">${m.s2==='-'?'0':m.s2}</div></div>
-                    <div class="flex flex-col gap-2 sm:gap-4 h-20 sm:h-24 justify-center"><div class="flex gap-1 items-center text-slate-900">${r1}</div><div class="flex gap-1 items-center text-slate-900">${r2}</div></div>
+        let setsHtml = sA.length > 0 ? `<div class="flex gap-2 items-center mt-3 justify-center bg-slate-50/50 py-2 rounded-xl border border-slate-100 min-h-[50px]">${sA.map((s, idx) => `<div class="set-pill"><span class="set-label">SET-${idx+1}</span><span class="set-value">${s[1]}-${s[2]}</span></div>`).join('')}</div>` : '';
+        const safeM = encodeURIComponent(JSON.stringify(m)).replace(/'/g, "%27");
+        return `
+        <div class="match-card p-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between gap-2">
+                <div class="category-badge shrink-0">${live ? '<span class="live-dot"></span>' : '<i class="fas fa-trophy text-amber-500"></i>'} ${getGroupCode(m)}</div>
+                <div class="flex flex-wrap justify-end gap-1 items-center min-w-0">
+                    <span class="text-[10px] font-black text-indigo-400 bg-indigo-50 px-2 py-1 rounded-lg uppercase whitespace-nowrap">${m.date} | ${m.time}</span>
+                    <span class="text-[9px] font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-lg truncate max-w-[140px]" title="${m.venue}"><i class="fas fa-map-marker-alt text-indigo-300 mr-1"></i> ${m.venue}</span>
                 </div>
             </div>
-            <div class="w-full lg:w-[140px] flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 lg:border-l border-slate-100 lg:pl-6 pt-5 lg:pt-0 border-t lg:border-t-0">
-                <a href="https://vesportscamps.com/" target="_blank" class="flex-1 lg:flex-none w-full lg:w-[120px] h-10 bg-indigo-950 rounded-xl flex items-center justify-center text-[9px] font-black text-white uppercase text-center px-2 shadow-md">VESPORTSCAMP</a>
-                <div class="flex flex-col items-end lg:items-center justify-center gap-2 flex-1 lg:w-full">
-                    <button onclick="openWhatsappModal('${encodeURIComponent(JSON.stringify(m))}')" class="text-[#25D366] font-black text-[13px] flex items-center justify-end lg:justify-center gap-1.5 hover:text-[#20bd5a] transition-all w-full"><i class="fab fa-whatsapp text-xl"></i> <span>WhatsApp</span></button>
-                    ${played ? `<button onclick="openReportModal('${encodeURIComponent(JSON.stringify(m))}')" class="text-indigo-600 font-black text-[13px] flex items-center justify-end lg:justify-center gap-1.5 hover:text-indigo-800 transition-all w-full"><i class="fas fa-file-pdf text-xl"></i> <span>Maç Raporu</span></button>` : ''}
-                </div>
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex-1 flex flex-col items-center text-center gap-2 min-w-0 text-slate-900">${getLogoHtml(m.t1, "w-14 h-14 border-none shadow-md")}<span class="text-[10px] sm:text-[11px] font-black uppercase leading-tight line-clamp-2 min-h-[2rem] flex items-center justify-center">${m.t1}</span></div>
+                <div class="shrink-0 flex items-center gap-2"><div class="score-box">${m.s1==='-'?'0':m.s1}</div><div class="text-slate-300 font-black text-2xl">:</div><div class="score-box">${m.s2==='-'?'0':m.s2}</div></div>
+                <div class="flex-1 flex flex-col items-center text-center gap-2 min-w-0 text-slate-900">${getLogoHtml(m.t2, "w-14 h-14 border-none shadow-md")}<span class="text-[10px] sm:text-[11px] font-black uppercase leading-tight line-clamp-2 min-h-[2rem] flex items-center justify-center">${m.t2}</span></div>
+            </div>
+            ${setsHtml}
+            <div class="mt-auto pt-2 grid grid-cols-2 gap-2">
+                <div class="col-span-2 text-[9px] font-black text-indigo-950/40 uppercase tracking-widest px-1 text-center">VOLEYBOL DAY PRO</div>
+                <button onclick="openWhatsappModal('${safeM}')" class="flex items-center justify-center gap-2 bg-[#25D366]/10 text-[#25D366] py-2.5 rounded-xl text-[10px] font-black uppercase hover:bg-[#25D366] hover:text-white transition-all"><i class="fab fa-whatsapp text-base"></i> PAYLAŞ</button>
+                ${played ? `<button onclick="openReportModal('${safeM}')" class="flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 py-2.5 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-file-pdf text-base"></i> RAPOR</button>` : `<a href="https://vesportscamps.com/" target="_blank" class="flex items-center justify-center gap-2 bg-indigo-950 text-white py-2.5 rounded-xl text-[8px] font-black uppercase shadow-md hover:scale-[1.02] transition-all">VESPORTSCAMP</a>`}
             </div>
         </div>`;
     }
 
-    // --- MODALS ---
-    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; document.getElementById('wa-team-password').value = ''; document.getElementById('wa-auth-error').classList.add('hidden'); }
-    
+    function getLogoHtml(teamName, classes = "w-10 h-10") {
+        if (!teamName) return "";
+        const core = getCoreName(teamName), norm = normalizeForLogo(core); let url = null; 
+        for (const k in state.logos) { if (norm === normalizeForLogo(k)) { url = state.logos[k]; break; } }
+        return `<div class="team-logo-circle ${classes} bg-white shadow-sm border border-slate-100 relative shrink-0 overflow-hidden"><span class="fallback-text">${core.substring(0, 2).toUpperCase()}</span>${url ? `<img src="${url}" loading="lazy" class="relative z-10" onerror="this.style.display='none'">` : ''}</div>`;
+    }
+
+    function calculateFullStats(tName) {
+        let p=0, w=0, l=0, d=0, n=0; const key = superNormalize(getCoreName(tName));
+        state.allMatches.forEach(m => {
+            const t1 = superNormalize(getCoreName(m.t1)), t2 = superNormalize(getCoreName(m.t2));
+            if (t1 === key || t2 === key) { if (isMatchPlayed(m)) { p++; const s1 = parseInt(m.s1||0), s2 = parseInt(m.s2||0); if (t1 === key) s1 > s2 ? w++ : l++; else s2 > s1 ? w++ : l++; } else { if (isMatchDelayed(m)) d++; else n++; } }
+        });
+        return { p, w, l, d, n };
+    }
+
+    function renderTopLogos() {
+        try {
+            const c = document.getElementById('top-logos-container'); if (!state.currentDate || !c) return;
+            const seen = new Set(); c.innerHTML = '';
+            state.allMatches.filter(m => m.date === state.currentDate).forEach(m => {
+                [m.t1, m.t2].forEach(t => { 
+                    const core = getCoreName(t); 
+                    if (core && !seen.has(core)) { 
+                        seen.add(core); 
+                        const safeC = core.replace(/'/g, "\\'");
+                        const chip = document.createElement('div'); chip.className = `p-1 rounded-full bg-white transition-all cursor-pointer shrink-0 border ${state.selectedTeam === core ? 'ring-4 ring-indigo-200 border-indigo-500 scale-110' : 'border-slate-100 shadow-sm'}`; chip.innerHTML = getLogoHtml(core, "w-11 h-11 border-none"); chip.onclick = () => selectTeam(safeC); c.appendChild(chip); 
+                    } 
+                });
+            });
+        } catch(e) {}
+    }
+
+    function renderDateTabs(shCenter) {
+        try {
+            const c = document.getElementById('date-tabs'); if(!c) return;
+            c.innerHTML = '';
+            const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); return new Date(p1[2]||0, (p1[1]||1)-1, p1[0]||0) - new Date(p2[2]||0, (p2[1]||1)-1, p2[0]||0); });
+            let act = null; ds.forEach(d => {
+                const isA = d === state.currentDate, b = document.createElement('button');
+                b.className = `px-6 py-2.5 rounded-[1.2rem] border shrink-0 transition-all flex flex-col items-center justify-center min-w-[120px] ${isA ? 'active-date-tab' : 'bg-white text-slate-600 border-slate-200 shadow-sm'}`;
+                b.innerHTML = `<span class="text-[12px] font-bold leading-tight text-slate-900">${d}</span><span class="text-[9px] font-black opacity-60 tracking-wider mt-0.5 text-slate-500">${getDayName(d)}</span>`;
+                b.onclick = () => { state.currentDate = d; updateUI(true); }; c.appendChild(b); if (isA) act = b;
+            });
+            if (shCenter && act) { setTimeout(() => { const x = act.offsetLeft - (c.clientWidth / 2) + (act.clientWidth / 2); c.scrollTo({ left: x, behavior: 'smooth' }); }, 100); }
+        } catch(e){}
+    }
+
+    // --- EVENT HANDLERLAR ---
+    function selectTeam(t) { state.selectedTeam = t; state.searchQuery = t; state.selectedTeamGroup = "all"; syncStateToURL(); updateUI(); }
+    function setRegion(r) { state.selectedRegion = r; state.selectedTeam = null; syncStateToURL(); fetchData(); }
+    function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); renderMatches(); }
+    function handleSearch(v) { state.searchQuery = v; updateUI(); }
+    function clearSelectedTeam() { state.selectedTeam = null; state.searchQuery = ""; syncStateToURL(); updateUI(); }
+    function setTeamGroupFilter(g) { state.selectedTeamGroup = g; renderMatches(); }
+
+    function closeReportModal() { document.getElementById('report-modal').style.display = 'none'; }
+    function closeWhatsappModal() { document.getElementById('whatsapp-modal').style.display = 'none'; }
+
     function openWhatsappModal(mStr) {
-        const m = JSON.parse(decodeURIComponent(mStr)); state.currentSharingMatch = m;
-        const modal = document.getElementById('whatsapp-modal'); modal.style.display = 'flex';
-        document.getElementById('wa-auth-error').classList.add('hidden');
-        document.getElementById('wa-team-password').value = '';
-        document.getElementById('wa-team-password').type = 'password';
-        document.getElementById('wa-pass-toggle-icon').className = 'fas fa-eye-slash';
-        
-        document.getElementById('wa-logo-t1-slot').innerHTML = getLogoHtml(m.t1, "w-8 h-8");
-        document.getElementById('wa-logo-t2-slot').innerHTML = getLogoHtml(m.t2, "w-8 h-8");
-        document.getElementById('wa-name-t1-slot').innerText = m.t1;
-        document.getElementById('wa-name-t2-slot').innerText = m.t2;
-        
-        let tid = 1; 
-        if (state.selectedTeam) { 
-            const sn = superNormalize(getCoreName(state.selectedTeam)); 
-            if (sn === superNormalize(getCoreName(m.t2))) tid = 2; 
-        }
-        switchWaTargetTeam(tid);
-        
-        document.getElementById('whatsapp-modal-match-info').innerHTML = `<div class="w-1/3 flex flex-col items-center gap-2 shrink-0">${getLogoHtml(m.t1, "w-14 h-14")} <span class="text-[9px] uppercase font-black line-clamp-2 text-slate-900">${m.t1}</span></div><div class="flex-1 flex flex-col items-center justify-center px-1"><span class="text-2xl font-black text-indigo-950">${isMatchPlayed(m) ? m.s1+"-"+m.s2 : "VS"}</span></div><div class="w-1/3 flex flex-col items-center gap-2 shrink-0">${getLogoHtml(m.t2, "w-14 h-14")} <span class="text-[9px] uppercase font-black line-clamp-2 text-slate-900">${m.t2}</span></div>`;
+        try {
+            const m = JSON.parse(decodeURIComponent(mStr)); state.currentSharingMatch = m;
+            document.getElementById('whatsapp-modal').style.display = 'flex';
+            document.getElementById('wa-team-password').value = '';
+            document.getElementById('wa-logo-t1-slot').innerHTML = getLogoHtml(m.t1, "w-8 h-8");
+            document.getElementById('wa-logo-t2-slot').innerHTML = getLogoHtml(m.t2, "w-8 h-8");
+            document.getElementById('wa-name-t1-slot').innerText = m.t1;
+            document.getElementById('wa-name-t2-slot').innerText = m.t2;
+            switchWaTargetTeam(1);
+            const played = isMatchPlayed(m);
+            document.getElementById('whatsapp-modal-match-info').innerHTML = `<div class="w-1/3 flex flex-col items-center gap-2">${getLogoHtml(m.t1, "w-14 h-14")} <span class="text-[9px] uppercase font-black line-clamp-2 text-slate-900">${m.t1}</span></div><div class="flex-1 flex flex-col items-center justify-center px-1 text-slate-800"><span class="text-2xl font-black">${played ? m.s1+"-"+m.s2 : "VS"}</span></div><div class="w-1/3 flex flex-col items-center gap-2">${getLogoHtml(m.t2, "w-14 h-14")} <span class="text-[9px] uppercase font-black line-clamp-2 text-slate-900">${m.t2}</span></div>`;
+        } catch(e) { console.error(e); }
     }
 
     function switchWaTargetTeam(id) {
-        const m = state.currentSharingMatch; if(!m) return;
-        const sel = (id === 1) ? m.t1 : m.t2; state.modalCurrentTeam = sel;
-        document.querySelectorAll('.wa-team-choice-btn').forEach(b => b.classList.remove('selected'));
-        document.getElementById(`wa-target-t${id}`).classList.add('selected');
-        document.getElementById('wa-selected-team-label').innerText = sel;
-        const rosterSec = document.getElementById('whatsapp-roster-section'), list = document.getElementById('players-input-list');
-        list.innerHTML = '';
-        
-        if (!isMatchPlayed(m)) {
-            rosterSec.style.display = 'flex';
-            const g = getGroupCode(m), tk = superNormalize(normalizeForLogo(sel)), gk = superNormalize(g);
-            let roster = (state.rosters[tk] && state.rosters[tk][gk]) ? state.rosters[tk][gk] : null;
-            
-            if (roster) { 
-                document.getElementById('coach-name-input').value = roster.coach || ''; 
-                roster.players.forEach((p, idx) => { if (idx < 18) addPlayerRow(idx + 1, p.no, p.name, p.pos); }); 
-            } else { 
-                document.getElementById('coach-name-input').value = ''; 
-            }
-            const cCount = list.children.length; for (let i = cCount + 1; i <= 14; i++) addPlayerRow(i);
-        } else { rosterSec.style.display = 'none'; }
+        try {
+            const m = state.currentSharingMatch; if(!m) return;
+            const sel = (id === 1) ? m.t1 : m.t2; state.modalCurrentTeam = sel;
+            document.querySelectorAll('.wa-team-choice-btn').forEach(b => b.classList.remove('selected'));
+            const targetBtn = document.getElementById(`wa-target-t${id}`); if(targetBtn) targetBtn.classList.add('selected');
+            document.getElementById('wa-selected-team-label').innerText = sel;
+            const rosterSec = document.getElementById('whatsapp-roster-section'), list = document.getElementById('players-input-list');
+            if(!list) return;
+            list.innerHTML = '';
+            if (!isMatchPlayed(m)) {
+                rosterSec.style.display = 'flex';
+                const g = getGroupCode(m), tk = superNormalize(normalizeForLogo(sel)), gk = superNormalize(g);
+                let roster = (state.rosters[tk] && state.rosters[tk][gk]) ? state.rosters[tk][gk] : null;
+                if (roster) { document.getElementById('coach-name-input').value = roster.coach || ''; roster.players.forEach((p, idx) => addPlayerRow(idx + 1, p.no, p.name, p.pos)); } 
+                else { document.getElementById('coach-name-input').value = ''; }
+                const cCount = list.children.length; for (let i = cCount + 1; i <= 14; i++) addPlayerRow(i);
+            } else { rosterSec.style.display = 'none'; }
+        } catch(e) {}
     }
 
     function addPlayerRow(i, no = '', nm = '', ps = '') {
-        const list = document.getElementById('players-input-list'), row = document.createElement('div');
+        const list = document.getElementById('players-input-list'); if(!list) return;
+        const row = document.createElement('div');
         const nPs = superNormalize(ps);
-        row.className = "flex items-center gap-2 w-full shrink-0 mb-1";
+        row.className = "flex items-center gap-2 w-full mb-1";
         row.innerHTML = `<span class="text-[10px] font-black text-slate-300 w-4 text-center">${i}.</span>
-            <input type="text" id="wa-p-no-${i}" value="${no==='-'?'':no}" placeholder="No" class="w-12 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black outline-none text-slate-900 focus:bg-white shadow-sm">
-            <input type="text" id="wa-p-name-${i}" value="${nm}" placeholder="Sporcu Adı" class="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-900 focus:bg-white shadow-sm">
-            <select id="wa-p-pos-${i}" class="w-24 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold outline-none text-slate-900 focus:bg-white shadow-sm">
-                <option value="">Mevki</option>
-                <option value="Pasör" ${nPs.includes('pasor')?'selected':''}>Pasör</option>
-                <option value="Smaçör" ${nPs.includes('smacor')?'selected':''}>Smaçör</option>
-                <option value="Libero" ${nPs.includes('libero')?'selected':''}>Libero</option>
-                <option value="Orta" ${nPs.includes('orta')?'selected':''}>Orta</option>
+            <input type="text" id="wa-p-no-${i}" value="${no==='-'?'':no}" placeholder="No" class="w-12 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black outline-none text-slate-900">
+            <input type="text" id="wa-p-name-${i}" value="${nm}" placeholder="Sporcu Adı" class="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none text-slate-900">
+            <select id="wa-p-pos-${i}" class="w-24 p-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold outline-none text-slate-900">
+                <option value="">Mevki</option><option value="Pasör" ${nPs.includes('pasor')?'selected':''}>Pasör</option><option value="Smaçör" ${nPs.includes('smacor')?'selected':''}>Smaçör</option><option value="Libero" ${nPs.includes('libero')?'selected':''}>Libero</option><option value="Orta" ${nPs.includes('orta')?'selected':''}>Orta</option>
             </select>`;
         list.appendChild(row);
     }
 
-    function closeReportModal() { 
-        document.getElementById('report-modal').style.display = 'none'; 
-        document.getElementById('report-team-password').value = ''; 
-        document.getElementById('report-auth-section').style.display = 'block';
-        document.getElementById('report-form-section').style.display = 'none';
+    function sendWhatsappMessage() {
+        try {
+            const tN = state.modalCurrentTeam;
+            const iPass = document.getElementById('wa-team-password').value.trim();
+            const coreName = getCoreName(tN);
+            const cPass = state.auth[superNormalize(normalizeForLogo(coreName))] || state.auth[superNormalize(normalizeForLogo(tN))];
+            if (!cPass || iPass !== cPass) { document.getElementById('wa-auth-error').classList.remove('hidden'); return; }
+            document.getElementById('wa-auth-error').classList.add('hidden');
+            const m = state.currentSharingMatch;
+            let text = `\u{1F3D0} *VOLEYBOL DAY PRO - MAÇ BİLGİSİ*\n\n\u{1F3C6} *Kategori:* ${getGroupCode(m)}\n\u{1F19A} *Maç:* ${m.t1} vs ${m.t2}\n\u{1F4C5} *Tarih:* ${m.date} - ${m.time}\n\u{1F4CD} *Salon:* ${m.venue}\n`;
+            if (isMatchPlayed(m)) { text += `\u{1F4CA} *Sonuç:* ${m.s1} - ${m.s2}\n`; if (m.sets && m.sets.trim() !== '-') text += `\u{1F4DD} *Setler:* ${m.sets.replace(/<[^>]*>/g, '')}\n`; }
+            const note = document.getElementById('whatsapp-note').value.trim();
+            if (note) text += `\n\u{1F4CC} *Not:* ${note}\n`;
+            if (!isMatchPlayed(m)) {
+                const coach = document.getElementById('coach-name-input').value.trim();
+                const meetTime = document.getElementById('meeting-time-input').value.trim();
+                const meetLoc = document.getElementById('meeting-location-input').value.trim();
+                const serveStatus = document.getElementById('team-serve-status-input').value;
+                text += `\n\u{1F4CB} *MAÇ KADROSU VE DETAYLAR*\n`;
+                if (coach) text += `👨🏻\u{200D}\u{1F3EB} *Antrenör:* ${coach}\n`;
+                if (meetTime || meetLoc) text += `\u{23F0} *Toplanma:* ${meetTime} ${meetLoc ? '- ' + meetLoc : ''}\n`;
+                text += `\u{1F68C} *Servis:* ${serveStatus.includes('Var') ? 'Var ✅' : 'Yok ❌'}\n\n\u{1F465} *Sporcu Listesi:*\n`;
+                for (let i = 1; i <= 14; i++) {
+                    const nI = document.getElementById(`wa-p-name-${i}`), noI = document.getElementById(`wa-p-no-${i}`), pI = document.getElementById(`wa-p-pos-${i}`);
+                    if (nI && nI.value.trim()) text += `${i}. ${nI.value.trim()} (No: ${noI.value||'-'}) - ${pI.value}\n`;
+                }
+            }
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            closeWhatsappModal();
+        } catch(e) { alert("Paylaşım başarısız oldu."); }
     }
-    
+
     function openReportModal(mStr) {
-        const m = JSON.parse(decodeURIComponent(mStr)); state.currentSharingMatch = m;
-        const modal = document.getElementById('report-modal'); modal.style.display = 'flex';
-        document.getElementById('report-auth-section').style.display = 'block';
-        document.getElementById('report-form-section').style.display = 'none';
-        document.getElementById('report-team-password').value = '';
-        document.getElementById('report-team-password').type = 'password';
-        document.getElementById('rep-pass-toggle-icon').className = 'fas fa-eye-slash';
-        document.getElementById('rep-logo-t1-slot').innerHTML = getLogoHtml(m.t1, "w-8 h-8");
-        document.getElementById('rep-logo-t2-slot').innerHTML = getLogoHtml(m.t2, "w-8 h-8");
-        document.getElementById('rep-name-t1-slot').innerText = m.t1;
-        document.getElementById('rep-name-t2-slot').innerText = m.t2;
-        switchReportTargetTeam(1);
+        try {
+            const m = JSON.parse(decodeURIComponent(mStr)); state.currentSharingMatch = m;
+            const modal = document.getElementById('report-modal'); if(!modal) return;
+            modal.style.display = 'flex';
+            document.getElementById('report-auth-section').style.display = 'block';
+            document.getElementById('report-form-section').style.display = 'none';
+            document.getElementById('report-team-password').value = '';
+            document.getElementById('rep-logo-t1-slot').innerHTML = getLogoHtml(m.t1, "w-8 h-8");
+            document.getElementById('rep-logo-t2-slot').innerHTML = getLogoHtml(m.t2, "w-8 h-8");
+            document.getElementById('rep-name-t1-slot').innerText = m.t1;
+            document.getElementById('rep-name-t2-slot').innerText = m.t2;
+            switchReportTargetTeam(1);
+        } catch(e) {}
     }
 
     function switchReportTargetTeam(id) {
         const m = state.currentSharingMatch; if(!m) return;
         const sel = (id === 1) ? m.t1 : m.t2; state.modalCurrentReportTeam = sel;
-        document.querySelectorAll('#rep-team-selection-row .wa-team-choice-btn').forEach(b => b.classList.toggle('selected', b.id === `rep-target-t${id}`));
+        document.querySelectorAll('#rep-team-selection-row .wa-team-choice-btn').forEach(b => b.classList.remove('selected'));
+        const btn = document.getElementById(`rep-target-t${id}`); if(btn) btn.classList.add('selected');
         document.getElementById('rep-selected-team-label').innerText = sel;
     }
 
     function verifyReportPassword() {
         const tN = state.modalCurrentReportTeam;
         const iPass = document.getElementById('report-team-password').value.trim();
-        const cPass = state.auth[superNormalize(normalizeForLogo(tN))];
+        const coreName = getCoreName(tN);
+        const cPass = state.auth[superNormalize(normalizeForLogo(coreName))] || state.auth[superNormalize(normalizeForLogo(tN))];
         if (!cPass || iPass !== cPass) { document.getElementById('rep-auth-error').classList.remove('hidden'); return; }
         document.getElementById('rep-auth-error').classList.add('hidden');
         document.getElementById('report-auth-section').style.display = 'none';
@@ -794,7 +925,8 @@
         const sel = state.modalCurrentReportTeam;
         const g = getGroupCode(m), tk = superNormalize(normalizeForLogo(sel)), gk = superNormalize(g);
         let roster = (state.rosters[tk] && state.rosters[tk][gk]) ? state.rosters[tk][gk] : null;
-        const list = document.getElementById('rep-players-list'); list.innerHTML = ''; state.reportPlayersCache = []; 
+        const list = document.getElementById('rep-players-list'); if(!list) return;
+        list.innerHTML = ''; state.reportPlayersCache = []; 
         if (roster && roster.players.length > 0) {
             roster.players.forEach((p, idx) => {
                 if(idx < 14) { state.reportPlayersCache.push(p); addReportPlayerRow(idx, p.no, p.name, p.pos); }
@@ -803,12 +935,13 @@
     }
 
     function addReportPlayerRow(idx, no, nm, ps) {
-        const list = document.getElementById('rep-players-list'), row = document.createElement('div');
+        const list = document.getElementById('rep-players-list'); if(!list) return;
+        const row = document.createElement('div');
         row.className = "flex flex-col gap-2 w-full shrink-0 mb-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm";
         row.innerHTML = `
-            <div class="flex items-center justify-between border-b pb-2">
-                <div class="flex items-center gap-2"><span class="w-6 h-6 bg-indigo-50 text-indigo-800 text-[10px] font-black flex items-center justify-center rounded-md">${no==='-'?'?':no}</span><span class="text-xs font-black text-slate-900 truncate uppercase">${nm}</span></div>
-                <div class="flex items-center gap-2"><span class="text-[9px] font-bold text-slate-400">PUAN:</span><input type="number" id="rep-p-score-${idx}" min="1" max="5" value="3" class="w-10 p-1 text-xs text-center border rounded-lg outline-none focus:border-indigo-500 bg-slate-50 font-black"></div>
+            <div class="flex items-center justify-between border-b pb-2 text-slate-900">
+                <div class="flex items-center gap-2"><span class="w-6 h-6 bg-indigo-50 text-indigo-800 text-[10px] font-black flex items-center justify-center rounded-md">${no==='-'?'?':no}</span><span class="text-xs font-black truncate uppercase text-slate-900">${nm}</span></div>
+                <div class="flex items-center gap-2 text-slate-900"><span class="text-[9px] font-bold text-slate-400">PUAN:</span><input type="number" id="rep-p-score-${idx}" min="1" max="5" value="3" class="w-10 p-1 text-xs text-center border rounded-lg outline-none focus:border-indigo-500 bg-slate-50 font-black"></div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 <div class="flex flex-col gap-1 w-full min-w-0">
@@ -825,263 +958,19 @@
         list.appendChild(row);
     }
 
-    // YENİ: ÇOKLU MADDELERİ ÇİP OLARAK EKLEME FONKSİYONU
     function addReportTag(idx, type, selectEl) {
         const val = selectEl.value;
         if (val === '-' || !val) return;
-        
         const container = document.getElementById(`rep-p-${type}-chips-${idx}`);
-        // Aynı madde daha önce eklendiyse tekrar ekleme
-        if (Array.from(container.children).some(c => c.dataset.val === val)) {
-            selectEl.value = '-';
-            return;
-        }
-        
+        if (Array.from(container.children).some(c => c.dataset.val === val)) { selectEl.value = '-'; return; }
         const chip = document.createElement('div');
         const bgColors = type === 'pro' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700';
         const iconColor = type === 'pro' ? 'text-emerald-500 hover:text-emerald-800' : 'text-rose-500 hover:text-rose-800';
-        
         chip.className = `inline-flex items-center gap-1.5 border text-[9px] font-black px-2 py-1 rounded-md shadow-sm ${bgColors}`;
         chip.dataset.val = val;
-        chip.innerHTML = `
-            <span class="truncate max-w-[140px]" title="${val}">${val}</span>
-            <i class="fas fa-times cursor-pointer ${iconColor}" onclick="this.parentElement.remove()"></i>
-        `;
-        
+        chip.innerHTML = `<span class="truncate max-w-[140px]">${val}</span><i class="fas fa-times cursor-pointer ${iconColor}" onclick="this.parentElement.remove()"></i>`;
         container.appendChild(chip);
-        selectEl.value = '-'; // Seçimi sıfırla ki yeni madde eklenebilsin
-    }
-
-    function downloadAsPDF(event) {
-        const btn = event ? (event.currentTarget || event.target) : null;
-        let originalText = btn ? btn.innerHTML : '';
-        if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl"></i> İNDİRİLİYOR...'; btn.disabled = true; }
-        
-        if (typeof window.html2pdf === 'undefined') {
-            alert("Sistem yüklenemedi. Lütfen sayfayı yenileyin.");
-            if (btn) { btn.innerHTML = originalText; btn.disabled = false; } return;
-        }
-
-        const m = state.currentSharingMatch, selTeam = state.modalCurrentReportTeam;
-        const summary = document.getElementById('rep-match-summary').value.trim() || 'Genel özet girilmedi.';
-        const sServe = document.getElementById('rep-score-serve').value;
-        const sRecv = document.getElementById('rep-score-recv').value;
-        const sAtk = document.getElementById('rep-score-atk').value;
-        const sDef = document.getElementById('rep-score-def').value;
-        const sSpirit = document.getElementById('rep-score-spirit').value;
-        const focusTech = document.getElementById('rep-focus-tech').value.trim() || '-';
-        const focusMental = document.getElementById('rep-focus-mental').value.trim() || '-';
-        
-        let playerRowsHtml = '';
-        state.reportPlayersCache.forEach((p, idx) => {
-            const score = document.getElementById(`rep-p-score-${idx}`).value;
-            
-            // Çiplerin İçinden Verileri Çek
-            const proContainer = document.getElementById(`rep-p-pro-chips-${idx}`);
-            const proChips = Array.from(proContainer.children).map(c => c.dataset.val);
-            const proText = proChips.length > 0 ? proChips.join(', ') : '-';
-            
-            const conContainer = document.getElementById(`rep-p-con-chips-${idx}`);
-            const conChips = Array.from(conContainer.children).map(c => c.dataset.val);
-            const conText = conChips.length > 0 ? conChips.join(', ') : '-';
-            
-            playerRowsHtml += `
-                <tr style="border-bottom: 1px solid #e2e8f0; font-size: 10px;">
-                    <td style="padding: 4px; font-weight: 800; color: #1e1b4b; text-align: center;">${p.no === '-' ? '' : p.no}</td>
-                    <td style="padding: 4px; font-weight: 800; color: #1e1b4b; text-transform: uppercase;">${p.name}</td>
-                    <td style="padding: 4px; color: #64748b; text-transform: uppercase; font-size: 9px;">${p.pos}</td>
-                    <td style="padding: 4px; font-weight: 800; text-align: center; color: #4338ca;">${score}</td>
-                    <td style="padding: 4px; color: #10b981; font-weight: 600; font-size: 8.5px; line-height: 1.2;">${proText}</td>
-                    <td style="padding: 4px; color: #f43f5e; font-weight: 600; font-size: 8.5px; line-height: 1.2;">${conText}</td>
-                </tr>`;
-        });
-
-        const rawLogoUrl = getLogoUrlStr(selTeam);
-        let logoHtml = '<div style="width:45px; height:45px; background:#f1f5f9; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; color:#1e1b4b;">VO</div>';
-        if (rawLogoUrl) {
-            let safeUrl = rawLogoUrl.startsWith('http') && !rawLogoUrl.includes('images.weserv.nl') ? `https://images.weserv.nl/?url=${encodeURIComponent(rawLogoUrl)}&default=${encodeURIComponent(rawLogoUrl)}` : rawUrl;
-            logoHtml = `<img src="${safeUrl}" crossorigin="anonymous" style="width: 45px; height: 45px; object-fit: contain;">`;
-        }
-
-        const isWin = (selTeam === m.t1 && parseInt(m.s1) > parseInt(m.s2)) || (selTeam === m.t2 && parseInt(m.s2) > parseInt(m.s1));
-        const resColor = isWin ? '#10b981' : '#f43f5e';
-        const resText = isWin ? 'GALİBİYET' : 'MAĞLUBİYET';
-
-        const htmlContent = `
-            <div style="width: 794px; height: 1115px; background-color: #ffffff; padding: 25px 35px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #1e1b4b; overflow: hidden;">
-                <!-- HEADER -->
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #facc15; padding-bottom: 8px; margin-bottom: 12px; flex-shrink: 0;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        ${logoHtml}
-                        <div>
-                            <h1 style="margin: 0; font-size: 16px; color: #1e1b4b; text-transform: uppercase; font-weight: 800;">RESMİ MAÇ DEĞERLENDİRME RAPORU</h1>
-                            <h2 style="margin: 2px 0 0 0; font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 600;">${selTeam}</h2>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 9px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">VOLEYBOL DAY PRO</div>
-                        <div style="font-size: 11px; font-weight: 800; color: #1e1b4b; margin-top: 2px;">${getTodayString()}</div>
-                    </div>
-                </div>
-
-                <!-- INFO BAR -->
-                <div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; border: 1px solid #f1f5f9; flex-shrink: 0;">
-                    <div>
-                        <div style="font-size: 9px; color: #64748b; font-weight: 700; margin-bottom: 2px;">Tarih & Salon</div>
-                        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin-bottom: 6px;">${m.date} - ${m.venue}</div>
-                        <div style="font-size: 9px; color: #64748b; font-weight: 700; margin-bottom: 2px;">Kategori / Lig</div>
-                        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b;">${getGroupCode(m)}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 9px; color: #64748b; font-weight: 700; margin-bottom: 2px;">Rakip Takım</div>
-                        <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin-bottom: 6px;">${selTeam === m.t1 ? m.t2 : m.t1}</div>
-                        <div style="font-size: 9px; color: #64748b; font-weight: 700; margin-bottom: 2px;">Sonuç ve Setler</div>
-                        <div style="font-size: 13px; font-weight: 900; color: ${resColor};">${m.s1} - ${m.s2} (${resText})</div>
-                        <div style="font-size: 10px; color: #1e1b4b; font-weight: 800; margin-top: 2px;">${m.sets.replace(/<[^>]*>/g, '')}</div>
-                    </div>
-                </div>
-
-                <!-- SUMMARY -->
-                <div style="margin-bottom: 12px; flex-shrink: 0;">
-                    <h3 style="font-size: 10px; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800;">MAÇIN GENEL ÖZETİ</h3>
-                    <p style="font-size: 11px; color: #334155; margin: 0; line-height: 1.4; font-weight: 500;">${summary}</p>
-                </div>
-
-                <!-- TEAM STATS -->
-                <div style="margin-bottom: 12px; flex-shrink: 0;">
-                    <h3 style="font-size: 10px; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase; font-weight: 800;">1. TAKIM GENEL DEĞERLENDİRMESİ (1-5 PUAN)</h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #f1f5f9; padding: 6px 12px; border-radius: 8px;">
-                        <div style="font-size: 10px; color: #334155; font-weight: 700; display: flex; align-items: center;">Servis Etkinliği: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:18px; height:18px; border-radius:4px; font-weight:900; margin-left: 4px;">${sServe}</span></div>
-                        <div style="font-size: 10px; color: #334155; font-weight: 700; display: flex; align-items: center;">Servis Karşılama: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:18px; height:18px; border-radius:4px; font-weight:900; margin-left: 4px;">${sRecv}</span></div>
-                        <div style="font-size: 10px; color: #334155; font-weight: 700; display: flex; align-items: center;">Hücum & Bitiricilik: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:18px; height:18px; border-radius:4px; font-weight:900; margin-left: 4px;">${sAtk}</span></div>
-                        <div style="font-size: 10px; color: #334155; font-weight: 700; display: flex; align-items: center;">Blok & Defans: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:18px; height:18px; border-radius:4px; font-weight:900; margin-left: 4px;">${sDef}</span></div>
-                        <div style="font-size: 10px; color: #334155; font-weight: 700; display: flex; align-items: center;">Takım Ruhu: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:18px; height:18px; border-radius:4px; font-weight:900; margin-left: 4px;">${sSpirit}</span></div>
-                    </div>
-                </div>
-
-                <!-- PLAYER PERFORMANCE -->
-                ${playerRowsHtml !== '' ? `
-                <div style="margin-bottom: 8px; flex-grow: 1;">
-                    <h3 style="font-size: 10px; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 4px; text-transform: uppercase; font-weight: 800;">2. BİREYSEL OYUNCU PERFORMANS TABLOSU</h3>
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                        <thead>
-                            <tr style="background: #f8fafc; font-size: 9px; color: #64748b; text-transform: uppercase;">
-                                <th style="padding: 4px; text-align: center; width: 25px; font-weight: 800;">NO</th>
-                                <th style="padding: 4px; font-weight: 800;">OYUNCU ADI</th>
-                                <th style="padding: 4px; font-weight: 800;">POZİSYON</th>
-                                <th style="padding: 4px; text-align: center; width: 35px; font-weight: 800;">PUAN</th>
-                                <th style="padding: 4px; font-weight: 800; width: 28%;">MAÇIN ARTISI</th>
-                                <th style="padding: 4px; font-weight: 800; width: 28%;">GELİŞİM ODAĞI</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${playerRowsHtml}
-                        </tbody>
-                    </table>
-                </div>` : ''}
-
-                <!-- ACTION PLAN -->
-                <div style="margin-top: auto; flex-shrink: 0;">
-                    <h3 style="font-size: 10px; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase; font-weight: 800;">3. SONUÇ VE EYLEM PLANI</h3>
-                    <div style="background: #fefce8; border: 1px solid #fef08a; padding: 10px; border-radius: 8px; font-size: 11px; line-height: 1.4;">
-                        <div style="margin-bottom: 4px;"><strong style="color: #ca8a04;">Teknik Odak:</strong> <span style="color: #713f12; font-weight: 600;">${focusTech}</span></div>
-                        <div><strong style="color: #ca8a04;">Taktik/Mental Odak:</strong> <span style="color: #713f12; font-weight: 600;">${focusMental}</span></div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const originalScrollY = window.scrollY;
-        const mainApp = document.getElementById('app');
-        const reportModal = document.getElementById('report-modal');
-        
-        mainApp.style.display = 'none';
-        reportModal.style.display = 'none';
-        window.scrollTo(0, 0);
-
-        const blocker = document.createElement('div');
-        blocker.style.position = 'fixed';
-        blocker.style.inset = '0';
-        blocker.style.backgroundColor = '#f8fafc';
-        blocker.style.zIndex = '9999999';
-        blocker.style.display = 'flex';
-        blocker.style.flexDirection = 'column';
-        blocker.style.alignItems = 'center';
-        blocker.style.justifyContent = 'center';
-        blocker.innerHTML = '<i class="fas fa-cog fa-spin text-indigo-600 text-6xl mb-4"></i><h2 class="text-2xl font-black text-indigo-950 uppercase tracking-tight">Rapor İşleniyor</h2><p class="text-slate-500 font-bold mt-2 text-center px-4">Lütfen bekleyin, A4 Formatlı PDF hazırlanıyor...</p>';
-        document.body.appendChild(blocker);
-
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.top = '-9999px'; 
-        tempContainer.style.left = '0';
-        tempContainer.innerHTML = htmlContent;
-        document.body.appendChild(tempContainer);
-
-        const element = tempContainer.firstElementChild;
-
-        const ayarlar = {
-            margin:       0,
-            filename:     `${superNormalize(selTeam)}_Mac_Raporu.pdf`,
-            image:        { type: 'jpeg', quality: 1.0 },
-            html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF:        { unit: 'px', format: [794, 1123], orientation: 'portrait' }
-        };
-
-        setTimeout(() => {
-            html2pdf().set(ayarlar).from(element).save().then(() => {
-                document.body.removeChild(tempContainer);
-                document.body.removeChild(blocker);
-                mainApp.style.display = 'block';
-                window.scrollTo(0, originalScrollY);
-                if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
-                closeReportModal();
-            }).catch(err => {
-                console.error("PDF Hatası:", err);
-                document.body.removeChild(tempContainer);
-                document.body.removeChild(blocker);
-                mainApp.style.display = 'block';
-                window.scrollTo(0, originalScrollY);
-                alert("PDF oluşturulurken hata oluştu.");
-                if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
-            });
-        }, 800); 
-    }
-
-    function copyReportAsText(event) {
-        const btn = event.currentTarget;
-        const origText = btn.innerHTML;
-        
-        const selTeam = state.modalCurrentReportTeam;
-        const m = state.currentSharingMatch;
-        const summary = document.getElementById('rep-match-summary').value.trim() || '-';
-        
-        let text = `🏐 MAÇ ANALİZ RAPORU - ${selTeam}\n`;
-        text += `📅 Tarih: ${m.date} | 📍 Salon: ${m.venue}\n`;
-        text += `🆚 Rakip: ${selTeam === m.t1 ? m.t2 : m.t1}\n`;
-        text += `📊 Sonuç: ${m.s1} - ${m.s2}\n\n`;
-        text += `📝 MAÇ ÖZETİ:\n${summary}\n\n`;
-        text += `🎯 GELECEK ANTRENMAN ODAĞI:\n`;
-        text += `Teknik: ${document.getElementById('rep-focus-tech').value.trim() || '-'}\n`;
-        text += `Mental: ${document.getElementById('rep-focus-mental').value.trim() || '-'}\n`;
-
-        navigator.clipboard.writeText(text).then(() => {
-            btn.innerHTML = '<i class="fas fa-check text-xl"></i> KOPYALANDI!';
-            btn.classList.replace('bg-emerald-600', 'bg-slate-800');
-            setTimeout(() => {
-                btn.innerHTML = origText;
-                btn.classList.replace('bg-slate-800', 'bg-emerald-600');
-            }, 2000);
-        }).catch(err => alert("Kopyalama başarısız oldu."));
-    }
-
-    function calculateFullStats(tName) {
-        let p=0, w=0, l=0, d=0, n=0; const key = superNormalize(getCoreName(tName));
-        state.allMatches.forEach(m => {
-            const t1 = superNormalize(getCoreName(m.t1)), t2 = superNormalize(getCoreName(m.t2));
-            if (t1 === key || t2 === key) { if (isMatchPlayed(m)) { p++; const s1 = parseInt(m.s1), s2 = parseInt(m.s2); if (t1 === key) s1 > s2 ? w++ : l++; else s2 > s1 ? w++ : l++; } else { if (isMatchDelayed(m)) d++; else n++; } }
-        });
-        return { p, w, l, d, n };
+        selectEl.value = '-';
     }
 
     function togglePasswordVisibility(inputId, iconId) { 
@@ -1090,18 +979,67 @@
         else { pi.type = 'password'; ti.className = 'fas fa-eye-slash'; } 
     }
 
+    function downloadAsPDF(event) {
+        const btn = event.currentTarget; const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin text-2xl"></i> İNDİRİLİYOR...'; btn.disabled = true;
+        try {
+            const m = state.currentSharingMatch, selTeam = state.modalCurrentReportTeam;
+            const sServe = document.getElementById('rep-score-serve').value, sRecv = document.getElementById('rep-score-recv').value, sAtk = document.getElementById('rep-score-atk').value, sDef = document.getElementById('rep-score-def').value, sSpirit = document.getElementById('rep-score-spirit').value;
+            const focusTech = document.getElementById('rep-focus-tech').value.trim() || '-', focusMental = document.getElementById('rep-focus-mental').value.trim() || '-';
+            const summary = (document.getElementById('rep-match-summary').value || '').trim() || '-';
+            let playerRowsHtml = '';
+            state.reportPlayersCache.forEach((p, idx) => {
+                const score = document.getElementById(`rep-p-score-${idx}`).value;
+                const proChips = Array.from(document.getElementById(`rep-p-pro-chips-${idx}`).children).map(c => c.dataset.val).join(', ') || '-';
+                const conChips = Array.from(document.getElementById(`rep-p-con-chips-${idx}`).children).map(c => c.dataset.val).join(', ') || '-';
+                playerRowsHtml += `<tr style="border-bottom: 1px solid #e2e8f0; font-size: 10px;"><td style="padding: 4px; font-weight: 800; text-align: center; color: #1e1b4b;">${p.no==='-'?'':p.no}</td><td style="padding: 4px; font-weight: 800; text-transform: uppercase; color: #1e1b4b;">${p.name}</td><td style="padding: 4px; color: #64748b; font-size: 9px;">${p.pos}</td><td style="padding: 4px; font-weight: 800; text-align: center; color: #4338ca;">${score}</td><td style="padding: 4px; color: #10b981; font-size: 8.5px;">${proChips}</td><td style="padding: 4px; color: #f43f5e; font-size: 8.5px;">${conChips}</td></tr>`;
+            });
+            const isWin = (selTeam === m.t1 && parseInt(m.s1||0) > parseInt(m.s2||0)) || (selTeam === m.t2 && parseInt(m.s2||0) > parseInt(m.s1||0));
+            const htmlContent = `<div style="width: 794px; height: 1115px; background-color: #ffffff; padding: 25px 35px; box-sizing: border-box; display: flex; flex-direction: column; font-family: sans-serif; color: #1e1b4b; overflow: hidden;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #facc15; padding-bottom: 8px; margin-bottom: 12px;"><div><h1 style="margin: 0; font-size: 16px; font-weight: 800;">RESMİ MAÇ RAPORU</h1><h2 style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">${selTeam}</h2></div><div style="text-align: right;"><div style="font-size: 9px; color: #94a3b8; font-weight: 800;">VOLEYBOL DAY PRO</div><div style="font-size: 11px; font-weight: 800; color: #1e1b4b;">${getTodayString()}</div></div></div><div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; border: 1px solid #f1f5f9;"><div><div style="font-size: 12px; font-weight: 800;">${m.date} - ${m.venue}</div><div style="font-size: 12px; font-weight: 800;">${getGroupCode(m)}</div></div><div style="text-align: right;"><div style="font-size: 12px; font-weight: 800;">${selTeam === m.t1 ? m.t2 : m.t1}</div><div style="font-size: 13px; font-weight: 900; color: ${isWin ? '#10b981' : '#f43f5e'};">${m.s1} - ${m.s2} (${isWin?'GALİBİYET':'MAĞLUBİYET'})</div></div></div><div style="margin-bottom: 12px;"><h3 style="font-size: 10px; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-weight: 800;">MAÇIN GENEL ÖZETİ</h3><p style="font-size: 11px; margin: 4px 0; color: #1e1b4b;">${summary}</p></div><div style="margin-bottom: 12px;"><h3 style="font-size: 10px; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-weight: 800;">1. TAKIM GENEL DEĞERLENDİRMESİ</h3><div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; color: #1e1b4b;"><span>Servis: ${sServe}</span><span>Karşılama: ${sRecv}</span><span>Hücum: ${sAtk}</span><span>Blok: ${sDef}</span><span>Ruh: ${sSpirit}</span></div></div><div style="flex-grow: 1;"><h3 style="font-size: 10px; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-weight: 800;">2. BİREYSEL PERFORMANS TABLOSU</h3><table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #f8fafc; font-size: 9px; color: #64748b; text-transform: uppercase;"><th style="padding: 4px; text-align: center;">NO</th><th>AD</th><th>POS</th><th>PUAN</th><th>ARTI</th><th>GELİŞİM</th></tr></thead><tbody>${playerRowsHtml}</tbody></table></div><div style="margin-top: auto; background: #fefce8; border: 1px solid #fef08a; padding: 10px; border-radius: 8px; font-size: 11px; color: #1e1b4b;"><strong>Teknik Odak:</strong> ${focusTech}<br><strong>Mental Odak:</strong> ${focusMental}</div></div>`;
+            const container = document.createElement('div'); container.innerHTML = htmlContent; container.style.position = 'absolute'; container.style.top = '-9999px'; document.body.appendChild(container);
+            html2pdf().set({ margin: 0, filename: `${superNormalize(selTeam)}_Rapor.pdf`, image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' } }).from(container.firstChild).save().then(() => { document.body.removeChild(container); btn.innerHTML = originalText; btn.disabled = false; closeReportModal(); });
+        } catch(e) {
+            btn.innerHTML = originalText; btn.disabled = false;
+        }
+    }
+
+    function copyReportAsText(event) {
+        try {
+            const btn = event.currentTarget; const origText = btn.innerHTML;
+            const selTeam = state.modalCurrentReportTeam;
+            const m = state.currentSharingMatch;
+            const summary = (document.getElementById('rep-match-summary').value || '').trim() || '-';
+            let text = `\u{1F3D0} MAÇ ANALİZ RAPORU - ${selTeam}\n\u{1F4C5} Tarih: ${m.date} | \u{1F4CD} Salon: ${m.venue}\n\u{1F19A} Rakip: ${selTeam === m.t1 ? m.t2 : m.t1}\n\u{1F4CA} Sonuç: ${m.s1} - ${m.s2}\n\n\u{1F4DD} MAÇ ÖZETİ:\n${summary}\n\n\u{1F3AF} GELECEK ANTRENMAN ODAĞI:\nTeknik: ${document.getElementById('rep-focus-tech').value.trim() || '-'}\nMental: ${document.getElementById('rep-focus-mental').value.trim() || '-'}\n`;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.innerHTML = '<i class="fas fa-check text-xl"></i> KOPYALANDI!';
+                btn.classList.replace('bg-emerald-600', 'bg-slate-800');
+                setTimeout(() => { btn.innerHTML = origText; btn.classList.replace('bg-slate-800', 'bg-emerald-600'); }, 2000);
+            });
+        } catch(e) {}
+    }
+
+    // --- BAŞLATMA ---
     window.onload = () => { 
-        syncURLToState(); setDailyQuote(); fetchData();
+        syncURLToState(); 
+        setDailyQuote(); 
+        fetchData();
+        
         setInterval(() => { 
-            const now = new Date(); 
-            const trNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 3));
-            const tEl = document.getElementById('live-time'), dEl = document.getElementById('live-date'); 
-            if (tEl) tEl.innerText = `${String(trNow.getHours()).padStart(2,'0')}:${String(trNow.getMinutes()).padStart(2,'0')}`; 
-            if (dEl) dEl.innerText = `${trNow.getDate()} ${TURKISH_DAYS[trNow.getDay()]}`; 
+            const now = new Date(); const trNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 3));
+            const lt = document.getElementById('live-time'), ld = document.getElementById('live-date');
+            if(lt) lt.innerText = `${String(trNow.getHours()).padStart(2,'0')}:${String(trNow.getMinutes()).padStart(2,'0')}`; 
+            if(ld) ld.innerText = `${trNow.getDate()} ${TURKISH_DAYS[trNow.getDay()]}`; 
         }, 1000); 
+
+        // Sürükleyerek kaydırma için olay dinleyicileri
         ['status-tabs', 'date-tabs', 'alphabet-index', 'region-tabs', 'top-logos-container'].forEach(id => { 
             const el = document.getElementById(id); 
-            if(el) { el.addEventListener('mousedown', (e) => { el.isDown = true; el.startX = e.pageX - el.offsetLeft; el.scrollLeftStart = el.scrollLeft; }); window.addEventListener('mouseup', () => el.isDown = false); el.addEventListener('mousemove', (e) => { if(!el.isDown) return; e.preventDefault(); const x = e.pageX - el.offsetLeft; const walk = (x - el.startX) * 2; el.scrollLeft = el.scrollLeftStart - walk; }); } 
+            if(el) { 
+                el.addEventListener('mousedown', (e) => { el.isDown = true; el.startX = e.pageX - el.offsetLeft; el.scrollLeftStart = el.scrollLeft; }); 
+                window.addEventListener('mouseup', () => el.isDown = false); 
+                el.addEventListener('mouseleave', () => el.isDown = false);
+                el.addEventListener('mousemove', (e) => { if(!el.isDown) return; e.preventDefault(); const x = e.pageX - el.offsetLeft; const walk = (x - el.startX) * 2; el.scrollLeft = el.scrollLeftStart - walk; }); 
+            } 
         });
     };
 </script>
