@@ -16,7 +16,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3851007677940856" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3851007677940856"
+     crossorigin="anonymous"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -188,6 +189,7 @@
     </footer>
 </div>
 
+<!-- WHATSAPP MODAL -->
 <div id="whatsapp-modal" class="modal-overlay text-slate-900">
     <div class="modal-content shadow-2xl custom-scrollbar max-w-[550px]">
         <button onclick="closeWhatsappModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors z-20"><i class="fas fa-times text-xl"></i></button>
@@ -231,6 +233,7 @@
     </div>
 </div>
 
+<!-- REPORT MODAL -->
 <div id="report-modal" class="modal-overlay text-slate-900">
     <div class="modal-content shadow-2xl max-w-[850px] custom-scrollbar">
         <button onclick="closeReportModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 transition-colors z-20"><i class="fas fa-times text-xl"></i></button>
@@ -556,15 +559,22 @@
 
     async function fetchRosters() {
         try {
-            const r = await fetch(`${ROSTER_DATA_SOURCE}&cb=${Date.now()}`); const csvText = await r.text(); if(csvText.toLowerCase().includes('<!doctype html>')) return;
-            state.rosters = {}; const rows = csvText.split(/\r?\n/).map(line => parseCSVLine(line)); 
+            const r = await fetch(`${ROSTER_DATA_SOURCE}&cb=${Date.now()}`); 
+            const csvText = await r.text(); 
+            if(csvText.toLowerCase().includes('<!doctype html>')) return;
+            state.rosters = {}; 
+            const rows = csvText.split(/\r?\n/).map(line => parseCSVLine(line)); 
             let lastTeam = "", lastGroup = "", lastCoach = "";
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i]; if (row.length < 2) continue;
                 const tr = (row[0]||'').replace(/^\uFEFF/, '').trim(), gr = (row[1]||'').trim(), co = (row[2]||'').trim(), no = (row[3]||'').trim(), nm = (row[4]||'').trim(), ps = (row[5]||'').trim(), img = (row[6]||'').trim();
-                if (tr) lastTeam = tr; if (gr) lastGroup = gr; if (co) lastCoach = co; if (!nm || !lastTeam || !lastGroup) continue;
+                if (tr) lastTeam = tr; 
+                if (gr) lastGroup = gr; 
+                if (co) lastCoach = co; 
+                if (!nm || !lastTeam || !lastGroup) continue;
                 const tKey = superNormalize(normalizeForLogo(lastTeam)), gKey = superNormalize(lastGroup);
-                if (!state.rosters[tKey]) state.rosters[tKey] = {}; if (!state.rosters[tKey][gKey]) state.rosters[tKey][gKey] = { coach: lastCoach, players: [] };
+                if (!state.rosters[tKey]) state.rosters[tKey] = {}; 
+                if (!state.rosters[tKey][gKey]) state.rosters[tKey][gKey] = { coach: lastCoach, players: [] };
                 state.rosters[tKey][gKey].players.push({ no: no || '-', name: nm, pos: ps || 'Oyuncu', img: img });
             }
         } catch (e) {}
@@ -583,19 +593,12 @@
     // --- GÖRÜNÜM KONTROLLERİ ---
     function showEmptyState(msg = "Veri bulunamadı.") {
         const empty = document.getElementById('empty-state');
-        if(empty) {
-            empty.classList.remove('hidden');
-            empty.classList.add('flex');
-            empty.querySelector('p').innerText = msg;
-        }
+        if(empty) { empty.classList.remove('hidden'); empty.classList.add('flex'); empty.querySelector('p').innerText = msg; }
     }
 
     function hideEmptyState() {
         const empty = document.getElementById('empty-state');
-        if(empty) {
-            empty.classList.remove('flex');
-            empty.classList.add('hidden');
-        }
+        if(empty) { empty.classList.remove('flex'); empty.classList.add('hidden'); }
     }
 
     function updateUI(shCenter = false) {
@@ -622,9 +625,45 @@
             renderDateTabs(shCenter); 
             renderAlphabetTeams(); 
             renderMatches();
-        } catch(e) {
-            console.error("UI Update Error:", e);
-        }
+        } catch(e) { console.error("UI Update Error:", e); }
+    }
+
+    function renderTopLogos() {
+        try {
+            const c = document.getElementById('top-logos-container'); if (!state.currentDate || !c) return;
+            const seen = new Set(); c.innerHTML = '';
+            state.allMatches.filter(m => m.date === state.currentDate).forEach(m => {
+                [m.t1, m.t2].forEach(t => { 
+                    const core = getCoreName(t); 
+                    if (core && !seen.has(core)) { 
+                        seen.add(core); 
+                        const safeC = core.replace(/'/g, "\\'");
+                        const chip = document.createElement('div'); chip.className = `p-1 rounded-full bg-white transition-all cursor-pointer shrink-0 border ${state.selectedTeam === core ? 'ring-4 ring-indigo-200 border-indigo-500 scale-110' : 'border-slate-100 shadow-sm'}`; chip.innerHTML = getLogoHtml(core, "w-11 h-11 border-none"); chip.onclick = () => selectTeam(safeC); c.appendChild(chip); 
+                    } 
+                });
+            });
+        } catch(e) { console.error("renderTopLogos Error", e); }
+    }
+
+    function renderDateTabs(shCenter) {
+        try {
+            const c = document.getElementById('date-tabs'); if(!c) return;
+            c.innerHTML = '';
+            const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { 
+                const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); 
+                return new Date(p1[2]||0, (p1[1]||1)-1, p1[0]||0) - new Date(p2[2]||0, (p2[1]||1)-1, p2[0]||0); 
+            });
+            let act = null; 
+            ds.forEach(d => {
+                const isA = d === state.currentDate, b = document.createElement('button');
+                b.className = `px-6 py-2.5 rounded-[1.2rem] border shrink-0 transition-all flex flex-col items-center justify-center min-w-[120px] ${isA ? 'active-date-tab' : 'bg-white text-slate-600 border-slate-200 shadow-sm'}`;
+                b.innerHTML = `<span class="text-[12px] font-bold leading-tight text-slate-900">${d}</span><span class="text-[9px] font-black opacity-60 tracking-wider mt-0.5 text-slate-500">${getDayName(d)}</span>`;
+                b.onclick = () => { state.currentDate = d; updateUI(true); }; 
+                c.appendChild(b); 
+                if (isA) act = b;
+            });
+            if (shCenter && act) { setTimeout(() => { const x = act.offsetLeft - (c.clientWidth / 2) + (act.clientWidth / 2); c.scrollTo({ left: x, behavior: 'smooth' }); }, 100); }
+        } catch(e) { console.error("renderDateTabs Error", e); }
     }
 
     function renderAlphabetTeams() {
@@ -681,6 +720,11 @@
                 if (state.selectedTeamGroup !== 'all') {
                     const tKey = superNormalize(normalizeForLogo(state.selectedTeam)), gKey = superNormalize(state.selectedTeamGroup);
                     let rData = (state.rosters[tKey] && state.rosters[tKey][gKey]) ? state.rosters[tKey][gKey] : null;
+                    if (!rData && state.rosters[tKey]) {
+                        // Akıllı Eşleşme (Fuzzy Match Fallback) - Grup adı tam uyuşmazsa takıma ait ilk listeyi getirir.
+                        rData = Object.values(state.rosters[tKey])[0]; 
+                    }
+
                     if (rData && rData.players.length > 0) {
                         let rHtml = `<div class="col-span-full bg-indigo-50/40 p-4 sm:p-6 rounded-[2.5rem] border border-indigo-100 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] mb-4"><div class="flex items-center justify-between mb-6 border-b border-indigo-200/50 pb-4"><h3 class="text-base font-black text-indigo-950 uppercase tracking-tighter flex items-center gap-2"><div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white"><i class="fas fa-users text-sm"></i></div> TAKIM KADROSU</h3>${rData.coach ? `<span class="bg-white text-indigo-700 px-4 py-2 rounded-xl text-[11px] font-black border border-indigo-200 shadow-sm uppercase font-mono text-slate-900"><i class="fas fa-whistle mr-2"></i> ${rData.coach}</span>` : ''}</div><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">`;
                         rData.players.forEach(p => { 
@@ -743,6 +787,13 @@
         </div>`;
     }
 
+    function getLogoUrlStr(teamName) {
+        if (!teamName) return null;
+        const core = getCoreName(teamName); const norm = normalizeForLogo(core); 
+        for (const k in state.logos) { if (norm === normalizeForLogo(k)) { return state.logos[k]; } }
+        return null;
+    }
+
     function getLogoHtml(teamName, classes = "w-10 h-10") {
         if (!teamName) return "";
         const core = getCoreName(teamName), norm = normalizeForLogo(core); let url = null; 
@@ -759,39 +810,6 @@
         return { p, w, l, d, n };
     }
 
-    function renderTopLogos() {
-        try {
-            const c = document.getElementById('top-logos-container'); if (!state.currentDate || !c) return;
-            const seen = new Set(); c.innerHTML = '';
-            state.allMatches.filter(m => m.date === state.currentDate).forEach(m => {
-                [m.t1, m.t2].forEach(t => { 
-                    const core = getCoreName(t); 
-                    if (core && !seen.has(core)) { 
-                        seen.add(core); 
-                        const safeC = core.replace(/'/g, "\\'");
-                        const chip = document.createElement('div'); chip.className = `p-1 rounded-full bg-white transition-all cursor-pointer shrink-0 border ${state.selectedTeam === core ? 'ring-4 ring-indigo-200 border-indigo-500 scale-110' : 'border-slate-100 shadow-sm'}`; chip.innerHTML = getLogoHtml(core, "w-11 h-11 border-none"); chip.onclick = () => selectTeam(safeC); c.appendChild(chip); 
-                    } 
-                });
-            });
-        } catch(e) {}
-    }
-
-    function renderDateTabs(shCenter) {
-        try {
-            const c = document.getElementById('date-tabs'); if(!c) return;
-            c.innerHTML = '';
-            const ds = [...new Set(state.allMatches.map(m => m.date).filter(d => d))].sort((a,b) => { const p1 = a.split('.').map(Number), p2 = b.split('.').map(Number); return new Date(p1[2]||0, (p1[1]||1)-1, p1[0]||0) - new Date(p2[2]||0, (p2[1]||1)-1, p2[0]||0); });
-            let act = null; ds.forEach(d => {
-                const isA = d === state.currentDate, b = document.createElement('button');
-                b.className = `px-6 py-2.5 rounded-[1.2rem] border shrink-0 transition-all flex flex-col items-center justify-center min-w-[120px] ${isA ? 'active-date-tab' : 'bg-white text-slate-600 border-slate-200 shadow-sm'}`;
-                b.innerHTML = `<span class="text-[12px] font-bold leading-tight text-slate-900">${d}</span><span class="text-[9px] font-black opacity-60 tracking-wider mt-0.5 text-slate-500">${getDayName(d)}</span>`;
-                b.onclick = () => { state.currentDate = d; updateUI(true); }; c.appendChild(b); if (isA) act = b;
-            });
-            if (shCenter && act) { setTimeout(() => { const x = act.offsetLeft - (c.clientWidth / 2) + (act.clientWidth / 2); c.scrollTo({ left: x, behavior: 'smooth' }); }, 100); }
-        } catch(e){}
-    }
-
-    // --- EVENT HANDLERLAR ---
     function selectTeam(t) { state.selectedTeam = t; state.searchQuery = t; state.selectedTeamGroup = "all"; syncStateToURL(); updateUI(); }
     function setRegion(r) { state.selectedRegion = r; state.selectedTeam = null; syncStateToURL(); fetchData(); }
     function setStatusFilter(s) { state.selectedStatus = s; document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.id === `filter-${s}`)); renderMatches(); }
@@ -831,6 +849,8 @@
                 rosterSec.style.display = 'flex';
                 const g = getGroupCode(m), tk = superNormalize(normalizeForLogo(sel)), gk = superNormalize(g);
                 let roster = (state.rosters[tk] && state.rosters[tk][gk]) ? state.rosters[tk][gk] : null;
+                if (!roster && state.rosters[tk]) roster = Object.values(state.rosters[tk])[0]; // FALLBACK
+
                 if (roster) { document.getElementById('coach-name-input').value = roster.coach || ''; roster.players.forEach((p, idx) => addPlayerRow(idx + 1, p.no, p.name, p.pos)); } 
                 else { document.getElementById('coach-name-input').value = ''; }
                 const cCount = list.children.length; for (let i = cCount + 1; i <= 14; i++) addPlayerRow(i);
@@ -925,6 +945,18 @@
         const sel = state.modalCurrentReportTeam;
         const g = getGroupCode(m), tk = superNormalize(normalizeForLogo(sel)), gk = superNormalize(g);
         let roster = (state.rosters[tk] && state.rosters[tk][gk]) ? state.rosters[tk][gk] : null;
+        if (!roster && state.rosters[tk]) {
+            roster = Object.values(state.rosters[tk])[0]; // FALLBACK
+        } else if (!roster) {
+            // Bulanık arama
+            for (const key in state.rosters) {
+                if (key.includes(tk) || tk.includes(key)) {
+                    roster = Object.values(state.rosters[key])[0];
+                    break;
+                }
+            }
+        }
+
         const list = document.getElementById('rep-players-list'); if(!list) return;
         list.innerHTML = ''; state.reportPlayersCache = []; 
         if (roster && roster.players.length > 0) {
@@ -968,7 +1000,7 @@
         const iconColor = type === 'pro' ? 'text-emerald-500 hover:text-emerald-800' : 'text-rose-500 hover:text-rose-800';
         chip.className = `inline-flex items-center gap-1.5 border text-[9px] font-black px-2 py-1 rounded-md shadow-sm ${bgColors}`;
         chip.dataset.val = val;
-        chip.innerHTML = `<span class="truncate max-w-[140px]">${val}</span><i class="fas fa-times cursor-pointer ${iconColor}" onclick="this.parentElement.remove()"></i>`;
+        chip.innerHTML = `<span class="truncate max-w-[140px]">${val}</span><i class="fas fa-times cursor-pointer ${iconColor} ml-1" onclick="this.parentElement.remove()"></i>`;
         container.appendChild(chip);
         selectEl.value = '-';
     }
@@ -992,13 +1024,150 @@
                 const score = document.getElementById(`rep-p-score-${idx}`).value;
                 const proChips = Array.from(document.getElementById(`rep-p-pro-chips-${idx}`).children).map(c => c.dataset.val).join(', ') || '-';
                 const conChips = Array.from(document.getElementById(`rep-p-con-chips-${idx}`).children).map(c => c.dataset.val).join(', ') || '-';
-                playerRowsHtml += `<tr style="border-bottom: 1px solid #e2e8f0; font-size: 10px;"><td style="padding: 4px; font-weight: 800; text-align: center; color: #1e1b4b;">${p.no==='-'?'':p.no}</td><td style="padding: 4px; font-weight: 800; text-transform: uppercase; color: #1e1b4b;">${p.name}</td><td style="padding: 4px; color: #64748b; font-size: 9px;">${p.pos}</td><td style="padding: 4px; font-weight: 800; text-align: center; color: #4338ca;">${score}</td><td style="padding: 4px; color: #10b981; font-size: 8.5px;">${proChips}</td><td style="padding: 4px; color: #f43f5e; font-size: 8.5px;">${conChips}</td></tr>`;
+                playerRowsHtml += `<tr style="border-bottom: 1px solid #e2e8f0; page-break-inside: avoid; font-size: 11px;"><td style="padding: 8px; font-weight: 800; text-align: center; color: #1e1b4b;">${p.no==='-'?'':p.no}</td><td style="padding: 8px; font-weight: 800; text-transform: uppercase; color: #1e1b4b;">${p.name}</td><td style="padding: 8px; color: #64748b; font-size: 9px; font-weight: bold;">${p.pos}</td><td style="padding: 8px; font-weight: 900; text-align: center; color: #4338ca; font-size: 13px;">${score}</td><td style="padding: 8px; color: #10b981; font-weight: 600; font-size: 9.5px;">${proChips}</td><td style="padding: 8px; color: #f43f5e; font-weight: 600; font-size: 9.5px;">${conChips}</td></tr>`;
             });
             const isWin = (selTeam === m.t1 && parseInt(m.s1||0) > parseInt(m.s2||0)) || (selTeam === m.t2 && parseInt(m.s2||0) > parseInt(m.s1||0));
-            const htmlContent = `<div style="width: 794px; height: 1115px; background-color: #ffffff; padding: 25px 35px; box-sizing: border-box; display: flex; flex-direction: column; font-family: sans-serif; color: #1e1b4b; overflow: hidden;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #facc15; padding-bottom: 8px; margin-bottom: 12px;"><div><h1 style="margin: 0; font-size: 16px; font-weight: 800;">RESMİ MAÇ RAPORU</h1><h2 style="margin: 2px 0 0 0; font-size: 12px; color: #64748b;">${selTeam}</h2></div><div style="text-align: right;"><div style="font-size: 9px; color: #94a3b8; font-weight: 800;">VOLEYBOL DAY PRO</div><div style="font-size: 11px; font-weight: 800; color: #1e1b4b;">${getTodayString()}</div></div></div><div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; border: 1px solid #f1f5f9;"><div><div style="font-size: 12px; font-weight: 800;">${m.date} - ${m.venue}</div><div style="font-size: 12px; font-weight: 800;">${getGroupCode(m)}</div></div><div style="text-align: right;"><div style="font-size: 12px; font-weight: 800;">${selTeam === m.t1 ? m.t2 : m.t1}</div><div style="font-size: 13px; font-weight: 900; color: ${isWin ? '#10b981' : '#f43f5e'};">${m.s1} - ${m.s2} (${isWin?'GALİBİYET':'MAĞLUBİYET'})</div></div></div><div style="margin-bottom: 12px;"><h3 style="font-size: 10px; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-weight: 800;">MAÇIN GENEL ÖZETİ</h3><p style="font-size: 11px; margin: 4px 0; color: #1e1b4b;">${summary}</p></div><div style="margin-bottom: 12px;"><h3 style="font-size: 10px; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-weight: 800;">1. TAKIM GENEL DEĞERLENDİRMESİ</h3><div style="display: flex; justify-content: space-between; background: #f8fafc; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 700; color: #1e1b4b;"><span>Servis: ${sServe}</span><span>Karşılama: ${sRecv}</span><span>Hücum: ${sAtk}</span><span>Blok: ${sDef}</span><span>Ruh: ${sSpirit}</span></div></div><div style="flex-grow: 1;"><h3 style="font-size: 10px; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; font-weight: 800;">2. BİREYSEL PERFORMANS TABLOSU</h3><table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #f8fafc; font-size: 9px; color: #64748b; text-transform: uppercase;"><th style="padding: 4px; text-align: center;">NO</th><th>AD</th><th>POS</th><th>PUAN</th><th>ARTI</th><th>GELİŞİM</th></tr></thead><tbody>${playerRowsHtml}</tbody></table></div><div style="margin-top: auto; background: #fefce8; border: 1px solid #fef08a; padding: 10px; border-radius: 8px; font-size: 11px; color: #1e1b4b;"><strong>Teknik Odak:</strong> ${focusTech}<br><strong>Mental Odak:</strong> ${focusMental}</div></div>`;
-            const container = document.createElement('div'); container.innerHTML = htmlContent; container.style.position = 'absolute'; container.style.top = '-9999px'; document.body.appendChild(container);
-            html2pdf().set({ margin: 0, filename: `${superNormalize(selTeam)}_Rapor.pdf`, image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' } }).from(container.firstChild).save().then(() => { document.body.removeChild(container); btn.innerHTML = originalText; btn.disabled = false; closeReportModal(); });
+            
+            const rawLogoUrl = getLogoUrlStr(selTeam);
+            let logoHtml = '<div style="width:50px; height:50px; background:#f1f5f9; border-radius:50%; border: 1px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#1e1b4b;">VO</div>';
+            if (rawLogoUrl) {
+                let safeUrl = rawLogoUrl.startsWith('http') && !rawLogoUrl.includes('images.weserv.nl') ? `https://images.weserv.nl/?url=${encodeURIComponent(rawLogoUrl)}&default=${encodeURIComponent(rawLogoUrl)}` : rawLogoUrl;
+                logoHtml = `<img id="pdf-logo-img" src="${safeUrl}" crossorigin="anonymous" style="width: 50px; height: 50px; object-fit: contain; border-radius: 50%; border: 1px solid #e2e8f0; padding: 2px;">`;
+            }
+
+            const htmlContent = `
+                <div style="width: 794px; height: 1115px; max-height: 1115px; background-color: #ffffff; padding: 30px 40px; box-sizing: border-box; display: flex; flex-direction: column; font-family: sans-serif; color: #1e1b4b; overflow: hidden; page-break-inside: avoid; page-break-after: avoid;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #facc15; padding-bottom: 12px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            ${logoHtml}
+                            <div>
+                                <h1 style="margin: 0; font-size: 18px; font-weight: 900; text-transform: uppercase;">RESMİ MAÇ DEĞERLENDİRME RAPORU</h1>
+                                <h2 style="margin: 4px 0 0 0; font-size: 13px; color: #64748b; font-weight: 700;">${selTeam}</h2>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 10px; color: #94a3b8; font-weight: 900; letter-spacing: 1px;">VOLEYBOL DAY PRO</div>
+                            <div style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin-top: 4px;">${getTodayString()}</div>
+                        </div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; border: 1px solid #f1f5f9;">
+                        <div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 800; margin-bottom: 3px; text-transform: uppercase;">Tarih & Salon</div>
+                            <div style="font-size: 14px; font-weight: 900; color: #1e1b4b; margin-bottom: 10px;">${m.date} - ${m.venue}</div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 800; margin-bottom: 3px; text-transform: uppercase;">Kategori / Lig</div>
+                            <div style="font-size: 14px; font-weight: 900; color: #1e1b4b;">${getGroupCode(m)}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: #64748b; font-weight: 800; margin-bottom: 3px; text-transform: uppercase;">Rakip Takım</div>
+                            <div style="font-size: 14px; font-weight: 900; color: #1e1b4b; margin-bottom: 10px;">${selTeam === m.t1 ? m.t2 : m.t1}</div>
+                            <div style="font-size: 11px; color: #64748b; font-weight: 800; margin-bottom: 3px; text-transform: uppercase;">Sonuç ve Setler</div>
+                            <div style="font-size: 16px; font-weight: 900; color: ${isWin ? '#10b981' : '#f43f5e'};">${m.s1} - ${m.s2} <span style="font-size: 12px;">(${isWin?'GALİBİYET':'MAĞLUBİYET'})</span></div>
+                            <div style="font-size: 12px; color: #1e1b4b; font-weight: 800; margin-top: 4px;">${m.sets.replace(/<[^>]*>/g, '')}</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 12px; color: #475569; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 10px; text-transform: uppercase; font-weight: 900;">MAÇIN GENEL ÖZETİ</h3>
+                        <p style="font-size: 13px; color: #334155; margin: 0; line-height: 1.6; font-weight: 600;">${summary}</p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 12px; color: #475569; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 10px; text-transform: uppercase; font-weight: 900;">1. TAKIM GENEL DEĞERLENDİRMESİ (1-5 PUAN)</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #f1f5f9; padding: 12px 20px; border-radius: 10px;">
+                            <div style="font-size: 12px; color: #334155; font-weight: 800; display: flex; align-items: center;">Servis Etkinliği: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:24px; height:24px; border-radius:6px; font-weight:900; margin-left: 8px; font-size: 14px;">${sServe}</span></div>
+                            <div style="font-size: 12px; color: #334155; font-weight: 800; display: flex; align-items: center;">Servis Karşılama: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:24px; height:24px; border-radius:6px; font-weight:900; margin-left: 8px; font-size: 14px;">${sRecv}</span></div>
+                            <div style="font-size: 12px; color: #334155; font-weight: 800; display: flex; align-items: center;">Hücum & Bitiriş: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:24px; height:24px; border-radius:6px; font-weight:900; margin-left: 8px; font-size: 14px;">${sAtk}</span></div>
+                            <div style="font-size: 12px; color: #334155; font-weight: 800; display: flex; align-items: center;">Blok & Defans: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:24px; height:24px; border-radius:6px; font-weight:900; margin-left: 8px; font-size: 14px;">${sDef}</span></div>
+                            <div style="font-size: 12px; color: #334155; font-weight: 800; display: flex; align-items: center;">Takım Ruhu: <span style="display:inline-flex; align-items:center; justify-content:center; background:#e0e7ff; color:#4338ca; width:24px; height:24px; border-radius:6px; font-weight:900; margin-left: 8px; font-size: 14px;">${sSpirit}</span></div>
+                        </div>
+                    </div>
+                    ${playerRowsHtml !== '' ? `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 12px; color: #475569; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 10px; text-transform: uppercase; font-weight: 900;">2. BİREYSEL OYUNCU PERFORMANS TABLOSU</h3>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; border: 1px solid #f1f5f9; border-radius: 8px; overflow: hidden;">
+                            <thead>
+                                <tr style="background: #f8fafc; font-size: 10px; color: #64748b; text-transform: uppercase; border-bottom: 2px solid #e2e8f0;">
+                                    <th style="padding: 10px 6px; text-align: center; width: 40px; font-weight: 900;">NO</th>
+                                    <th style="padding: 10px 6px; font-weight: 900;">OYUNCU ADI</th>
+                                    <th style="padding: 10px 6px; font-weight: 900;">POZİSYON</th>
+                                    <th style="padding: 10px 6px; text-align: center; width: 50px; font-weight: 900;">PUAN</th>
+                                    <th style="padding: 10px 6px; font-weight: 900; width: 30%;">MAÇIN ARTISI</th>
+                                    <th style="padding: 10px 6px; font-weight: 900; width: 30%;">GELİŞİM ODAĞI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${playerRowsHtml}
+                            </tbody>
+                        </table>
+                    </div>` : ''}
+                    <div style="margin-top: 10px;">
+                        <h3 style="font-size: 12px; color: #475569; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 10px; text-transform: uppercase; font-weight: 900;">3. SONUÇ VE EYLEM PLANI</h3>
+                        <div style="background: #fefce8; border: 1px solid #fef08a; padding: 15px 20px; border-radius: 10px; font-size: 13px; line-height: 1.6;">
+                            <div style="margin-bottom: 8px;"><strong style="color: #ca8a04; font-weight: 900;">Teknik Odak:</strong> <span style="color: #713f12; font-weight: 700;">${focusTech}</span></div>
+                            <div><strong style="color: #ca8a04; font-weight: 900;">Taktik/Mental Odak:</strong> <span style="color: #713f12; font-weight: 700;">${focusMental}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const originalScrollY = window.scrollY;
+
+            const blocker = document.createElement('div');
+            blocker.style.position = 'fixed'; blocker.style.inset = '0'; blocker.style.backgroundColor = '#f8fafc'; blocker.style.zIndex = '9999999'; blocker.style.display = 'flex'; blocker.style.flexDirection = 'column'; blocker.style.alignItems = 'center'; blocker.style.justifyContent = 'center';
+            blocker.innerHTML = '<i class="fas fa-cog fa-spin text-indigo-600 text-6xl mb-4"></i><h2 class="text-2xl font-black text-indigo-950 uppercase tracking-tight">Rapor İşleniyor</h2><p class="text-slate-500 font-bold mt-2 text-center px-4">Lütfen bekleyin, A4 Formatlı PDF hazırlanıyor...</p>';
+            document.body.appendChild(blocker);
+
+            const container = document.createElement('div'); 
+            container.innerHTML = htmlContent; 
+            
+            // PDF'in scroll pozisyonundan etkilenip boş veya yarım çıkmaması için:
+            // Ekranın en üstüne, Blocker'ın hemen arkasına koyuyoruz. Görünmez olur ama tam renderlanır.
+            container.style.position = 'absolute'; 
+            container.style.top = '0px'; 
+            container.style.left = '0px';
+            container.style.width = '794px';
+            container.style.zIndex = '9999998'; 
+            document.body.appendChild(container);
+
+            // Sayfayı en üste kaydır ki scroll kaynaklı offset hataları olmasın
+            window.scrollTo(0, 0);
+
+            const ayarlar = {
+                margin:       0,
+                filename:     `${superNormalize(selTeam)}_Rapor.pdf`,
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, scrollX: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const triggerPDF = () => {
+                setTimeout(() => {
+                    html2pdf().set(ayarlar).from(container.firstElementChild).save().then(() => {
+                        if(document.body.contains(container)) document.body.removeChild(container);
+                        if(document.body.contains(blocker)) document.body.removeChild(blocker);
+                        window.scrollTo(0, originalScrollY);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        closeReportModal();
+                    }).catch(err => {
+                        console.error("PDF Error", err);
+                        if(document.body.contains(container)) document.body.removeChild(container);
+                        if(document.body.contains(blocker)) document.body.removeChild(blocker);
+                        window.scrollTo(0, originalScrollY);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+                }, 800);
+            };
+
+            const logoImg = container.querySelector('#pdf-logo-img');
+            if (logoImg && !logoImg.complete) {
+                logoImg.onload = triggerPDF;
+                logoImg.onerror = triggerPDF;
+            } else {
+                triggerPDF();
+            }
+
         } catch(e) {
+            console.error("PDF Prep Error", e);
             btn.innerHTML = originalText; btn.disabled = false;
         }
     }
